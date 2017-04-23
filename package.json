@@ -10,7 +10,16 @@
     "react": "^15.5.3",
     "react-dom": "^15.5.3",
     "react-simpletabs": "^0.7.0",
-    "react-tabs": "^0.8.2"
+    "react-tabs": "^0.8.2",
+    "jquery": "1.9.1",
+    "redux": "lastest",
+    "next-redux-wrapper": "lastest",
+    "semantic-ui-dropdown": "lastest",
+    "redux-thunk": "latest",
+    "react-redux": "latest",
+    "semantic-ui-transition": "latest",
+    "semantic-ui-dimmer": "latest",
+    "imagesloaded": "lateset"
   },
   "devDependencies": {
     "js-cookie": "^2.1.4",
