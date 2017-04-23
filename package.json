@@ -1,0 +1,26 @@
+{
+  "name": "levelup.name",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "faster-react-tabs": "^1.0.4",
+    "isotope-layout": "^3.0.3",
+    "next": "^2.1.0",
+    "react": "^15.5.3",
+    "react-dom": "^15.5.3",
+    "react-simpletabs": "^0.7.0",
+    "react-tabs": "^0.8.2"
+  },
+  "devDependencies": {
+    "js-cookie": "^2.1.4",
+    "next-style-loader": "^0.3.1"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "",
+  "license": "ISC"
+}
