@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "codemirror": "^5.25.2",
     "faster-react-tabs": "^1.0.4",
     "imagesloaded": "4.1.1",
     "isotope-layout": "^3.0.3",
@@ -12,7 +11,6 @@
     "jsonwebtoken": "^7.4.0",
     "next": "^2.1.0",
     "next-redux-wrapper": "1.1.1",
-    "ngprogress": "^1.1.1",
     "nprogress": "^0.2.0",
     "quill": "^1.2.4",
     "react": "^15.5.3",
@@ -25,7 +23,6 @@
     "semantic-ui-dimmer": "latest",
     "semantic-ui-dropdown": "2.2.10",
     "semantic-ui-transition": "latest",
-    "summernote": "^0.8.3"
   },
   "devDependencies": {
     "js-cookie": "^2.1.4",
