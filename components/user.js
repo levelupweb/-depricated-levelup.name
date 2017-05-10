@@ -1,96 +1,116 @@
 import React from 'react';
 import Link from 'next/link'
+import {connect} from 'react-redux'
 
-export default class User extends React.Component {
+export class User extends React.Component {
 
   constructor(props) {
     super(props);
   }
 
   render() {
+    var user = this.props.user.profile;
     return (
       <div className={`${this.props.size} user`}>
-      	<div className="image">
-    			<Avatar size={this.props.size} link={this.props.avatarUrl} />
-    		</div>
-    		<div className="content">
-    			<Link href="/user"><span className="name"><a href="#">Иван К</a></span></Link>
-    			<div className={(this.props.size == 'small') ? `hidden` : `description`}>Программист</div>
-    		</div>
+        {(this.props.user.isLogged) ?
+          <div>
+            <div className="image">
+              <div className="ui inline dropdown">
+                <div className="text"><Avatar size={this.props.size} link={this.props.avatarUrl} /></div>
+                <div className="menu">
+                  <div className="item" data-text="this week">Профиль</div>
+                  <div className="item" data-text="this month">Написать пост</div>
+                  <div className="item" data-text="this month">Настройки</div>
+                  <div className="divider"></div>
+                  <div className="item" data-text="this month">Выход</div>
+                </div>
+              </div>
+            </div>
+            <div className="content">
+              <Link href="/user"><span className="name"><a href="#">{user.slug}</a></span></Link>
+              <div className={(this.props.size == 'small') ? `hidden` : `description`}>Программист</div>
+            </div>
+            </div>
+          :
+            <div><Link href="/auth"><a>Войти</a></Link></div>
+        }
 
-  		<style jsx>{`
-			.user {
-				display:inline-block;
-        margin:6px 0px;
-			}
+    		<style jsx>{`
+  			.user {
+  				display: flex;
+          margin: 6px 0px;
+          align-items: center;
+  			}
 
-      .user .image,
-      .user .content {
-        display:inline-block;
-        vertical-align:middle;
-      }
+        .user .image,
+        .user .content {
+          display:inline-block;
+          vertical-align:middle;
+        }
 
-      .user.small {
-        margin-bottom:6px;
-      }
+        .user.small {
+          margin-bottom:6px;
+        }
 
-      .user.medium {
-        margin-bottom:4px;
-      }
+        .user.medium {
+          margin-bottom:4px;
+        }
 
-      .user.small .image {
-        width:20px;
-        height:20px;
-        margin:0px;
-      }
+        .user.small .image {
+          width:20px;
+          height:20px;
+          margin:0px;
+        }
 
-      .user.medium .image {
-        width:30px;
-        height:30px;
-      }
+        .user.medium .image {
+          width:30px;
+          height:30px;
+        }
 
-      .user .image a {
-        display:inline-block;
-      }
+        .user.dropdown .content {
+          display:none;
+        }
 
-			.user .content {
-				padding-left:15px;
-			}
+        .user .image a {
+          display:inline-block;
+        }
 
-      .user.small .content {
-        padding-left:8px;
-        margin:5px 0px;
-      }
+  			.user .content {
+  				padding-left:15px;
+  			}
 
-			.user .content .name {
-				display:block;
-				font-size:17px;
-				font-weight:bold;
-			}
+        .user.small .content {
+          padding-left:8px;
+          margin:5px 0px;
+        }
 
-      .user.small .content .name {
-        font-size:14px;
-        font-weight:100;
-      }
+  			.user .content .name {
+  				display:block;
+  				font-size:17px;
+  				font-weight:bold;
+  			}
 
-      .user.medium .content .name {
-        font-size:14px;
-      }
+        .user.small .content .name {
+          font-size:14px;
+          font-weight:100;
+        }
 
-			.user .content .description {
-				font-size:13px;
-				color:rgba(0,0,0,0.4);
-				margin-top:5px;
-			}
+        .user.medium .content .name {
+          font-size:14px;
+        }
 
-      .user.medium .content .description {
-        font-size:13px;
-        margin-top:0px;
-      }
+  			.user .content .description {
+  				font-size:13px;
+  				color:rgba(0,0,0,0.4);
+  				margin-top:5px;
+  			}
 
+        .user.medium .content .description {
+          font-size:13px;
+          margin-top:0px;
+        }
 
-
-  		`}</style>
+    		`}</style>
       </div>
     );
   }
@@ -117,3 +137,5 @@ export class Avatar extends React.Component {
     )
   }
 }
+
+export default connect((store) => store)(User)

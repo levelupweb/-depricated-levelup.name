@@ -4,6 +4,7 @@ import Sidebar from '../components/sidebar'
 import Body from '../components/body'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
+import initScripts from '../utils/initscripts'
 
 class UserContainer extends React.Component {
 
@@ -24,10 +25,7 @@ class UserContainer extends React.Component {
   }
 
   componentDidMount() {
-    window.$ = require('jquery');
-    require('../static/css/ui/semantic.min.js');
-    var dropdown = require('semantic-ui-dropdown');
-    $('.ui.dropdown').dropdown();
+    initScripts();
   }
 
 

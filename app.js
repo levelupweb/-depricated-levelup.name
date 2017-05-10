@@ -1,24 +1,22 @@
-const { createServer } = require('http')
-const { parse } = require('url')
+const express = require('express')
 const next = require('next')
-const cookiesMiddleware = require('universal-cookie-express')
-
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
+const cookie = require('react-cookie')
+const { parse } = require('url')
+const cookieParser = require('cookie-parser')
+const app = next({ dev: true, dir: process.cwd() })
 const handle = app.getRequestHandler()
 
-
-app.use(cookiesMiddleware())
-
 app.prepare().then(() => {
-  createServer((req, res) => {
-    // Be sure to pass `true` as the second argument to `url.parse`.
-    // This tells it to parse the query portion of the URL.
-    const parsedUrl = parse(req.url, true)
-    const { pathname, query } = parsedUrl
+  const server = express()
+  server.use(cookieParser())
 
+  server.get('*', (req, res) => {
+    const parsedUrl = parse(req.url, true)
+    const { pathname, query } = parsedUrl 
+    return handle(req, res)
   })
-  .listen(3000, (err) => {
+
+  server.listen(3000, (err) => {
     if (err) throw err
     console.log('> Ready on http://localhost:3000')
   })

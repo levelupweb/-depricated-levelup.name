@@ -1,7 +1,5 @@
 const defaultState = {
-	auth: false,
-	user: null,
-	error: null
+	isLogged: false
 }
 
 export default (state = defaultState, action) => {
@@ -9,18 +7,25 @@ export default (state = defaultState, action) => {
     case 'LOGIN_SUCCESS': 
     	return {
     		...state,
-    		auth: true,
-    		user: action.payload,
-    		error: null	
+    		isLogged: true,
+    		profile: action.payload
     	}
 
     case 'LOGIN_FAILURE': 
     	return {
     		...state,
-    		auth: false,
-    		user: null,
-    		error: action.payload
+    		isLogged: false,
+    		profile: null
     	}
+
+    case 'LOGOUT':
+        return {
+            ...state,
+            isLogged: false,
+            profile: null,
+            lol: '123'
+        }
+
     default: return state
   }
 }

@@ -4,14 +4,15 @@ import UserList from './user-list'
 import TagsList from './tags-list'
 import {connect} from 'react-redux'
 import User from './user'
-import Cookies from 'js-cookie'
-import Router from 'next/router'
+import cookies from 'js-cookie'
+import router from 'next/router'
+import {getLogout} from '../actions/user'
 
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-    	auth: false,
+    	auth: this.props.user.isLogged,
     	subscriptions: {
     		users: [
     			{name: 'Алексей Ашанов', description: 'Программист', updates: 1, id: 0},
@@ -56,15 +57,11 @@ class Sidebar extends React.Component {
   	this.setFooter()
   }
 
-  componentWillMount() {
-  	this.isLogged()
+  async handleLogout() {
+  	await cookies.remove('x-access-token', { path: '' });
+  	await this.props.dispatch({type: 'LOGOUT'});
+  	await router.push('/', '/', {})
   }
-
-  handleLogout() {
-  	Cookies.remove('user', { path: '' });
-  	Router.replace('/', '/', {})
-  }
-
 
   setFooter() {
   	var footer = document.getElementById('footer');
@@ -82,23 +79,15 @@ class Sidebar extends React.Component {
   	$('.sidebar').dimmer('add content', $('.sidebar .menu.vertical')).dimmer('show');
   }
 
-  isLogged() {
-  	if(this.props.user.auth || Cookies.get('user') ) {
-  		this.setState({
-  			auth: true
-  		})
-  	} 
-  }
-
   componentDidUpdate(prevProps, prevState) {
   	this.setFooter()
   }
 
+
   render() {
     return (
       <div className="sidebar">
-
-      	{!this.state.auth ? 
+      	{!this.props.user.isLogged ? 
       		<div>
       			<div className="block profile simple">
       				<Link href="/auth"><a><i className="fa fa-lock"></i> Авторизация</a></Link>
@@ -194,44 +183,37 @@ class Sidebar extends React.Component {
 					position:relative;
 					overflow-y:scroll;
 				}
-
 				.footer {
 					background:#f5f5f5;
 					position:absolute;
 					left:0px;
 				}
-
 		  		.footer .menu {
 					display:flex;
 					flex-wrap:wrap;
 					flex-direction:row;
 		  		}
-
 		  		.footer .switcher .menu {
 					display:none;
 					bottom:100%!important;
 					margin-bottom:10px;
 					top:auto!important;
 		  		}
-
 		  		.footer .menu a {
 		  			display:inline-block;
 					margin-right:10px;
 					margin-bottom:5px;
 					color:#000;
 		  		}
-
 		  		.footer .switcher {
 		  			margin-bottom:5px;
 		  			color:#000;
 		  			display:block;
 		  		}
-
 		  		.profile  {
 		  			position:relative;
 		  			text-align:left;
 		  		}
-
 		  		.profile.simple {
 		  			 height:85px;
 		  			 display:flex;
@@ -239,17 +221,14 @@ class Sidebar extends React.Component {
 		  			 align-items:center;
 		  			 background:#f5f5f5;
 		  		}
-
 		  		.profile.simple a {
 					font-size:15px;
 					font-weight:bold;
 					color:#000;
 		  		}
-
 		  		.profile .menu .profile .content .description {
 		  			color:#c0c0c0!important;
 		  		}
-
 		  		.profile .secondary.menu {
 					text-align:left;
 		  		}
@@ -269,11 +248,9 @@ class Sidebar extends React.Component {
 					background:none!important;
 					height:auto;
 				}
-
 				.button:focus {
 					background:#c0c0c0!important;
 				}
-
 		    `}</style>  
 		</div>
     );

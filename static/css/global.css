@@ -22,6 +22,10 @@ body {
 	transition:0.2s all ease;
 }
 
+.transition {
+	transition:0.2s all ease;
+}
+
 .transparent {
 	background:transparent!important;
 	padding-left:0px!important;
@@ -105,7 +109,15 @@ form .field input:focus {
 	min-height:100%;
 }
 
+.site-editor .after-header >.block {
+	padding:0px;
+}
+
 .auth.block {
+	padding-top:0px;
+}
+
+.panel.block {
 	padding-top:0px;
 }
 
@@ -143,10 +155,6 @@ form .field input:focus {
 
 .header-wrapper .secondary.menu .item {
 	background:#fafafa;
-}
-
-.main .header {
-	margin:10px 0px!important;
 }
 
 .main h1.header {
@@ -515,4 +523,9 @@ margin-top:0px;
 .tabs-menu span {
 	color:rgba(0,0,0,0.3);
 	font-weight:100;
+}
+
+.header-background-img img {
+    width:100%;
+    opacity:0.2;
 }

@@ -4223,15 +4223,17 @@ input::selection {
 
 .ui.basic.primary.buttons .button,
 .ui.basic.primary.button {
-  box-shadow: 0px 0px 0px 1px #2185D0 inset !important;
-  color: #2185D0 !important;
+  box-shadow: 0px 0px 0px 1px #57c1b3 inset !important;
+  color: #57c1b3 !important;
+  border-color: #57c1b3;
 }
 
 .ui.basic.primary.buttons .button:hover,
 .ui.basic.primary.button:hover {
   background: transparent !important;
-  box-shadow: 0px 0px 0px 1px #1678c2 inset !important;
-  color: #1678c2 !important;
+  box-shadow: 0px 0px 0px 1px #48a297 inset !important;
+  color: #48a297 !important;
+  border-color: #57c1b3;
 }
 
 .ui.basic.primary.buttons .button:focus,

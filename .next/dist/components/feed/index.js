@@ -50,9 +50,6 @@ var _listArticle2 = _interopRequireDefault(_listArticle);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = 'E:\\www\\Levelup.name\\components\\feed\\index.js';
-
-
 var Feed = function (_React$Component) {
   (0, _inherits3.default)(Feed, _React$Component);
 
@@ -61,6 +58,7 @@ var Feed = function (_React$Component) {
 
     var _this2 = (0, _possibleConstructorReturn3.default)(this, (Feed.__proto__ || (0, _getPrototypeOf2.default)(Feed)).call(this, props));
 
+    _this2.interval = null;
     _this2.state = {
       perPage: 4,
       page: 0,
@@ -201,11 +199,7 @@ var Feed = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       for (var i = 0; i < this.state.perPage; i++) {
-        this.state.elements.push(_react2.default.createElement(_article2.default, { data: this.state.articles[i], key: i, __source: {
-            fileName: _jsxFileName,
-            lineNumber: 157
-          }
-        }));
+        this.state.elements.push(_react2.default.createElement(_article2.default, { data: this.state.articles[i], key: i }));
       }
     }
   }, {
@@ -242,19 +236,11 @@ var Feed = function (_React$Component) {
       if (loaded < this.state.articles.length) {
         if (this.state.page != pages) {
           for (var i = loaded; i < loaded + this.state.perPage; i++) {
-            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i, __source: {
-                fileName: _jsxFileName,
-                lineNumber: 191
-              }
-            }));
+            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i }));
           }
         } else {
           for (var i = loaded; i < loaded + lost; i++) {
-            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i, __source: {
-                fileName: _jsxFileName,
-                lineNumber: 195
-              }
-            }));
+            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i }));
           }
         }
       } else {
@@ -272,8 +258,7 @@ var Feed = function (_React$Component) {
       var _this3 = this;
 
       var feed = document.querySelector('.feed');
-
-      window.startInterval = setInterval(function () {
+      this.interval = setInterval(function () {
         if (!_this3.state.isFull) {
           _this3.handleScroll(feed, feed.clientHeight);
           _this3.setState({
@@ -297,6 +282,11 @@ var Feed = function (_React$Component) {
       }
     }
   }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      clearInterval(this.interval);
+    }
+  }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {}
   }, {
@@ -305,25 +295,7 @@ var Feed = function (_React$Component) {
 
       var posts = !this.state.masonry.length ? this.state.elements : this.state.masonry;
 
-      return _react2.default.createElement('div', {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 241
-        }
-      }, _react2.default.createElement('div', { className: 'grid', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 242
-        }
-      }, _react2.default.createElement('div', { className: 'grid-sizer', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 243
-        }
-      }), posts), !this.state.isFull ? _react2.default.createElement(_loader2.default, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 247
-        }
-      }) : '');
+      return _react2.default.createElement('div', null, _react2.default.createElement('div', { className: 'grid' }, _react2.default.createElement('div', { className: 'grid-sizer' }), posts), !this.state.isFull ? _react2.default.createElement(_loader2.default, null) : '');
     }
   }]);
 

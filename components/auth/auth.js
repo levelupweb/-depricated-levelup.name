@@ -2,17 +2,15 @@ import React from 'react';
 import {connect} from 'react-redux'
 import {auth} from '../../actions/user'
 import Router from 'next/router'
-import Cookies from 'js-cookie'
+import cookie from 'js-cookie'
+import axios from 'axios'
+import config from '../../app.config.js'
 
 class Auth extends React.Component {
-  static propTypes = {
-    name: React.PropTypes.string,
-  };
-
-  interval = null
 
   constructor(props) {
     super(props);
+    this.interval = null;
     this.state = {
       formID: 'loginForm',
       formElement: null,
@@ -37,10 +35,29 @@ class Auth extends React.Component {
 
   handleAuth() {
     const user = this.formToObject();
-    this.props.dispatch(auth(user));
-    if(!this.hasError()) {
-      this.handleSuccess()
-    }
+    axios({
+      url: config.API + 'user/auth',
+      method: 'POST',
+      data: {
+        slug: user.userLogin, 
+        userPassword: user.userPassword
+      }
+    })
+    .then((result) => {
+      var response = result.data;
+      console.log(response)
+      if(response.success) {
+        this.handleSuccess(response);
+      } else {
+        this.handleError(response);
+      }
+    })
+  }
+
+  handleError(response) {
+    this.setState({
+      error: response
+    })
   }
 
   startTimer() {
@@ -70,9 +87,12 @@ class Auth extends React.Component {
     return user
   }
 
-  handleSuccess() {
+  handleSuccess(response) {
     $('.form .dimmer').dimmer('show')
-    Cookies.set('user', this.props.user.userLogin);
+    cookie.set('x-access-token', response.user.token, { expires: 7, path: '' });
+    console.log(this.props);
+    console.log(response.user)
+    this.props.dispatch({type: 'LOGIN_SUCCESS', payload: response.user});
     this.startTimer()
   }
 
@@ -101,7 +121,7 @@ class Auth extends React.Component {
   render() { 
     let error = (this.hasError()) ? this.getError() : null;
     return (
-      	<form className="ui form" id="loginForm">
+        <form className="ui form" id="loginForm">
 
           {this.hasError() ? 
             <div className="ui negative message">
@@ -112,17 +132,17 @@ class Auth extends React.Component {
           </div>
           : null }
 
-      	  <h2 className="ui header">
-      	  	 Вход <small>авторизация</small>
-      	  </h2>
-    		  <div className="field">
-    		    <input type="text" name="userLogin" placeholder="E-mail или логин" />
-    		  </div>
-    		  <div className="field">
-    		    <input type="password" name="userPassword" placeholder="Пароль" />
-    		  </div>
-    		  <a className="ui button circular loginButton primary">Войти</a>
-    		  <span className="registerButton"><a href="#">Регистрация</a></span>
+          <h2 className="ui header">
+             Вход <small>авторизация</small>
+          </h2>
+          <div className="field">
+            <input type="text" name="userLogin" placeholder="E-mail или логин" />
+          </div>
+          <div className="field">
+            <input type="password" name="userPassword" placeholder="Пароль" />
+          </div>
+          <a className="ui button circular loginButton primary">Войти</a>
+          <span className="registerButton"><a href="#">Регистрация</a></span>
 
           <div className="ui dimmer">
             <div className="content">
@@ -145,7 +165,7 @@ class Auth extends React.Component {
             }
           `}</style>
 
-    		</form>
+        </form>
     );
   }
 }

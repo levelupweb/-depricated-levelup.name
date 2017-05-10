@@ -67,57 +67,57 @@ var Header = function (_React$Component) {
 
 						return _react2.default.createElement('div', { className: 'header-wrapper', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 21
+										lineNumber: 22
 								}
 						}, this.props.header.search ? _react2.default.createElement('div', { className: 'ui secondary menu block search', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 24
+										lineNumber: 25
 								}
 						}, _react2.default.createElement('div', { className: 'menu left', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 25
+										lineNumber: 26
 								}
 						}, _react2.default.createElement('div', { className: 'search-inner', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 26
+										lineNumber: 27
 								}
 						}, _react2.default.createElement(_searchbar2.default, {
 								__source: {
 										fileName: _jsxFileName,
-										lineNumber: 27
+										lineNumber: 28
 								}
 						}), _react2.default.createElement('a', { className: 'ui item', onClick: function onClick() {
 										_this2.getSearch(true);
 								}, __source: {
 										fileName: _jsxFileName,
-										lineNumber: 28
+										lineNumber: 29
 								}
 						}, _react2.default.createElement('i', { className: 'fa fa-times', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 29
+										lineNumber: 30
 								}
 						}))))) : _react2.default.createElement('div', { className: 'ui secondary menu block', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 37
+										lineNumber: 38
 								}
 						}, _react2.default.createElement(_menu2.default, {
 								__source: {
 										fileName: _jsxFileName,
-										lineNumber: 38
+										lineNumber: 39
 								}
 						}), _react2.default.createElement('div', { className: 'right menu', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 40
+										lineNumber: 41
 								}
 						}, _react2.default.createElement('a', { className: 'ui item', onClick: function onClick() {
 										_this2.getSearch(true);
 								}, __source: {
 										fileName: _jsxFileName,
-										lineNumber: 41
+										lineNumber: 42
 								}
 						}, _react2.default.createElement('i', { className: 'fa fa-search', __source: {
 										fileName: _jsxFileName,
-										lineNumber: 42
+										lineNumber: 43
 								}
 						})))));
 				}

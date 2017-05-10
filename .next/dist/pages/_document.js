@@ -46,9 +46,6 @@ var _jquery2 = _interopRequireDefault(_jquery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = 'E:\\www\\Levelup.name\\pages\\_document.js?entry';
-
-
 var MyDocument = function (_Document) {
   (0, _inherits3.default)(MyDocument, _Document);
 
@@ -61,56 +58,7 @@ var MyDocument = function (_Document) {
   (0, _createClass3.default)(MyDocument, [{
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('html', {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 17
-        }
-      }, _react2.default.createElement(_document.Head, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 18
-        }
-      }, _react2.default.createElement('link', { href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&subset=cyrillic', rel: 'stylesheet', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 19
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'static/css/fa/css/font-awesome.min.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 20
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'static/css/ui/semantic.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 23
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'static/css/ui/components/dropdown.min.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 24
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'static/css/global.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 27
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'static/css/normalize.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 28
-        }
-      })), _react2.default.createElement('body', {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 30
-        }
-      }, this.props.customValue, _react2.default.createElement(_document.Main, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 32
-        }
-      }), _react2.default.createElement(_document.NextScript, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 33
-        }
-      })));
+      return _react2.default.createElement('html', null, _react2.default.createElement(_document.Head, null, _react2.default.createElement('link', { href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&subset=cyrillic', rel: 'stylesheet' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/fa/css/font-awesome.min.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/semantic.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/components/dropdown.min.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/global.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/normalize.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/loader.css' }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/libs/summernote.css' })), _react2.default.createElement('body', null, this.props.customValue, _react2.default.createElement(_document.Main, null), _react2.default.createElement(_document.NextScript, null)));
     }
   }], [{
     key: 'getInitialProps',

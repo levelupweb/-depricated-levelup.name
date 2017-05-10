@@ -1,107 +1,256 @@
 import React from 'react';
 import { Avatar } from '../user.js'
+import config from '../../app.config'
+import 'isomorphic-fetch'
+
 
 export default class Editor extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      post: {
+        id: '893nf821fnk',
+        postThumbnail: null,
+        postTitle: '',
+        postTags: '',
+      }
+    }
   }
 
   componentDidMount() {
-  	this.bindListeners();
+    // Подготовка разметки
+    var Quill = require('quill')
+    var options = {
+      debug: 'info',
+      modules: {
+        toolbar: '#toolbar'
+      },
+      placeholder: 'Compose an epic...'
+    };
+    var editor = new Quill('#editor', options);
   	this.settingTextareaHeight();
+    this.postTitle.focus();
   }
 
-  bindListeners() {
-  	var _this = this;
-  	var thumbnail = document.querySelector('.thumbnail');
-  	var form = document.getElementById('thumbnailUploader')
-  	thumbnail.addEventListener('click', () => {
-  		form.click();
-  	})
-
-  	var input = document.getElementById('postTitle');
-  	input.focus()
-  	input.addEventListener('keyup', () => {
-  		_this.handleType(input.value)
-  	})
+  handleThumbnail() {
+    if(!this.state.post.postThumbnail) { 
+      this.uploader.click();
+    } else {
+      this.handleDeleteThumbnail()
+    }
   }
-
 
   settingTextareaHeight() {
-  	var header = document.querySelector('.editor > .header');
-  	var thumbnail = document.querySelector('.editor > .thumbnail');
   	var clientHeight = document.body.clientHeight;
-  	var headerHeight = header.clientHeight + thumbnail.clientHeight;
-  	var form = document.querySelector('.content textarea');
-  	form.style.height = clientHeight - headerHeight - 62 + 'px';
+  	var headerHeight = this.headerwrapper.clientHeight;
+  	this.textarea.style.height = clientHeight - headerHeight - 112 + 'px';
   }
 
-  handleType(val) {
-  	var postLink = document.getElementById('postLink');
-  	var link = val.replace(/\s/g, '-').toLowerCase()
-  	postLink.innerHTML = link;
+  handleTyping(e) {
+    var value = e.target.value
+  	var link = value.replace(/\s/g, '-').toLowerCase()
+  	this.link.innerHTML = link;
+    this.setState({
+      ...this.state,
+      post: { 
+        ...this.state.post,
+        postTitle: value 
+      }
+    })
   }
 
+  handleSave() {
+    
+  }
 
+  parseForm() {
+    //this.editor.querySelector('input')
+  }
+
+  async handleUpload(e, id) {
+    var image = e.target.files[0];
+    var formData = new FormData();
+    var url = config.API + 'post/upload';
+    await formData.append('postThumbnail', image);
+    await formData.append('postId', id)
+    if (image) {
+       await fetch(url, {
+        method:'POST',
+        body: formData
+      }).then(async (res) => {
+        var result = await res.json()
+        await this.setThumbnail(result.filename);
+      })
+    }
+  }
+
+  setThumbnail(filename) {
+    var url = config.storage + 'posts/' + this.state.post.id + '/' + filename;
+    this.setState({
+      post: { postThumbnail: url }
+    })
+  }
+
+  componentDidUpdate() {
+    //this.handleStatus('Черновик сохранён')
+  }
+
+  handleStatus(status) {
+    this.status.innerHTML = status;
+    setTimeout(() => {
+      this.status.innerHTML = '';
+    }, 3000)
+  }
+
+  getBackground() {
+    if(this.state.post.postThumbnail) {
+      return (<img src={this.state.post.postThumbnail} className="header-background-img" />)
+    }
+  }
+
+  handleDeleteThumbnail() {
+    this.setState({
+      post: {
+        postThumbnail: null
+      }
+    })
+  }
+
+  handleFirstSave() {
+    if(this.state.post.postTitle != '' && this.state.post.postThumbnail != null) {
+      this.handleStatus('Черновик сохранён')
+    }
+  }
 
   render() {
     return (
-      <div className="editor">
-      	<div className="header block">
-	      	<div className="title">
-	      		<Avatar size="small" />
-	      		<h3 className="ui header">
-	      			<input id="postTitle" type="text" placeholder="Ваш заголовок" />
-	      			<span className="sub header">http://levelup.name/<span id="postLink">ссылка</span></span>
-	      		</h3>
-	      	</div>
-	      	<div className="action">
-	      		<button className="large fluid circular ui button primary">
-				  Написать пост
-				</button>
-	      	</div>
-      	</div>
-      	<div className="thumbnail">
-      		<input type="file" id="thumbnailUploader" />
-      		Загрузить изображение
-      	</div>
-      	<div className="content block">
-			<textarea placeholder="Ваш текст здесь.."></textarea>
-			<div className="panel">
-			<div className="ui vertical menu">
-			  <div className="ui left pointing dropdown link item">
-			    <i className="fa fa-header"></i>
-			    <div className="menu">
-			      <div className="item">Заголовок 1</div>
-			      <div className="item">Заголовок 2</div>
-			      <div className="item">Заголовок 3</div>
-			      <div className="item">Заголовок 4</div>
-			    </div>
-			  </div>
-				<a className="item"><i className="fa fa-bold"></i></a>
-				<a className="item"><i className="fa fa-italic"></i></a>
-				<a className="item"><i className="fa fa-underline"></i></a>
-				<a className="item"><i className="fa fa-list"></i></a>
-				<a className="item"><i className="fa fa-list-ol"></i></a>
-				<a className="item"><i className="fa fa-chain"></i></a>
-				<a className="item"><i className="fa fa-save"></i></a>
-			</div>
-			</div>
-      	</div>
+      <div className="editor" ref={(editor) => {this.editor = editor}}>
+      	<div className="header-wrapper" ref={(headerwrapper) => {this.headerwrapper = headerwrapper}}>
+          <div className="header" ref={(header) => {this.header = header}}>
+            <div className="header-background"><img src={this.state.post.postThumbnail} className="header-background-img" /></div>
+            <div className="header-content block">
+    	      	<div className="title">
+    	      		<Avatar size="small" />
+    	      		<h3 className="ui header">
+    	      			<input defaultValue={this.state.post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
+    	      			<span className="sub header">http://levelup.name/<span ref={(link) => {this.link = link}}>ссылка</span></span>
+    	      		</h3>
+    	      	</div>
+    	      	<div className="action">
+                <span className="status" ref={(status) => {this.status = status}}></span>
+                <button className="ui primary basic button circular large" onClick={() => {this.handleSave()}}>
+                  Опубликовать
+                </button>
+    	      	</div>
+            </div>
+            <div className="thumbnail" onClick={() => {this.handleThumbnail()}} ref={(thumbnail) => {this.thumbnail = thumbnail}}>
+              <input onChange={(e) => {this.handleUpload(e, this.state.post.id)}} ref={(uploader) => {this.uploader = uploader}} type="file" name="postThumbnail" />
+              <span>{(this.state.post.postThumbnail == null) ? <span>Загрузить изображение</span> : <span onClick={() => {this.handleDeleteThumbnail()}}>Удалить изображение</span>}</span>
+            </div>
+        	</div>
+        </div>
+        <div className="content">
+          <div className="block block-shadow floating">
+            <div className="tags">
+              <input defaultValue={this.state.post.postTags} name="postTags" type="text" placeholder="Вводите теги через запятую" />
+            </div>
+          </div>
+        	<div className="block">
+            <div id="toolbar">
+              <select className="ql-size">
+                <option value="small"></option>
+                <option defaultValue></option>
+                <option value="large"></option>
+                <option value="huge"></option>
+              </select>
+              <button className="ql-bold"></button>
+              <button className="ql-script" value="sub"></button>
+              <button className="ql-script" value="super"></button>
+            </div>
+      			<textarea id="editor" onFocus={() => {this.handleFirstSave()}} placeholder="Ваш текст здесь.." ref={(textarea) => {this.textarea = textarea}}></textarea>
+      			<div className="panel">
+        			<div className="ui vertical menu">
+        			  <div className="ui left pointing dropdown link item">
+        			    <i className="fa fa-header"></i>
+        			    <div className="menu">
+        			      <div className="item">Заголовок 1</div>
+        			      <div className="item">Заголовок 2</div>
+        			      <div className="item">Заголовок 3</div>
+        			      <div className="item">Заголовок 4</div>
+        			    </div>
+        			  </div>
+        				<a className="item"><i className="fa fa-bold"></i></a>
+        				<a className="item"><i className="fa fa-italic"></i></a>
+        				<a className="item"><i className="fa fa-underline"></i></a>
+        				<a className="item"><i className="fa fa-list"></i></a>
+        				<a className="item"><i className="fa fa-list-ol"></i></a>
+        				<a className="item"><i className="fa fa-chain"></i></a>
+        				<a className="item"><i className="fa fa-save"></i></a>
+        			</div>
+      			</div>
+        	</div>
+        </div>
 
       	<style jsx>{`
       		.editor .header .title > * {
-				vertical-align:middle;
-      		}
+    				vertical-align:middle;
+          }
 
-			.editor > .header,
-			.editor > .header .title {
-				display:flex;
-				flex-direction:row;
-				justify-content:space-between;
-				align-items:center;
-			}
+    			.editor .header-wrapper .header-content,
+    			.editor .header-wrapper .header-content .title {
+    				display:flex;
+    				flex-direction:row;
+    				justify-content:space-between;
+    				align-items:center;
+    			}
+
+
+          .editor .header-wrapper > .header {
+            position:relative;
+            overflow:hidden;
+            height:181px;
+            
+          }
+
+          .editor .header-content {
+            position:relative;
+            left:0px;
+            top:0px;
+            z-index:10;
+            background: rgba(255,255,255,0.6);
+          }
+
+          .editor .header-content .action button {
+            opacity:.9;
+          }
+
+          .editor .header-content .action .status {
+            margin-right:20px;
+            color:#c0c0c0;
+          }
+
+
+          .header-background-img {
+            width:100%;
+            opacity:0.2;
+          }
+
+          .editor .header-background {
+            position:absolute;
+            left:0px;
+            top:0px;
+            width:100%;
+            overflow:hidden;
+          }
+
+          .editor .floating {
+            position:absolute;
+            left:0px;
+            top:100%;
+            width:100%;
+            background:#fff;
+          }
 
       		.editor .header .title > .header {
       			padding-left:15px;
@@ -112,46 +261,53 @@ export default class Editor extends React.Component {
       			margin-top:3px!important;
       		}
 
-			.editor .header .title > .header input {
-				border:0px;
-				background:none;
-				outline:0px;
-			}
-      		.editor .action {
-      		}
+    			.editor .header .title > .header input {
+    				border:0px;
+    				background:none;
+    				outline:0px;
+            width:100%;
+    			}
 
       		.editor .thumbnail {
+            position:absolute;
+            left:0px;
+            bottom:0px;
       			height:100px;
       			width:100%;
+            z-index:10;
       			display:flex;
       			justify-content:center;
       			align-items:center;
-      			background:#fafafa;
+      			background:rgba(0,0,0,0.05);
       			cursor:pointer;
       			transition:0.2s all ease;
       		}
 
+          .editor .thumbnail > span {
+            border-bottom:1px solid rgba(0,0,0,0.1);
+            padding-bottom:4px;
+          }
+
       		.editor .thumbnail:hover {
-      			background:#eee;
+      			background:rgba(0,0,0,0.1);
       		}
 
-      		#thumbnailUploader {
+      		.editor .thumbnail input[type="file"] {
       			display:none;
       			opacity:0;
       			visibility:hidden;
       		}
 
-			.editor .content {
-				position:relative;
-			}
+    			.editor .content {
+    				position:relative;
+    			}
 
       		.editor .content input {
       			width:100%;
       			background:none;
       			border:0px;
-      			border-bottom:1px solid rgba(0,0,0,0.2);
-      			padding:10px 0px;
-      			font-size:20px;
+      			padding:5px 0px;
+      			font-size:15px;
       		}
 
       		.editor .content input:focus,
@@ -161,6 +317,7 @@ export default class Editor extends React.Component {
 
       		.editor .content textarea {
       			width:100%;
+            padding-right:200px;
       			background:none;
       			border:0px;
       			font-size:16px;
@@ -169,21 +326,24 @@ export default class Editor extends React.Component {
 
       		.editor .content .panel {
       			position:absolute;
-      			left:100%;
-      			top:0px;
+      			right:20px;
+      			top:20px;
       			background:#fafafa;
       		}
 
 
       		.editor .content .panel .item {
-				font-size:17px;
+				    font-size:17px;
       		}
 
       		.editor .panel .vertical.menu {
       			width:4em;
-      			border-left: 0px;
-    			border-radius: 0px 3px 3px 0px;
+      			border: 0px;
       		}
+
+          .editor .title .ui.header {
+            margin:0px
+          }
 
       	`}</style>
       </div>

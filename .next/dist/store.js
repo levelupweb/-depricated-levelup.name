@@ -19,10 +19,14 @@ var _actions = require('./actions');
 
 var actions = _interopRequireWildcard(_actions);
 
+var _reduxPromise = require('redux-promise');
+
+var _reduxPromise2 = _interopRequireDefault(_reduxPromise);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initStore = exports.initStore = function initStore(initialState) {
-  return (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.applyMiddleware)(_reduxThunk2.default));
+  return (0, _redux.createStore)(_reducers2.default, initialState, (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default)));
 };

@@ -22,24 +22,23 @@ class Body extends React.Component {
   	    title = null,
   	    children = this.props.children;
 
-  	if (data.showTitle) {
+  	if (data.pageShowTitle) {
       title = (
         <h1 className="ui header">
-		  {data.title}
-		  <div className="sub header">{data.description}</div>
-		</h1>
+    		  {data.pageTitle}
+    		  <div className="sub header">{data.pageDescription}</div>
+    		</h1>
       )
     }
     return (
-      <div className={`${this.props.classnames} main`}>
+      <div className={(data.pageShowSidebar) ? `${data.pageClassnames} main` : `${data.pageClassnames} full main`}>
       	<div className="inner">
-
-      		{data.displayHeader ? <Header/ > : ``}
+      		{data.pageShowHeader ? <Header/ > : ``}
       			<div className="after-header">
-      				<div className="">
+      				<div>
       	      	{data.beforeChildren}
       	      </div>
-      				<div className={`${data.classnames}`}>
+      				<div className="block">
       					{title}
       					{children}
       	      </div>

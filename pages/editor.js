@@ -3,42 +3,35 @@ import Editor from '../components/editor/'
 import Body from '../components/body'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
+import initScripts from '../utils/initscripts'
+import createPage from '../utils/createPage.js'
+import page from '../components/HOC/page'
 
-class WriteContainer extends React.Component {
+class Page extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      page: {
-        classnames: 'user',
-        title: 'Добавление поста',
-        description: 'Страница добавления поста',
-        showTitle: false,
-        children: <Editor />,
-        beforeChildren: null,
-        afterChildren: null,
-        displayHeader: false
-      }
-    }
+  }
+
+  componentWillMount() {
+    var page = createPage(this.props.page, <Editor />, null, null);
+    this.state = { page: page }
   }
 
   componentDidMount() {
-    window.$ = require('jquery');
-    require('../static/css/ui/semantic.min.js');
-    var dropdown = require('semantic-ui-dropdown');
-    $('.ui.dropdown').dropdown();
+    initScripts()
   }
-
 
   render() {
   	var page = this.state.page;
     return (
       <div>
-        <Body page={page} classnames={`full`}>{page.children}</Body>
+        <Body page={page}>{page.child}</Body>
       </div>
-    );
+    )
   }
 }
 
-
-export default withRedux(initStore, state => state)(WriteContainer)
+const query = {}
+const Container = page(Page, 'editor', query)
+export default withRedux(initStore, (state) => state)(Container)

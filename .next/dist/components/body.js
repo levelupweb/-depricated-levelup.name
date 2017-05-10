@@ -52,9 +52,6 @@ var _flashpost2 = _interopRequireDefault(_flashpost);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = 'E:\\www\\Levelup.name\\components\\body.js';
-
-
 var Body = function (_React$Component) {
   (0, _inherits3.default)(Body, _React$Component);
 
@@ -78,43 +75,10 @@ var Body = function (_React$Component) {
           title = null,
           children = this.props.children;
 
-      if (data.showTitle) {
-        title = _react2.default.createElement('h1', { className: 'ui header', __source: {
-            fileName: _jsxFileName,
-            lineNumber: 27
-          }
-        }, data.title, _react2.default.createElement('div', { className: 'sub header', __source: {
-            fileName: _jsxFileName,
-            lineNumber: 29
-          }
-        }, data.description));
+      if (data.pageShowTitle) {
+        title = _react2.default.createElement('h1', { className: 'ui header' }, data.pageTitle, _react2.default.createElement('div', { className: 'sub header' }, data.pageDescription));
       }
-      return _react2.default.createElement('div', { className: this.props.classnames + ' main', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 34
-        }
-      }, _react2.default.createElement('div', { className: 'inner', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 35
-        }
-      }, data.displayHeader ? _react2.default.createElement(_header2.default, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 37
-        }
-      }) : '', _react2.default.createElement('div', { className: 'after-header', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 38
-        }
-      }, _react2.default.createElement('div', { className: '', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 39
-        }
-      }, data.beforeChildren), _react2.default.createElement('div', { className: '' + data.classnames, __source: {
-          fileName: _jsxFileName,
-          lineNumber: 42
-        }
-      }, title, children), data.afterChildren)));
+      return _react2.default.createElement('div', { className: data.pageShowSidebar ? data.pageClassnames + ' main' : data.pageClassnames + ' full main' }, _react2.default.createElement('div', { className: 'inner' }, data.pageShowHeader ? _react2.default.createElement(_header2.default, null) : '', _react2.default.createElement('div', { className: 'after-header' }, _react2.default.createElement('div', null, data.beforeChildren), _react2.default.createElement('div', { className: 'block' }, title, children), data.afterChildren)));
     }
   }]);
 

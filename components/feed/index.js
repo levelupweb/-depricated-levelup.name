@@ -10,6 +10,7 @@ export default class Feed extends React.Component {
 
   constructor(props) {
     super(props);
+    this.interval = null;
     this.state = {
     	perPage: 4,
     	page: 0,
@@ -147,6 +148,7 @@ export default class Feed extends React.Component {
     }
   }
 
+
   componentWillUnmount() {
     this.createGrid();
     $('.grid').css({height:0})
@@ -207,8 +209,7 @@ export default class Feed extends React.Component {
 
   createEventListeners() {
   	var feed = document.querySelector('.feed');
-
-    window.startInterval = setInterval(() => {
+    this.interval = setInterval(() => {
     	if (!this.state.isFull) { 
       		this.handleScroll(feed, feed.clientHeight);
           this.setState({
@@ -227,6 +228,10 @@ export default class Feed extends React.Component {
     if ($(".loader.active").offset().top < $(window).scrollTop() + $(window).outerHeight()) {
     	this.pushItems()
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   componentDidUpdate(prevProps, prevState) {

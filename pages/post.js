@@ -7,6 +7,9 @@ import Header from '../components/header'
 import Post from '../components/post/'
 import Body from '../components/body'
 import PostAfter from '../components/post/postafter' 
+import Router from 'next/router'
+import initScripts from '../utils/initscripts'
+
 
 class PostContainer extends React.Component {
 
@@ -33,10 +36,7 @@ class PostContainer extends React.Component {
   }
 
   componentDidMount() {
-    window.$ = require('jquery');
-    require('../static/css/ui/semantic.min.js');
-    var dropdown = require('semantic-ui-dropdown');
-    $('.ui.dropdown').dropdown();
+    initScripts()
   }
 
 
