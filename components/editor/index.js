@@ -7,6 +7,11 @@ import axios from 'axios'
 import randomString from '../../utils/randomString.js'
 import router from 'next/router'
 
+// 1. Сделать дату добавления
+// 2. Упростить Handle Save + сделать обработчик ошибок
+// 3. Решить проблему с postDescription
+// 4. Решить проблему с загрузкой изображений в редакторе
+
 export default class EditorWrapper extends React.Component {
 
   constructor(props) {
@@ -46,13 +51,7 @@ export default class EditorWrapper extends React.Component {
   }
 
   createStorage() {
-    var _this = this;
-    return new Promise((resolve,reject) => {
-      _this.updateState('storage', randomString(10)).then((res) => {
-        //_this.handleSave()
-      })
-      resolve()
-    })
+    this.updateState('storage', randomString(10))
   }
 
   hasPost() {
@@ -64,7 +63,7 @@ export default class EditorWrapper extends React.Component {
   }
 
   handleThumbnail() {
-    if(!this.state.post.postThumbnail) { 
+    if(!this.state.post.postImage) { 
       this.uploader.click();
     } else {
       this.handleDeleteThumbnail()
@@ -74,7 +73,7 @@ export default class EditorWrapper extends React.Component {
   settingTextareaHeight() {
   	var clientHeight = document.body.clientHeight;
   	var headerHeight = this.headerwrapper.clientHeight;
-  	document.querySelector('.quill').style.height = clientHeight - headerHeight - 112 + 'px';
+  	document.querySelector('.quill').style.height = clientHeight - headerHeight + 'px';
   }
 
   handleTyping(e) {
@@ -146,7 +145,7 @@ export default class EditorWrapper extends React.Component {
   setThumbnail(filename) {
     var url = config.storage + 'posts/' + this.state.post.storage + '/' + filename;
     this.updateState('postImage', url)
-    this.handleFirstSave()
+    this.handleSave()
   }
 
   handleStatus(status) {
@@ -156,20 +155,8 @@ export default class EditorWrapper extends React.Component {
     }, 3000)
   }
 
-  getBackground() {
-    if(this.state.post.postImage) {
-      return (<img src={this.state.post.postImage} className="header-background-img" />)
-    }
-  }
-
   handleDeleteThumbnail() {
     this.updateState('postImage', null)
-  }
-
-  handleFirstSave() {
-    if(this.state.post.postTitle != '' && this.state.post.postImage != null) {
-      this.handleSave();
-    }
   }
 
   handleEditorChange() {
@@ -233,7 +220,7 @@ export default class EditorWrapper extends React.Component {
             </div>
             <div className="thumbnail" onClick={() => {this.handleThumbnail()}} ref={(thumbnail) => {this.thumbnail = thumbnail}}>
               <input onChange={(e) => {this.handleUpload(e)}} ref={(uploader) => {this.uploader = uploader}} type="file" name="postThumbnail" />
-              <span>{(post.postThumbnail == null) ? <span>Загрузить изображение</span> : <span onClick={() => {this.handleDeleteThumbnail()}}>Удалить изображение</span>}</span>
+              <span>{(post.postImage == null) ? <span>Загрузить изображение</span> : <span onClick={() => {this.handleDeleteThumbnail()}}>Удалить изображение</span>}</span>
             </div>
           </div>
           <div className="tags block">
@@ -319,9 +306,13 @@ export default class EditorWrapper extends React.Component {
     				border:0px;
     				background:none;
     				outline:0px;
-            width:200px;
+            width:100%;
             display:inline-block;
     			}
+
+          .editor .header .title .sub.header input {
+            width:200px;
+          }
 
       		.editor .thumbnail {
             position:absolute;

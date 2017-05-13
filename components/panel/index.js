@@ -1,14 +1,16 @@
 import React from 'react';
+import {connect} from 'react-redux'
 import { Pages } from './pages'
 import { Users } from './users'
 import { Posts } from './posts'
 
-export default class Panel extends React.Component {
+class Panel extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
+    
     return (
       <div className="panel-wrapper">
       	<div className="ui grid">
@@ -33,3 +35,5 @@ export default class Panel extends React.Component {
     );
   }
 }
+
+export default connect((store) => store)(Panel)

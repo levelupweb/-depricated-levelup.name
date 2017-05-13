@@ -2,6 +2,9 @@ import React from 'react';
 import Link from 'next/link'
 import {connect} from 'react-redux'
 
+// 1. Разделить вид для владельца и для третьих лиц
+// 2. Пофиксить баг с отображением small-темплейта
+
 export class User extends React.Component {
 
   constructor(props) {

@@ -2,11 +2,12 @@ import React from 'react';
 import Link from 'next/link'
 import UserList from './user-list'
 import TagsList from './tags-list'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import User from './user'
 import cookies from 'js-cookie'
 import router from 'next/router'
-import {getLogout} from '../actions/user'
+import { getLogout } from '../actions/user'
+import { UI } from '../utils/initscripts.js'
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -63,6 +64,7 @@ class Sidebar extends React.Component {
   	await router.push('/', '/', {})
   }
 
+  // Упростить
   setFooter() {
   	var footer = document.getElementById('footer');
   	var footerHeight = footer.scrollHeight;
@@ -74,12 +76,13 @@ class Sidebar extends React.Component {
   }
 
   userBarSwitch() {
-  	var transition = require('semantic-ui-transition');
-  	var dimmer = require('semantic-ui-dimmer');
-  	$('.sidebar').dimmer('add content', $('.sidebar .menu.vertical')).dimmer('show');
+  	UI();
+  	$('.sidebar')
+  	.dimmer('add content', $('.sidebar .menu.vertical'))
+  	.dimmer('show');
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
   	this.setFooter()
   }
 
@@ -157,26 +160,26 @@ class Sidebar extends React.Component {
 	      	</div>
       	}
 
-      	<div className="block footer" id="footer">
-      		<div className="block-content">
-      			<div className="ui dropdown switcher">
-				  
-				  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
-				  <div className="menu">
-				    <div className="item">Levelupmusic</div>
-				    <div className="item">Levelupworlds</div>
-				    <div className="item">Levelupplace</div>
-				  </div>
-				</div>
-      			<div className="menu">
-      				<a href="#">помощь</a>
-      				<a href="#">карьера</a>
-      				<a href="#">блог</a>
-      				<a href="#">публичность</a>
-      				<a href="#">о проекте</a>
-      			</div>
-      		</div>
-      	</div>
+	      	<div className="block footer" id="footer">
+	      		<div className="block-content">
+	      			<div className="ui dropdown switcher">
+					  
+					  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
+					  <div className="menu">
+					    <div className="item">Levelupmusic</div>
+					    <div className="item">Levelupworlds</div>
+					    <div className="item">Levelupplace</div>
+					  </div>
+					</div>
+	      			<div className="menu">
+	      				<a href="#">помощь</a>
+	      				<a href="#">карьера</a>
+	      				<a href="#">блог</a>
+	      				<a href="#">публичность</a>
+	      				<a href="#">о проекте</a>
+	      			</div>
+	      		</div>
+	      	</div>
 		  <style jsx>{`
 	
 				.sidebar {

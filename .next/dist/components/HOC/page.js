@@ -106,7 +106,7 @@ var prepareData = function () {
                     switch (_context2.prev = _context2.next) {
                       case 0:
                         slug = item.single ? query.slug : '';
-                        url = _appConfig2.default.API + item.type + '/entries/' + slug;
+                        url = _appConfig2.default.API + item.type + '/entries/' + encodeURI(slug);
                         _context2.next = 4;
                         return (0, _isomorphicFetch2.default)(url).then(function () {
                           var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(res) {

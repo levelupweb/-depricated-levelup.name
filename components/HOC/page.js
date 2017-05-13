@@ -38,7 +38,7 @@ async function prepareData(builder, query) {
 
   await Promise.all(queries.map(async (item) => {
     var slug = (item.single) ? query.slug : ``;
-    var url = config.API + item.type + `/entries/` + slug;
+    var url = config.API + item.type + `/entries/` + encodeURI(slug);
     await fetch(url).then(async (res) => {
       data[item.type] = await res.json();
     })
@@ -95,7 +95,7 @@ export default function page(Component, slug, builder) {
   render() {
     return (
       <div>
-      {this.state.isLoading ? (
+        {this.state.isLoading ? (
           <Loader />
         ) : (
           <Component {...this.props} />

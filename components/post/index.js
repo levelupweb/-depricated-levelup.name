@@ -29,7 +29,7 @@ export default class Post extends React.Component {
   }
 
   componentDidMount() {
-    const postContainer = document.getElementsByClassName('post')[0];
+    const postContainer = document.querySelector('.site-post');
     const postHeight = postContainer.scrollHeight;
 
     window.onscroll = () => {
@@ -65,7 +65,7 @@ export default class Post extends React.Component {
             Подписаться
           </a>
         </div>
-        <div className="block">
+        <div>
           <div className="bar">
             <div className="user">
               <a href="#"><img className="rounded image ui" src="../static/img/avatar.png" />

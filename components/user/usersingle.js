@@ -33,7 +33,7 @@ class UserSingle extends React.Component {
     return (
       <div>
       	<UserBar />
-      	<div className="block profile-feed feed">
+      	<div className="profile-feed feed">
     			<div id="tabs-container">
     			    <ul className="tabs-menu">
   			        <li className="current"><a href="#publications">Публикации <span>3</span></a></li>

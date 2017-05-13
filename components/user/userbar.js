@@ -10,18 +10,15 @@ export default class UserBar extends React.Component {
 
   render() {
     return (
-      <div className="userbar block">
+      <div className="userbar">
       	<User />
       	<Statistic />
 
-
       	<style jsx>{`
       		.userbar {
-      			background:#fafafa;
       			display:flex;
       			justify-content:space-between;
       			align-items:center;
-      			padding-top:20px;
       			padding-bottom:20px;
       		}
       	`}</style>
