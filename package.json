@@ -15,6 +15,7 @@
     "quill": "^1.2.4",
     "react": "^15.5.3",
     "react-dom": "^15.5.3",
+    "react-quill": "^1.0.0-rc.2",
     "react-redux": "latest",
     "react-simpletabs": "^0.7.0",
     "react-tabs": "^0.8.2",
@@ -22,7 +23,7 @@
     "redux-thunk": "latest",
     "semantic-ui-dimmer": "latest",
     "semantic-ui-dropdown": "2.2.10",
-    "semantic-ui-transition": "latest",
+    "semantic-ui-transition": "latest"
   },
   "devDependencies": {
     "js-cookie": "^2.1.4",

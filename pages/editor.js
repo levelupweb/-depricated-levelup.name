@@ -1,5 +1,5 @@
 import React from 'react';
-import Editor from '../components/editor/'
+import EditorWrapper from '../components/editor/index'
 import Body from '../components/body'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
@@ -14,7 +14,7 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.page, <Editor />, null, null);
+    var page = createPage(this.props.page, <EditorWrapper data={this.props.data} />, null, null);
     this.state = { page: page }
   }
 
@@ -32,6 +32,12 @@ class Page extends React.Component {
   }
 }
 
-const query = {}
+const query = {
+  editor: {
+    type: 'post',
+    single: true
+  }
+}
+
 const Container = page(Page, 'editor', query)
 export default withRedux(initStore, (state) => state)(Container)

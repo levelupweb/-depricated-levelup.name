@@ -21,7 +21,9 @@ export default class MyDocument extends Document {
           <link rel="stylesheet" href="http://localhost:3000/static/css/global.css" />
           <link rel="stylesheet" href="http://localhost:3000/static/css/normalize.css" />
           <link rel="stylesheet" href="http://localhost:3000/static/css/loader.css" />
-          <link rel="stylesheet" href="http://localhost:3000/static/libs/summernote.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/libs/quill/quill.snow.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/libs/quill/quill.bubble.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/libs/quill/quill.core.css" />
        </Head>
        <body>
          {this.props.customValue}

@@ -529,3 +529,47 @@ margin-top:0px;
     width:100%;
     opacity:0.2;
 }
+
+/* EDITOR CUSTOM QUILL STYLES */
+
+.ql-toolbar.ql-snow {
+	position: absolute;
+    right: 20px;
+    padding:0px!important;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index:999;
+}
+
+.ql-toolbar.ql-snow .ql-formats {
+	display:flex;
+	flex-direction:column;
+	border-bottom:1px solid rgba(0,0,0,0.2);
+}
+
+.ql-toolbar.ql-snow button {
+	position:relative;
+	padding:8px!important;
+	width:auto!important;
+	height:auto!important;
+}
+
+.ql-toolbar.ql-snow button svg {
+    width: 18px!important;
+}
+
+.ql-toolbar.ql-snow button .label {
+	top:auto!important;
+	bottom: -5px!important;
+	background:transparent!important;
+}
+
+.ql-editor {
+	padding:0px!important;
+	-ms-overflow-style: none; 
+	overflow: -moz-scrollbars-none;
+	padding-right:100px!important;
+}
+
+.ql-editor::-webkit-scrollbar { width: 0 !important }

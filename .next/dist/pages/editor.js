@@ -28,9 +28,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _editor = require('../components/editor/');
+var _index = require('../components/editor/index');
 
-var _editor2 = _interopRequireDefault(_editor);
+var _index2 = _interopRequireDefault(_index);
 
 var _body = require('../components/body');
 
@@ -68,7 +68,7 @@ var Page = function (_React$Component) {
   (0, _createClass3.default)(Page, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
-      var page = (0, _createPage2.default)(this.props.page, _react2.default.createElement(_editor2.default, null), null, null);
+      var page = (0, _createPage2.default)(this.props.page, _react2.default.createElement(_index2.default, { data: this.props.data }), null, null);
       this.state = { page: page };
     }
   }, {
@@ -87,7 +87,13 @@ var Page = function (_React$Component) {
   return Page;
 }(_react2.default.Component);
 
-var query = {};
+var query = {
+  editor: {
+    type: 'post',
+    single: true
+  }
+};
+
 var Container = (0, _page2.default)(Page, 'editor', query);
 exports.default = (0, _nextReduxWrapper2.default)(_store.initStore, function (state) {
   return state;

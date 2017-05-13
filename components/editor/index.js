@@ -2,35 +2,65 @@ import React from 'react';
 import { Avatar } from '../user.js'
 import config from '../../app.config'
 import 'isomorphic-fetch'
+import Editor from './editor.js'
+import axios from 'axios'
+import randomString from '../../utils/randomString.js'
+import router from 'next/router'
 
-
-export default class Editor extends React.Component {
+export default class EditorWrapper extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       post: {
-        id: '893nf821fnk',
-        postThumbnail: null,
+        storage: null,
+        slug: '',
+        postImage: null,
+        postDescription: '',
         postTitle: '',
         postTags: '',
+        postContent: '',
+        postLikes: 0,
+        postFavorites: [],
+        postAuthor: null
       }
-    }
+    } 
+  }
+
+  componentWillMount() {
+    this.getPost()
   }
 
   componentDidMount() {
     // Подготовка разметки
-    var Quill = require('quill')
-    var options = {
-      debug: 'info',
-      modules: {
-        toolbar: '#toolbar'
-      },
-      placeholder: 'Compose an epic...'
-    };
-    var editor = new Quill('#editor', options);
-  	this.settingTextareaHeight();
+    this.settingTextareaHeight();
     this.postTitle.focus();
+
+    if(!this.state.post.storage) {
+      this.createStorage();
+    }
+  }
+
+  getPost() {
+    this.updateState(this.props.data.post)
+  }
+
+  createStorage() {
+    var _this = this;
+    return new Promise((resolve,reject) => {
+      _this.updateState('storage', randomString(10)).then((res) => {
+        //_this.handleSave()
+      })
+      resolve()
+    })
+  }
+
+  hasPost() {
+    if (this.props.data.post) {
+      return true
+    } else {
+      return false
+    }
   }
 
   handleThumbnail() {
@@ -44,39 +74,67 @@ export default class Editor extends React.Component {
   settingTextareaHeight() {
   	var clientHeight = document.body.clientHeight;
   	var headerHeight = this.headerwrapper.clientHeight;
-  	this.textarea.style.height = clientHeight - headerHeight - 112 + 'px';
+  	document.querySelector('.quill').style.height = clientHeight - headerHeight - 112 + 'px';
   }
 
   handleTyping(e) {
     var value = e.target.value
   	var link = value.replace(/\s/g, '-').toLowerCase()
-  	this.link.innerHTML = link;
-    this.setState({
-      ...this.state,
-      post: { 
-        ...this.state.post,
-        postTitle: value 
-      }
+  	this.link.value = link;
+    this.updateState('postTitle', value).then(() => {
+      this.updateState('slug', link)
     })
   }
 
   handleSave() {
-    
+    var body = this.state.post;
+    var _this = this;
+    if(this.state.post._id) {
+      var url = config.API + 'post/entries/' + this.state.post._id + '/update';
+    } else {
+      var url = config.API + 'post/add';
+    }
+
+    axios.post(url, body)
+    .then(function (response) {
+      if(response.data) {
+        _this.handleStatus('Сохранено!')
+        _this.handleRedirect()
+        _this.getPostFromServer()
+      } else {
+        console.log(response.data)
+      }
+    })
+
+    .catch(function (error) {
+      // Handle Error
+    });
   }
 
-  parseForm() {
-    //this.editor.querySelector('input')
+  getPostFromServer() {
+    axios.get(config.API + 'post/entries/' + this.state.post.slug).then((res) => {
+      this.updateState(res.data);
+    })
   }
 
-  async handleUpload(e, id) {
+  handleRedirect() {
+    return new Promise((resolve, reject) => {
+      const href = '/editor?slug=' + this.state.post.slug
+      const as = href
+      router.replace(href, as, { shallow: true })
+      resolve()
+    })
+  }
+
+  async handleUpload(e) {
     var image = e.target.files[0];
     var formData = new FormData();
     var url = config.API + 'post/upload';
     await formData.append('postThumbnail', image);
-    await formData.append('postId', id)
+    await formData.append('storage', this.state.post.storage)
     if (image) {
        await fetch(url, {
-        method:'POST',
+        method: 'POST',
         body: formData
       }).then(async (res) => {
         var result = await res.json()
@@ -86,14 +144,9 @@ export default class Editor extends React.Component {
   }
 
   setThumbnail(filename) {
-    var url = config.storage + 'posts/' + this.state.post.id + '/' + filename;
-    this.setState({
-      post: { postThumbnail: url }
-    })
-  }
-
-  componentDidUpdate() {
-    //this.handleStatus('Черновик сохранён')
+    var url = config.storage + 'posts/' + this.state.post.storage + '/' + filename;
+    this.updateState('postImage', url)
+    this.handleFirstSave()
   }
 
   handleStatus(status) {
@@ -104,91 +157,92 @@ export default class Editor extends React.Component {
   }
 
   getBackground() {
-    if(this.state.post.postThumbnail) {
-      return (<img src={this.state.post.postThumbnail} className="header-background-img" />)
+    if(this.state.post.postImage) {
+      return (<img src={this.state.post.postImage} className="header-background-img" />)
     }
   }
 
   handleDeleteThumbnail() {
-    this.setState({
-      post: {
-        postThumbnail: null
-      }
-    })
+    this.updateState('postImage', null)
   }
 
   handleFirstSave() {
-    if(this.state.post.postTitle != '' && this.state.post.postThumbnail != null) {
-      this.handleStatus('Черновик сохранён')
+    if(this.state.post.postTitle != '' && this.state.post.postImage != null) {
+      this.handleSave();
     }
   }
 
+  handleEditorChange() {
+    return () => {
+      var area = document.querySelector('.ql-editor');
+      this.updateState('postContent', area.innerHTML)
+    }
+  }
+
+  handleTagsChange(e) {
+    this.updateState('postTags', e.target.value)
+  }
+
+  updateState(key, value) {
+    return new Promise((resolve, reject) => {
+      if(typeof key === 'object') {
+        this.setState({
+          ...this.state,
+          post: { 
+            ...this.state.post,
+            ...key
+          }
+        })
+      } else {
+        console.log(key, value)
+        this.setState({
+          ...this.state,
+          post: { 
+            ...this.state.post,
+            [key]: value
+          }
+        })
+      }
+      resolve(true)
+    })
+  }
+
+
   render() {
+    //console.log(this.state.post)
+    var post = this.state.post;
     return (
       <div className="editor" ref={(editor) => {this.editor = editor}}>
       	<div className="header-wrapper" ref={(headerwrapper) => {this.headerwrapper = headerwrapper}}>
           <div className="header" ref={(header) => {this.header = header}}>
-            <div className="header-background"><img src={this.state.post.postThumbnail} className="header-background-img" /></div>
+            <div className="header-background"><img src={post.postImage} className="header-background-img" /></div>
             <div className="header-content block">
     	      	<div className="title">
     	      		<Avatar size="small" />
     	      		<h3 className="ui header">
-    	      			<input defaultValue={this.state.post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
-    	      			<span className="sub header">http://levelup.name/<span ref={(link) => {this.link = link}}>ссылка</span></span>
+    	      			<input defaultValue={post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
+    	      			<span className="sub header">http://levelup.name/<input onChange={(e) => {this.handleTyping(e)}} type="text" defaultValue={post.slug} ref={(link) => {this.link = link}} /></span>
     	      		</h3>
     	      	</div>
     	      	<div className="action">
                 <span className="status" ref={(status) => {this.status = status}}></span>
                 <button className="ui primary basic button circular large" onClick={() => {this.handleSave()}}>
-                  Опубликовать
+                  {(!this.state.post._id) ? `Опубликовать` : `Сохранить`}
                 </button>
     	      	</div>
             </div>
             <div className="thumbnail" onClick={() => {this.handleThumbnail()}} ref={(thumbnail) => {this.thumbnail = thumbnail}}>
-              <input onChange={(e) => {this.handleUpload(e, this.state.post.id)}} ref={(uploader) => {this.uploader = uploader}} type="file" name="postThumbnail" />
-              <span>{(this.state.post.postThumbnail == null) ? <span>Загрузить изображение</span> : <span onClick={() => {this.handleDeleteThumbnail()}}>Удалить изображение</span>}</span>
-            </div>
-        	</div>
-        </div>
-        <div className="content">
-          <div className="block block-shadow floating">
-            <div className="tags">
-              <input defaultValue={this.state.post.postTags} name="postTags" type="text" placeholder="Вводите теги через запятую" />
+              <input onChange={(e) => {this.handleUpload(e)}} ref={(uploader) => {this.uploader = uploader}} type="file" name="postThumbnail" />
+              <span>{(post.postThumbnail == null) ? <span>Загрузить изображение</span> : <span onClick={() => {this.handleDeleteThumbnail()}}>Удалить изображение</span>}</span>
             </div>
           </div>
+          <div className="tags block">
+            <input onChange={(e) => {this.handleTagsChange(e)}} defaultValue={post.postTags} name="postTags" type="text" placeholder="Вводите теги через запятую" />
+          </div>
+        </div>
+        <div className="content">
         	<div className="block">
-            <div id="toolbar">
-              <select className="ql-size">
-                <option value="small"></option>
-                <option defaultValue></option>
-                <option value="large"></option>
-                <option value="huge"></option>
-              </select>
-              <button className="ql-bold"></button>
-              <button className="ql-script" value="sub"></button>
-              <button className="ql-script" value="super"></button>
-            </div>
-      			<textarea id="editor" onFocus={() => {this.handleFirstSave()}} placeholder="Ваш текст здесь.." ref={(textarea) => {this.textarea = textarea}}></textarea>
-      			<div className="panel">
-        			<div className="ui vertical menu">
-        			  <div className="ui left pointing dropdown link item">
-        			    <i className="fa fa-header"></i>
-        			    <div className="menu">
-        			      <div className="item">Заголовок 1</div>
-        			      <div className="item">Заголовок 2</div>
-        			      <div className="item">Заголовок 3</div>
-        			      <div className="item">Заголовок 4</div>
-        			    </div>
-        			  </div>
-        				<a className="item"><i className="fa fa-bold"></i></a>
-        				<a className="item"><i className="fa fa-italic"></i></a>
-        				<a className="item"><i className="fa fa-underline"></i></a>
-        				<a className="item"><i className="fa fa-list"></i></a>
-        				<a className="item"><i className="fa fa-list-ol"></i></a>
-        				<a className="item"><i className="fa fa-chain"></i></a>
-        				<a className="item"><i className="fa fa-save"></i></a>
-        			</div>
-      			</div>
+            <Editor value={post.postContent} onChange={this.handleEditorChange()} />
         	</div>
         </div>
 
@@ -265,7 +319,8 @@ export default class Editor extends React.Component {
     				border:0px;
     				background:none;
     				outline:0px;
-            width:100%;
+            width:200px;
+            display:inline-block;
     			}
 
       		.editor .thumbnail {
@@ -278,7 +333,8 @@ export default class Editor extends React.Component {
       			display:flex;
       			justify-content:center;
       			align-items:center;
-      			background:rgba(0,0,0,0.05);
+      			background:rgba(0,0,0,0.7);
+            color:#c0c0c0;
       			cursor:pointer;
       			transition:0.2s all ease;
       		}
@@ -289,7 +345,7 @@ export default class Editor extends React.Component {
           }
 
       		.editor .thumbnail:hover {
-      			background:rgba(0,0,0,0.1);
+      			background:rgba(0,0,0,0.8);
       		}
 
       		.editor .thumbnail input[type="file"] {
@@ -302,26 +358,30 @@ export default class Editor extends React.Component {
     				position:relative;
     			}
 
-      		.editor .content input {
+          .editor .tags {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+          }
+
+      		.editor .tags input {
       			width:100%;
       			background:none;
       			border:0px;
-      			padding:5px 0px;
-      			font-size:15px;
+      			font-size:17px;
       		}
 
-      		.editor .content input:focus,
+      		.editor .tags input:focus,
       		.editor .content textarea:focus {
       			outline:0px;
       		}
 
-      		.editor .content textarea {
+      		.editor .content .quill {
       			width:100%;
             padding-right:200px;
       			background:none;
       			border:0px;
       			font-size:16px;
       			min-height:50vh;
+            border:0px;
       		}
 
       		.editor .content .panel {

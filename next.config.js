@@ -7,8 +7,7 @@ module.exports = {
                 '$': 'jquery',
                 'jQuery': 'jquery',
                 'masonry': 'masonry-layout',
-                'isotope': 'isotope-laylout',
-                'require.specified': 'require.resolve'
+                'isotope': 'isotope-laylout'
             })
         )
 
