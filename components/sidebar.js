@@ -128,7 +128,7 @@ class Sidebar extends React.Component {
 					</div>
 		      	</div>
 
-		      	<div className="block">
+		      	<div className="block add">
 		      		<Link href="/editor" prefetch><button className="large fluid circular ui button primary">
 					  Написать пост
 					</button></Link>
@@ -159,7 +159,6 @@ class Sidebar extends React.Component {
 		      	</div>
 	      	</div>
       	}
-
 	      	<div className="block footer" id="footer">
 	      		<div className="block-content">
 	      			<div className="ui dropdown switcher">
@@ -181,7 +180,9 @@ class Sidebar extends React.Component {
 	      		</div>
 	      	</div>
 		  <style jsx>{`
-	
+				.block.add {
+					padding-top:0px;
+				}
 				.sidebar {
 					position:relative;
 					overflow-y:scroll;

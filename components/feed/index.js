@@ -4,7 +4,8 @@ import Link from 'next/link'
 import Router from 'next/router'
 import Article from './article'
 import ListArticle from './listArticle'
-
+import axios from 'axios'
+import config from '../../app.config.js'
 
 export default class Feed extends React.Component {
 
@@ -16,138 +17,11 @@ export default class Feed extends React.Component {
     	page: 0,
     	isFull: false,
     	scrolled: 0,
-    	elements: [],
+    	entries: [],
     	masonry: [],
-      templates: {article: Article, listarticle: ListArticle},
-    	articles: [{
-    		title: 'Как мы делали ML Boot Camp III',
-    		description: `19 марта закончился третий чемпионат по машинному обучению на платформе ML Boot Camp. 614 человек прислали решения и поборолись за главный приз ー MacBook Air.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/0ec/0e9/24f/0ec0e924f02b4743ae92dc48289d4983.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 100
-    	},
-    	{
-    		title: 'Натив или гибрид? Специалисты Яндекса отвечают на главный вопрос мобильной разработки',
-    		description: `Осталось буквально четыре дня до момента, когда мы закончим принимать заявки на участие во второй «Мобилизации» Яндекса.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/3ec/aca/8e0/3ecaca8e03314c638b679c2cd68b3115.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 50
-    	},
-    	{
-    		title: 'Опыт внедрения Tarantool в сервисе Calltouch',
-    		description: `В современном мире информационных технологий у всех — и у крупных, и у небольших компаний — существует большое количество различных API.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/656/391/54f/65639154fc194c6589bf230e85c46cc1.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 50
-    	},
-    	{
-    		title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-    		description: `Это история одного из самых запомнившихся случаев в моей инженерной практике. По понятным причинам я поменял имена, места и некоторые узнаваемые детали, чтобы нельзя было точно определить заказчика и других участников истории. `,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 100
-    	},
-    	{
-    		title: 'Как мы делали ML Boot Camp III',
-    		description: `19 марта закончился третий чемпионат по машинному обучению на платформе ML Boot Camp. 614 человек прислали решения и поборолись за главный приз ー MacBook Air.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/0ec/0e9/24f/0ec0e924f02b4743ae92dc48289d4983.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 100
-    	},
-    	{
-    		title: 'Натив или гибрид? Специалисты Яндекса отвечают на главный вопрос мобильной разработки',
-    		description: `Осталось буквально четыре дня до момента, когда мы закончим принимать заявки на участие во второй «Мобилизации» Яндекса.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/3ec/aca/8e0/3ecaca8e03314c638b679c2cd68b3115.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 50
-    	},
-    	{
-    		title: 'Опыт внедрения Tarantool в сервисе Calltouch',
-    		description: `В современном мире информационных технологий у всех — и у крупных, и у небольших компаний — существует большое количество различных API.`,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/files/656/391/54f/65639154fc194c6589bf230e85c46cc1.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 50
-    	},
-    	{
-    		title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-    		description: `Это история одного из самых запомнившихся случаев в моей инженерной практике. По понятным причинам я поменял имена, места и некоторые узнаваемые детали, чтобы нельзя было точно определить заказчика и других участников истории. `,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 100
-    	},
-    	{
-    		title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-    		description: `Это история одного из самых запомнившихся случаев в моей инженерной практике. По понятным причинам я поменял имена, места и некоторые узнаваемые детали, чтобы нельзя было точно определить заказчика и других участников истории. `,
-    		meta: {
-    			likes: 20,
-    			comments: 13
-    		},
-    		image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-    		author: {
-    			name: 'Иван К.',
-    			description: 'Программист'
-    		},
-    		size: 100
-    	}]
+      templates: {article: Article, listarticle: ListArticle}
     }
   }
-
 
   componentWillUnmount() {
     this.createGrid();
@@ -155,9 +29,25 @@ export default class Feed extends React.Component {
   }
 
   componentWillMount() {
-  	for(var i = 0; i < this.state.perPage; i++) {
-  		this.state.elements.push(<Article data={this.state.articles[i]} key={i} />)
-  	}
+    if(this.props.data) { 
+      this.props.data.post.map((item, i) => {
+        this.state.entries.push(<Article data={item} key={i} />)
+      })
+    }
+  }
+
+  componentDidMount() {
+    if(!this.props.data) {
+      this.state.entries.push(<div>Hello</div>)
+    }
+    //this.pushItems()
+    this.createGrid()
+    //this.createEventListeners();
+    this.setState({
+      isFull: true
+    })
+
+
   }
 
   createGrid() {
@@ -169,16 +59,11 @@ export default class Feed extends React.Component {
 	  		itemSelector: '.grid-item',
 			  percentPosition: true,
 			  masonry: {
-			    columnWidth: '.grid-sizer'
+			    columnWidth: '.grid-sizer',
+          gutterWidth: 10
 			  }
 	  	});	
 	 });
-  }
-
-  componentDidMount() {
-  	this.pushItems()
-  	this.createGrid()
-  	this.createEventListeners();
   }
 
   pushItems() {
@@ -194,8 +79,8 @@ export default class Feed extends React.Component {
 		  	}
   		} else {
   			for(var i = loaded; i < loaded + lost; i++) {
-  		  		this.state.masonry.push(<SpecifiedArticle data={this.state.articles[i]} key={i} />);
-  		  	}
+		  		this.state.masonry.push(<SpecifiedArticle data={this.state.articles[i]} key={i} />);
+		  	}
   		}
   	} else {
   		this.setState({
@@ -234,24 +119,17 @@ export default class Feed extends React.Component {
     clearInterval(this.interval);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    
-  }
 
   render() {
-
-  	var posts = (!this.state.masonry.length) ? this.state.elements : this.state.masonry
-
+  	//var posts = (!this.state.masonry.length) ? this.state.elements : this.state.masonry
+    var posts = this.state.entries
     return (
     <div>
     	<div className="grid">
     		<div className="grid-sizer"></div>
 			 {posts}
 		  </div>
-
-    {(!this.state.isFull) ? <Loader /> : ``}
-
-		
+      {(!this.state.isFull) ? <Loader /> : ``}
 	 </div>
     );
   }

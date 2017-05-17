@@ -28,3 +28,8 @@ export function getLogout() {
 		dispatch({type: 'LOGOUT'})
 	}
 }
+
+export async function getUserById(id) {
+	return await axios.get(config.API + 'user/entries/id/' + id)
+	
+}

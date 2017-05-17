@@ -7,7 +7,6 @@ import FlashPost from '../components/flashpost'
 import Feed from '../components/feed/'
 import Router from 'next/router'
 import NProgress from 'nprogress'
-import 'isomorphic-fetch';
 import { auth } from '../actions/user.js';
 import initScripts from '../utils/initscripts'
 import config from '../app.config.js'
@@ -20,13 +19,13 @@ Router.onRouteChangeStart = (url) => {
 Router.onRouteChangeComplete = () => NProgress.done()
 Router.onRouteChangeError = () => NProgress.done()
 
-class IndexPage extends React.Component {
+class Page extends React.Component {
   constructor(props) {
     super(props);
   }
 
   componentWillMount() {
-    var page = createPage(this.props.page, <Feed template="article" />, <FlashPost />, null);
+    var page = createPage(this.props.page, <Feed template="article" data={this.props.data} />, <FlashPost />, null);
     this.state = { page: page }
   }
 
@@ -45,5 +44,12 @@ class IndexPage extends React.Component {
   }
 }
 
-const Index = page(IndexPage, 'index');
-export default withRedux(initStore, (state) => state)(Index)
+const query = {
+  page: {
+    type: 'post',
+    single: false
+  }
+}
+
+const Container = page(Page, 'index', query);
+export default withRedux(initStore, (state) => state)(Container)

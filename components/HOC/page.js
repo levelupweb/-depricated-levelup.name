@@ -42,8 +42,8 @@ async function prepareData(builder, query) {
     await fetch(url).then(async (res) => {
       data[item.type] = await res.json();
     })
-  }));
 
+  }));
   return data;
 }
  

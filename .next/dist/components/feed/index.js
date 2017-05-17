@@ -48,6 +48,14 @@ var _listArticle = require('./listArticle');
 
 var _listArticle2 = _interopRequireDefault(_listArticle);
 
+var _axios = require('axios');
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _appConfig = require('../../app.config.js');
+
+var _appConfig2 = _interopRequireDefault(_appConfig);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Feed = function (_React$Component) {
@@ -64,127 +72,9 @@ var Feed = function (_React$Component) {
       page: 0,
       isFull: false,
       scrolled: 0,
-      elements: [],
+      entries: [],
       masonry: [],
-      templates: { article: _article2.default, listarticle: _listArticle2.default },
-      articles: [{
-        title: 'Как мы делали ML Boot Camp III',
-        description: '19 \u043C\u0430\u0440\u0442\u0430 \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u043B\u0441\u044F \u0442\u0440\u0435\u0442\u0438\u0439 \u0447\u0435\u043C\u043F\u0438\u043E\u043D\u0430\u0442 \u043F\u043E \u043C\u0430\u0448\u0438\u043D\u043D\u043E\u043C\u0443 \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044E \u043D\u0430 \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0435 ML Boot Camp. 614 \u0447\u0435\u043B\u043E\u0432\u0435\u043A \u043F\u0440\u0438\u0441\u043B\u0430\u043B\u0438 \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u0438 \u043F\u043E\u0431\u043E\u0440\u043E\u043B\u0438\u0441\u044C \u0437\u0430 \u0433\u043B\u0430\u0432\u043D\u044B\u0439 \u043F\u0440\u0438\u0437 \u30FC MacBook Air.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/0ec/0e9/24f/0ec0e924f02b4743ae92dc48289d4983.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 100
-      }, {
-        title: 'Натив или гибрид? Специалисты Яндекса отвечают на главный вопрос мобильной разработки',
-        description: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0431\u0443\u043A\u0432\u0430\u043B\u044C\u043D\u043E \u0447\u0435\u0442\u044B\u0440\u0435 \u0434\u043D\u044F \u0434\u043E \u043C\u043E\u043C\u0435\u043D\u0442\u0430, \u043A\u043E\u0433\u0434\u0430 \u043C\u044B \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u043C \u043F\u0440\u0438\u043D\u0438\u043C\u0430\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0438 \u043D\u0430 \u0443\u0447\u0430\u0441\u0442\u0438\u0435 \u0432\u043E \u0432\u0442\u043E\u0440\u043E\u0439 \xAB\u041C\u043E\u0431\u0438\u043B\u0438\u0437\u0430\u0446\u0438\u0438\xBB \u042F\u043D\u0434\u0435\u043A\u0441\u0430.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/3ec/aca/8e0/3ecaca8e03314c638b679c2cd68b3115.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 50
-      }, {
-        title: 'Опыт внедрения Tarantool в сервисе Calltouch',
-        description: '\u0412 \u0441\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u043C \u043C\u0438\u0440\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u0443 \u0432\u0441\u0435\u0445 \u2014 \u0438 \u0443 \u043A\u0440\u0443\u043F\u043D\u044B\u0445, \u0438 \u0443 \u043D\u0435\u0431\u043E\u043B\u044C\u0448\u0438\u0445 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0439 \u2014 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442 \u0431\u043E\u043B\u044C\u0448\u043E\u0435 \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0437\u043B\u0438\u0447\u043D\u044B\u0445 API.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/656/391/54f/65639154fc194c6589bf230e85c46cc1.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 50
-      }, {
-        title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-        description: '\u042D\u0442\u043E \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0434\u043D\u043E\u0433\u043E \u0438\u0437 \u0441\u0430\u043C\u044B\u0445 \u0437\u0430\u043F\u043E\u043C\u043D\u0438\u0432\u0448\u0438\u0445\u0441\u044F \u0441\u043B\u0443\u0447\u0430\u0435\u0432 \u0432 \u043C\u043E\u0435\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440\u043D\u043E\u0439 \u043F\u0440\u0430\u043A\u0442\u0438\u043A\u0435. \u041F\u043E \u043F\u043E\u043D\u044F\u0442\u043D\u044B\u043C \u043F\u0440\u0438\u0447\u0438\u043D\u0430\u043C \u044F \u043F\u043E\u043C\u0435\u043D\u044F\u043B \u0438\u043C\u0435\u043D\u0430, \u043C\u0435\u0441\u0442\u0430 \u0438 \u043D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u0443\u0437\u043D\u0430\u0432\u0430\u0435\u043C\u044B\u0435 \u0434\u0435\u0442\u0430\u043B\u0438, \u0447\u0442\u043E\u0431\u044B \u043D\u0435\u043B\u044C\u0437\u044F \u0431\u044B\u043B\u043E \u0442\u043E\u0447\u043D\u043E \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0437\u0430\u043A\u0430\u0437\u0447\u0438\u043A\u0430 \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438. ',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 100
-      }, {
-        title: 'Как мы делали ML Boot Camp III',
-        description: '19 \u043C\u0430\u0440\u0442\u0430 \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u043B\u0441\u044F \u0442\u0440\u0435\u0442\u0438\u0439 \u0447\u0435\u043C\u043F\u0438\u043E\u043D\u0430\u0442 \u043F\u043E \u043C\u0430\u0448\u0438\u043D\u043D\u043E\u043C\u0443 \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044E \u043D\u0430 \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0435 ML Boot Camp. 614 \u0447\u0435\u043B\u043E\u0432\u0435\u043A \u043F\u0440\u0438\u0441\u043B\u0430\u043B\u0438 \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u0438 \u043F\u043E\u0431\u043E\u0440\u043E\u043B\u0438\u0441\u044C \u0437\u0430 \u0433\u043B\u0430\u0432\u043D\u044B\u0439 \u043F\u0440\u0438\u0437 \u30FC MacBook Air.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/0ec/0e9/24f/0ec0e924f02b4743ae92dc48289d4983.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 100
-      }, {
-        title: 'Натив или гибрид? Специалисты Яндекса отвечают на главный вопрос мобильной разработки',
-        description: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0431\u0443\u043A\u0432\u0430\u043B\u044C\u043D\u043E \u0447\u0435\u0442\u044B\u0440\u0435 \u0434\u043D\u044F \u0434\u043E \u043C\u043E\u043C\u0435\u043D\u0442\u0430, \u043A\u043E\u0433\u0434\u0430 \u043C\u044B \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u043C \u043F\u0440\u0438\u043D\u0438\u043C\u0430\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0438 \u043D\u0430 \u0443\u0447\u0430\u0441\u0442\u0438\u0435 \u0432\u043E \u0432\u0442\u043E\u0440\u043E\u0439 \xAB\u041C\u043E\u0431\u0438\u043B\u0438\u0437\u0430\u0446\u0438\u0438\xBB \u042F\u043D\u0434\u0435\u043A\u0441\u0430.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/3ec/aca/8e0/3ecaca8e03314c638b679c2cd68b3115.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 50
-      }, {
-        title: 'Опыт внедрения Tarantool в сервисе Calltouch',
-        description: '\u0412 \u0441\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u043C \u043C\u0438\u0440\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u043E\u043D\u043D\u044B\u0445 \u0442\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0439 \u0443 \u0432\u0441\u0435\u0445 \u2014 \u0438 \u0443 \u043A\u0440\u0443\u043F\u043D\u044B\u0445, \u0438 \u0443 \u043D\u0435\u0431\u043E\u043B\u044C\u0448\u0438\u0445 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0439 \u2014 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442 \u0431\u043E\u043B\u044C\u0448\u043E\u0435 \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0437\u043B\u0438\u0447\u043D\u044B\u0445 API.',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/files/656/391/54f/65639154fc194c6589bf230e85c46cc1.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 50
-      }, {
-        title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-        description: '\u042D\u0442\u043E \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0434\u043D\u043E\u0433\u043E \u0438\u0437 \u0441\u0430\u043C\u044B\u0445 \u0437\u0430\u043F\u043E\u043C\u043D\u0438\u0432\u0448\u0438\u0445\u0441\u044F \u0441\u043B\u0443\u0447\u0430\u0435\u0432 \u0432 \u043C\u043E\u0435\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440\u043D\u043E\u0439 \u043F\u0440\u0430\u043A\u0442\u0438\u043A\u0435. \u041F\u043E \u043F\u043E\u043D\u044F\u0442\u043D\u044B\u043C \u043F\u0440\u0438\u0447\u0438\u043D\u0430\u043C \u044F \u043F\u043E\u043C\u0435\u043D\u044F\u043B \u0438\u043C\u0435\u043D\u0430, \u043C\u0435\u0441\u0442\u0430 \u0438 \u043D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u0443\u0437\u043D\u0430\u0432\u0430\u0435\u043C\u044B\u0435 \u0434\u0435\u0442\u0430\u043B\u0438, \u0447\u0442\u043E\u0431\u044B \u043D\u0435\u043B\u044C\u0437\u044F \u0431\u044B\u043B\u043E \u0442\u043E\u0447\u043D\u043E \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0437\u0430\u043A\u0430\u0437\u0447\u0438\u043A\u0430 \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438. ',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 100
-      }, {
-        title: 'Как я возил робота, чуть не поседел и залил кровью серверную',
-        description: '\u042D\u0442\u043E \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0434\u043D\u043E\u0433\u043E \u0438\u0437 \u0441\u0430\u043C\u044B\u0445 \u0437\u0430\u043F\u043E\u043C\u043D\u0438\u0432\u0448\u0438\u0445\u0441\u044F \u0441\u043B\u0443\u0447\u0430\u0435\u0432 \u0432 \u043C\u043E\u0435\u0439 \u0438\u043D\u0436\u0435\u043D\u0435\u0440\u043D\u043E\u0439 \u043F\u0440\u0430\u043A\u0442\u0438\u043A\u0435. \u041F\u043E \u043F\u043E\u043D\u044F\u0442\u043D\u044B\u043C \u043F\u0440\u0438\u0447\u0438\u043D\u0430\u043C \u044F \u043F\u043E\u043C\u0435\u043D\u044F\u043B \u0438\u043C\u0435\u043D\u0430, \u043C\u0435\u0441\u0442\u0430 \u0438 \u043D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u0443\u0437\u043D\u0430\u0432\u0430\u0435\u043C\u044B\u0435 \u0434\u0435\u0442\u0430\u043B\u0438, \u0447\u0442\u043E\u0431\u044B \u043D\u0435\u043B\u044C\u0437\u044F \u0431\u044B\u043B\u043E \u0442\u043E\u0447\u043D\u043E \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0437\u0430\u043A\u0430\u0437\u0447\u0438\u043A\u0430 \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438. ',
-        meta: {
-          likes: 20,
-          comments: 13
-        },
-        image: 'https://habrastorage.org/getpro/habr/post_images/797/933/d8a/797933d8a7cc536bfaba42021078fa00.jpg',
-        author: {
-          name: 'Иван К.',
-          description: 'Программист'
-        },
-        size: 100
-      }]
+      templates: { article: _article2.default, listarticle: _listArticle2.default }
     };
     return _this2;
   }
@@ -198,9 +88,26 @@ var Feed = function (_React$Component) {
   }, {
     key: 'componentWillMount',
     value: function componentWillMount() {
-      for (var i = 0; i < this.state.perPage; i++) {
-        this.state.elements.push(_react2.default.createElement(_article2.default, { data: this.state.articles[i], key: i }));
+      var _this3 = this;
+
+      if (this.props.data) {
+        this.props.data.post.map(function (item, i) {
+          _this3.state.entries.push(_react2.default.createElement(_article2.default, { data: item, key: i }));
+        });
       }
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      if (!this.props.data) {
+        this.state.entries.push(_react2.default.createElement('div', null, 'Hello'));
+      }
+      //this.pushItems()
+      this.createGrid();
+      //this.createEventListeners();
+      this.setState({
+        isFull: true
+      });
     }
   }, {
     key: 'createGrid',
@@ -213,17 +120,11 @@ var Feed = function (_React$Component) {
           itemSelector: '.grid-item',
           percentPosition: true,
           masonry: {
-            columnWidth: '.grid-sizer'
+            columnWidth: '.grid-sizer',
+            gutterWidth: 10
           }
         });
       });
-    }
-  }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.pushItems();
-      this.createGrid();
-      this.createEventListeners();
     }
   }, {
     key: 'pushItems',
@@ -255,13 +156,13 @@ var Feed = function (_React$Component) {
   }, {
     key: 'createEventListeners',
     value: function createEventListeners() {
-      var _this3 = this;
+      var _this4 = this;
 
       var feed = document.querySelector('.feed');
       this.interval = setInterval(function () {
-        if (!_this3.state.isFull) {
-          _this3.handleScroll(feed, feed.clientHeight);
-          _this3.setState({
+        if (!_this4.state.isFull) {
+          _this4.handleScroll(feed, feed.clientHeight);
+          _this4.setState({
             scrolled: document.body.scrollTop
           });
         }
@@ -287,14 +188,10 @@ var Feed = function (_React$Component) {
       clearInterval(this.interval);
     }
   }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {}
-  }, {
     key: 'render',
     value: function render() {
-
-      var posts = !this.state.masonry.length ? this.state.elements : this.state.masonry;
-
+      //var posts = (!this.state.masonry.length) ? this.state.elements : this.state.masonry
+      var posts = this.state.entries;
       return _react2.default.createElement('div', null, _react2.default.createElement('div', { className: 'grid' }, _react2.default.createElement('div', { className: 'grid-sizer' }), posts), !this.state.isFull ? _react2.default.createElement(_loader2.default, null) : '');
     }
   }]);

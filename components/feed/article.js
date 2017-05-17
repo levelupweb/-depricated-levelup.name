@@ -7,25 +7,44 @@ export default class Article extends React.Component {
     super(props);
   }
 
+  componentWillMount() {
+  	this.setState({
+  		...this.props.data
+  	})
+  }
+
+  componentDidMount() {
+  	var description = this.stripHTML(this.state.postContent.substring(0, 200))
+  	this.setState({
+  		postDescription: description
+  	})
+  }
+
+  stripHTML(html) {
+  	var strip = require('../../utils/stripHTML.js').strip;
+  	return strip(html)
+  }
+
   render() {
-  	var post = this.props.data;
+  	var post = this.state;
+  	var description = post.postContent.substring(0, 200);
     return (
-      <article className={`article preview grid-item w-${post.size} ${this.props.classNames}`}>
-		<User />
+      <article className={`article preview grid-item w-100`}>
+		<User id={post.postAuthor} />
 		<div className="image">
-			<img src={post.image} className="rounded ui image fluid" />
+			<img src={post.postImage} className="rounded ui image fluid" />
 		</div>
 		<div className="content">
 			<Link href={{ pathname: 'post', query: { id: '1' }}}>
-				<a><h1>{post.title}</h1></a>
+				<a><h1>{post.postTitle}</h1></a>
 			</Link>
-			<p className="primary">{post.description}</p>
+			<p className="primary">{post.postDescription}</p>
 		</div>
 
 		<div className="meta">
 			<a className="item" href="#">Читать далее</a>
-			<a className="item"><i className="fa fa-comment-o"></i> {post.meta.comments}</a>
-		    <a className="item"><i className="fa fa-heart-o"></i> {post.meta.likes}</a>
+			<a className="item"><i className="fa fa-comment-o"></i> 10</a>
+		    <a className="item"><i className="fa fa-heart-o"></i> {post.postLikes}</a>
 		</div>
 
 		<style jsx>{`
