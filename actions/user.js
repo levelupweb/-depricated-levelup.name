@@ -30,6 +30,13 @@ export function getLogout() {
 }
 
 export async function getUserById(id) {
-	return await axios.get(config.API + 'user/entries/id/' + id)
-	
+	return await axios.get(config.API + 'user/entries/id/' + id)	
+}
+
+export async function updateUserById(id, data) {
+	return await axios.post(config.API + 'user/entries/' + id + '/update', data)
+}
+
+export async function removeUserById(id) {
+	return await axios.get(config.API + `user/entries/` + id + `/remove`)
 }

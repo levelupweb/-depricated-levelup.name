@@ -5,10 +5,10 @@ import axios from 'axios'
 import config from '../app.config.js'
 import Loader from './loader'
 import { getUserById } from '../actions/user.js'
+import Avatar from 'react-avatar'
 
 // 1. Разделить вид для владельца и для третьих лиц
 // 2. Пофиксить баг с отображением small-темплейта
-
 
 export class User extends React.Component {
 
@@ -49,7 +49,11 @@ export class User extends React.Component {
         <div className={`${this.props.size} user`}>
           <div className="image">
             <div className="ui inline dropdown">
-              <div className="text"><Avatar size={this.props.size} url={user.userImage} /></div>
+              <div className="text">
+                <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
+                  <Avatar color={`#46978c`} round={true} size={32} src={user.userImage} name={user.slug} />
+                </a></Link>
+              </div>
               <div className="menu">
                 <div className="item" data-text="this week">Профиль</div>
                 <div className="item" data-text="this month">Написать пост</div>
@@ -60,7 +64,9 @@ export class User extends React.Component {
             </div>
           </div>
           <div className="content">
-            <Link href="/user"><span className="name"><a href="#">{user.slug}</a></span></Link>
+            <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
+              <span className="name">{user.slug}</span>
+            </a></Link>
             <div className={(this.props.size == 'small') ? `hidden` : `description`}>{user.userDescription}</div>
           </div>
           
@@ -76,6 +82,7 @@ export class User extends React.Component {
           .user .content {
             display:flex;
             align-items:center;
+            flex-direction:column;
           }
 
           .user.small {
@@ -132,7 +139,6 @@ export class User extends React.Component {
     			.user .content .description {
     				font-size:13px;
     				color:rgba(0,0,0,0.4);
-    				margin-top:5px;
     			}
 
           .user.medium .content .description {
@@ -150,25 +156,5 @@ export class User extends React.Component {
 }
 
 
-export class Avatar extends React.Component {
-  render() {
-    return (
-      <div className="avatar">
-        <a href="#">
-          <img 
-            className={(this.props.size == 'small') ? `circular image ui` : `circular image ui`} 
-            src={(this.props.url) ? this.props.url : `../static/img/no-avatar.png`}
-            width="32px" />
-        </a>
-        <style jsx>{`
-          .avatar {
-            display:inline-block;
-            vertical-align:middle;
-          }
-        `}</style>
-      </div>
-    )
-  }
-}
 
 export default connect((store) => store)(User)

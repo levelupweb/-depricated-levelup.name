@@ -9,9 +9,10 @@ export default class UserBar extends React.Component {
   }
 
   render() {
+    var user = this.props.data.user
     return (
       <div className="userbar">
-      	<User />
+      	<User id={user._id} />
       	<Statistic />
 
       	<style jsx>{`

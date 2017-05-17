@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getUserById = undefined;
+exports.removeUserById = exports.updateUserById = exports.getUserById = undefined;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
 
@@ -75,5 +75,55 @@ var getUserById = exports.getUserById = function () {
 
 	return function getUserById(_x) {
 		return _ref.apply(this, arguments);
+	};
+}();
+
+var updateUserById = exports.updateUserById = function () {
+	var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(id, data) {
+		return _regenerator2.default.wrap(function _callee2$(_context2) {
+			while (1) {
+				switch (_context2.prev = _context2.next) {
+					case 0:
+						_context2.next = 2;
+						return _axios2.default.post(_appConfig2.default.API + 'user/entries/' + id + '/update', data);
+
+					case 2:
+						return _context2.abrupt('return', _context2.sent);
+
+					case 3:
+					case 'end':
+						return _context2.stop();
+				}
+			}
+		}, _callee2, this);
+	}));
+
+	return function updateUserById(_x2, _x3) {
+		return _ref2.apply(this, arguments);
+	};
+}();
+
+var removeUserById = exports.removeUserById = function () {
+	var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(id) {
+		return _regenerator2.default.wrap(function _callee3$(_context3) {
+			while (1) {
+				switch (_context3.prev = _context3.next) {
+					case 0:
+						_context3.next = 2;
+						return _axios2.default.get(_appConfig2.default.API + 'user/entries/' + id + '/remove');
+
+					case 2:
+						return _context3.abrupt('return', _context3.sent);
+
+					case 3:
+					case 'end':
+						return _context3.stop();
+				}
+			}
+		}, _callee3, this);
+	}));
+
+	return function removeUserById(_x4) {
+		return _ref3.apply(this, arguments);
 	};
 }();

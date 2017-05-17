@@ -6,6 +6,7 @@ import Article from './article'
 import ListArticle from './listArticle'
 import axios from 'axios'
 import config from '../../app.config.js'
+import { getPostsByUserId } from '../../actions/post'
 
 export default class Feed extends React.Component {
 
@@ -36,14 +37,17 @@ export default class Feed extends React.Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if(!this.props.data) {
-      this.state.entries.push(<div>Hello</div>)
+      var posts = await getPostsByUserId(this.props.author);
+      await posts.data.map(async (post, i) => {
+        await this.state.entries.push(<Article data={post} key={i} />)
+      })
     }
     //this.pushItems()
-    this.createGrid()
+    await this.createGrid()
     //this.createEventListeners();
-    this.setState({
+    await this.setState({
       isFull: true
     })
 

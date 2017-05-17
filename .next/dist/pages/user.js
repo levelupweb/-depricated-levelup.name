@@ -38,9 +38,9 @@ var _body = require('../components/body');
 
 var _body2 = _interopRequireDefault(_body);
 
-var _usersingle = require('../components/user/usersingle');
+var _user = require('../components/user/');
 
-var _usersingle2 = _interopRequireDefault(_usersingle);
+var _user2 = _interopRequireDefault(_user);
 
 var _initscripts = require('../utils/initscripts');
 
@@ -76,7 +76,7 @@ var Page = function (_React$Component) {
   (0, _createClass3.default)(Page, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
-      var page = (0, _createPage2.default)(this.props.page, _react2.default.createElement(_usersingle2.default, { data: this.props.data }), null, null);
+      var page = (0, _createPage2.default)(this.props.page, _react2.default.createElement(_user2.default, { data: this.props.data }), null, null);
       this.state = { page: page };
     }
   }, {

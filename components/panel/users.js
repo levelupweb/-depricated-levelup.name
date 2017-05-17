@@ -5,6 +5,8 @@ import Link from 'next/link'
 import serializeForm from '../../utils/serializeForm'
 import config from '../../app.config'
 import Loader from '../loader'
+import Avatar from 'react-avatar'
+import { updateUserById, removeUserById } from '../../actions/user'
 
 /* 
 1. Сделать смену пароля
@@ -222,92 +224,214 @@ class Entry extends React.Component {
 export class UsersContainer extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      user: {
+        slug: null, 
+        userDescription: null,
+        userName: null,
+        userEmail: null,
+        userGender: null,
+        userRole: null,
+        userImage: null,
+        userPassword: null,
+        userCompany: null,
+        userDescription: null,
+        userBio: null
+      }
+    }
+  }
+
+  componentWillMount() {
+    this.setState({
+      ...this.state,
+      user: {
+        ...this.state.user,
+        ...this.props.data.user
+      }
+    })
   }
 
   componentDidMount() {
     UI()
     $('.ui.checkbox').checkbox();
+    this.bindChangeEvent()
   }
 
   handleSave() {
-    var form = this.form;
-    var inputs = form.querySelectorAll('input');
-    axios.post(config.API + 'user/entries/' + this.props.data.user.slug + '/update', serializeForm(inputs)).then(function (response) {
-      // Handle Success
+    updateUserById(this.state.user._id, this.state.user).then((res) => {
+      // handle success
     })
-    .catch(function (error) {
-      // Handle Error
-    });
   }
 
   handleRemove(id) {
-    var result = confirm('Вы действительно хотите удалить пользователя?');
-    if(result) {
-      axios.get(config.API + `user/entries/` + id + `/remove`).then((res) => {
-        // handle removed
+    let result = confirm('Вы действительно хотите удалить пользователя?');
+    if (result) {
+      removeUserById(id).then((res) => {
+        // handle success
       })
     }
   }
 
+  bindChangeEvent() {
+    let self = this;
+    let inputs = document.querySelectorAll('.form input, .form textarea');
+    inputs.forEach((input) => {
+      input.addEventListener('change', (e) => {
+        let property = e.target.name;
+        let value = e.target.value;
+        self.setState({
+          ...self.state,
+          user: {
+            ...self.state.user,
+            [property]: value
+          }
+        })
+      });
+    })
+  }
+
+  // Переписать в actions при помощи axios!!!
+  async handleUpload(e) {
+    var self = this;
+    var image = e.target.files[0];
+    var formData = new FormData();
+    var url = config.API + 'user/upload';
+    await formData.append('userImage', image);
+    await formData.append('slug', this.state.user.slug)
+    if (image) {
+       await fetch(url, {
+        method: 'POST',
+        body: formData
+      }).then(async (res) => {
+        var result = await res.json()
+        var path = config.storage + 'users/' + self.state.user.slug + '/' + result.filename
+        await self.setState({
+          ...self.state,
+          user: {
+            ...self.state.user,
+            userImage: path
+          }
+        })
+      })
+    }
+  }
 
   render() {
-    var entry = this.props.data.user;
-    console.log(entry._id)
+    var entry = this.state.user;
     return (
-      <div className="ui grid">
-        <div className="ui eight wide column">
-          <h3 className="ui header">{entry.slug}
+      <div>
+        <h3 className="ui header">
+          <Avatar src={entry.userImage} name={entry.slug} color={`#46978c`} size={40} className={`ui image`} round={true} />
+          <div className="content">
+            {entry.slug}
             <div className="sub header">
             {entry.userEmail}
             </div>
-          </h3>
-          <div className="ui divider"></div>
-          <div className="ui form" ref={(form) => {this.form = form}}>
-            <div className="field">
-              <input defaultValue={entry.userName}  type="text" name="userName" placeholder="Полное имя пользователя" />
-            </div>
-            <div className="field">
-              <input defaultValue={entry.slug} type="text" name="slug" placeholder="Логин пользователя" />
-            </div>
-            <div className="field">
-              <input defaultValue={entry.userEmail} type="text" name="userEmail" placeholder="E-mail пользователя" />
-            </div>
-            <div className="field">
-                <div className="ui selection dropdown">
-                    <input defaultValue={entry.userGender} type="hidden" name="userGender" />
-                    <i className="dropdown icon"></i>
-                    <div className="default text">Пол</div>
-                    <div className="menu">
-                        <div className="item" data-value="male">Мужской</div>
-                        <div className="item" data-value="female">Женский</div>
-                    </div>
-                </div>
-            </div>
-            <div className="field">
-                <div className="ui selection dropdown">
-                    <input defaultValue={entry.userRole} type="hidden" name="userRole" />
-                    <i className="dropdown icon"></i>
-                    <div className="default text">Роль</div>
-                    <div className="menu">
-                        <div className="item" data-value="subscriber">Пользователь</div>
-                        <div className="item" data-value="advertiser">Рекламодатель</div>
-                        <div className="item" data-value="admin">Администратор</div>
-                        <div className="item" data-value="stuff">Редактор</div>
-                    </div>
-                </div>
-            </div>
-            <div className="field">
-              <input type="password" name="userPassword" placeholder="Введите новый пароль" />
-            </div>
-            <div className="field">
-              <input type="password" name="userPasswordSecond" placeholder="Новый пароль ещё раз" />
-            </div>
           </div>
+        </h3>
+        <div className="ui divider"></div>
+          <div className="ui form" ref={(form) => {this.form = form}}>
+            <div className="ui grid">
+              <div className="ui six wide column">
+                <div className="field">
+                  <input defaultValue={entry.userName} type="text" name="userName" placeholder="Полное имя пользователя" />
+                </div>
+                <div className="field">
+                  <input disabled defaultValue={entry.slug} type="text" name="slug" placeholder="Логин пользователя" />
+                </div>
+                <div className="field">
+                  <input defaultValue={entry.userEmail} type="text" name="userEmail" placeholder="E-mail пользователя" />
+                </div>
+                <div className="field">
+                    <div className="ui selection dropdown">
+                        <input defaultValue={entry.userGender} type="hidden" name="userGender" />
+                        <i className="dropdown icon"></i>
+                        <div className="default text">Пол</div>
+                        <div className="menu">
+                            <div className="item" data-value="male">Мужской</div>
+                            <div className="item" data-value="female">Женский</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="field">
+                    <div className="ui selection dropdown">
+                        <input defaultValue={entry.userRole} type="hidden" name="userRole" />
+                        <i className="dropdown icon"></i>
+                        <div className="default text">Роль</div>
+                        <div className="menu">
+                            <div className="item" data-value="subscriber">Пользователь</div>
+                            <div className="item" data-value="advertiser">Рекламодатель</div>
+                            <div className="item" data-value="admin">Администратор</div>
+                            <div className="item" data-value="stuff">Редактор</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="field">
+                  <input type="password" name="userPassword" placeholder="Введите новый пароль" />
+                </div>
+                <div className="field">
+                  <input type="password" name="userPasswordSecond" placeholder="Новый пароль ещё раз" />
+                </div>
+              </div>
+              <div className="ui six wide column">
+                <div className="field">
+                  <input type="text" defaultValue={entry.userCompany} name="userCompany" placeholder="Компания, место работы" />
+                </div>
+                <div className="field">
+                  <input type="text" defaultValue={entry.userDescription} name="userDescription" placeholder="Профессия, должность" />
+                </div>
+                <div className="field">
+                  <textarea name="userBio" placeholder="Биография, пару слов о себе" rows="2">{entry.userBio}</textarea>
+                </div>
+              </div>
+              <div className="ui four wide column">
+                <div>
+                  <div className="selectAvatar" onClick={() => {this.avatar.click()}}>
+                    <Avatar round={true} src={entry.userImage} name={entry.slug} color={`#46978c`} size={100} className={`ui image`} />
+                    <div className="selectAvatarIcon"><i className="fa fa-cog" aria-hidden="true"></i></div>
+                  </div>
+                  <span className="content small"></span>
+                  <input onChange={(e) => this.handleUpload(e)} type="file" className="hidden ui" ref={(avatar) => {this.avatar = avatar}} />
+                </div>
+              </div>
+            </div>
           <br />
           <div className="button ui primary" onClick={() => {this.handleSave()}}>Сохранить</div>
           <div className="button ui" onClick={() => {this.handleRemove(entry._id)}}>Удалить пользователя</div>
         </div>
-      </div> 
+        <style jsx>{`
+          .selectAvatar {
+            cursor:pointer;
+            position:relative;
+            width:100px;
+            border-radius:100%;
+            overflow:hidden;
+          }
+
+          .selectAvatar:hover .selectAvatarIcon {
+            opacity:1;
+          }
+
+          .selectAvatarIcon {
+             position:absolute;
+             left:0px;
+             top:0px;
+             background:rgba(0,0,0,0.5);
+             color:#fff;
+             width:100%;
+             height:100%;
+             display:flex;
+             justify-content:center;
+             align-items:center;
+             opacity:0;
+             transition:0.2s all ease;
+          }
+
+          .selectAvatarIcon i {
+            font-size:20px;
+          }
+        `}</style>
+      </div>
     );
   }
 }

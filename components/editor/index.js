@@ -181,7 +181,6 @@ export default class EditorWrapper extends React.Component {
           }
         })
       } else {
-        console.log(key, value)
         this.setState({
           ...this.state,
           post: { 

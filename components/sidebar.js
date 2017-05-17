@@ -109,7 +109,7 @@ class Sidebar extends React.Component {
       		: 
       		<div>
 	      		<div className="profile block">
-		      		<User />
+		      		<User id={this.props.user.profile._id} />
 		      		<div className="button userbar">
 			      		<div onClick={() => {this.userBarSwitch()}} className="ui icon top left pointing button">
 						  <i className="fa fa-angle-down"></i>
