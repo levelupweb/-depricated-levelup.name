@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getPostsByUserId = undefined;
+exports.setLikeById = exports.getPostsByUserId = undefined;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -45,5 +45,36 @@ var getPostsByUserId = exports.getPostsByUserId = function () {
 
 	return function getPostsByUserId(_x) {
 		return _ref.apply(this, arguments);
+	};
+}();
+
+var setLikeById = exports.setLikeById = function () {
+	var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(token, id) {
+		return _regenerator2.default.wrap(function _callee2$(_context2) {
+			while (1) {
+				switch (_context2.prev = _context2.next) {
+					case 0:
+						_context2.next = 2;
+						return (0, _axios2.default)({
+							url: _appConfig2.default.API + 'post/entries/' + id + '/like',
+							method: 'GET',
+							headers: {
+								'authorization': token
+							}
+						});
+
+					case 2:
+						return _context2.abrupt('return', _context2.sent);
+
+					case 3:
+					case 'end':
+						return _context2.stop();
+				}
+			}
+		}, _callee2, this);
+	}));
+
+	return function setLikeById(_x2, _x3) {
+		return _ref2.apply(this, arguments);
 	};
 }();

@@ -45,6 +45,9 @@ class Body extends React.Component {
       	      {data.afterChildren}
       		</div>
       	</div>
+        <div className="advert">
+          <div className="title">BANNER</div>
+        </div>
       </div>
     );
   }

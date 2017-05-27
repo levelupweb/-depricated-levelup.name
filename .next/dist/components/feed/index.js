@@ -74,35 +74,32 @@ var Feed = function (_React$Component) {
   function Feed(props) {
     (0, _classCallCheck3.default)(this, Feed);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (Feed.__proto__ || (0, _getPrototypeOf2.default)(Feed)).call(this, props));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (Feed.__proto__ || (0, _getPrototypeOf2.default)(Feed)).call(this, props));
 
-    _this2.interval = null;
-    _this2.state = {
+    _this.interval = null;
+    _this.state = {
       perPage: 4,
       page: 0,
       isFull: false,
       scrolled: 0,
       entries: [],
       masonry: [],
-      templates: { article: _article2.default, listarticle: _listArticle2.default }
+      templates: {
+        article: _article2.default,
+        listarticle: _listArticle2.default
+      }
     };
-    return _this2;
+    return _this;
   }
 
   (0, _createClass3.default)(Feed, [{
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      this.createGrid();
-      $('.grid').css({ height: 0 });
-    }
-  }, {
     key: 'componentWillMount',
     value: function componentWillMount() {
-      var _this3 = this;
+      var _this2 = this;
 
       if (this.props.data) {
         this.props.data.post.map(function (item, i) {
-          _this3.state.entries.push(_react2.default.createElement(_article2.default, { data: item, key: i }));
+          _this2.state.entries.push(_react2.default.createElement(_article2.default, { data: item, key: i }));
         });
       }
     }
@@ -110,7 +107,7 @@ var Feed = function (_React$Component) {
     key: 'componentDidMount',
     value: function () {
       var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-        var _this4 = this;
+        var _this3 = this;
 
         var posts;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -135,14 +132,14 @@ var Feed = function (_React$Component) {
                         switch (_context.prev = _context.next) {
                           case 0:
                             _context.next = 2;
-                            return _this4.state.entries.push(_react2.default.createElement(_article2.default, { data: post, key: i }));
+                            return _this3.state.entries.push(_react2.default.createElement(_article2.default, { data: post, key: i }));
 
                           case 2:
                           case 'end':
                             return _context.stop();
                         }
                       }
-                    }, _callee, _this4);
+                    }, _callee, _this3);
                   }));
 
                   return function (_x, _x2) {
@@ -175,6 +172,71 @@ var Feed = function (_React$Component) {
       return componentDidMount;
     }()
   }, {
+    key: 'componentWillReceiveProps',
+    value: function () {
+      var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(nextProps) {
+        var _this4 = this;
+
+        var components, posts;
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (this.props.data) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                components = [];
+                _context4.next = 4;
+                return (0, _post.getPostsByUserId)(nextProps.author);
+
+              case 4:
+                posts = _context4.sent;
+                _context4.next = 7;
+                return posts.data.map(function () {
+                  var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(post, i) {
+                    return _regenerator2.default.wrap(function _callee3$(_context3) {
+                      while (1) {
+                        switch (_context3.prev = _context3.next) {
+                          case 0:
+                            _context3.next = 2;
+                            return components.push(_react2.default.createElement(_article2.default, { data: post, key: i }));
+
+                          case 2:
+                          case 'end':
+                            return _context3.stop();
+                        }
+                      }
+                    }, _callee3, _this4);
+                  }));
+
+                  return function (_x4, _x5) {
+                    return _ref4.apply(this, arguments);
+                  };
+                }());
+
+              case 7:
+                _context4.next = 9;
+                return this.setState({
+                  entries: components
+                });
+
+              case 9:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function componentWillReceiveProps(_x3) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return componentWillReceiveProps;
+    }()
+  }, {
     key: 'createGrid',
     value: function createGrid() {
       var Isotope = require('isotope-layout');
@@ -192,70 +254,8 @@ var Feed = function (_React$Component) {
       });
     }
   }, {
-    key: 'pushItems',
-    value: function pushItems() {
-      var loaded = this.state.perPage * this.state.page;
-      var lost = this.state.articles.length % this.state.perPage;
-      var pages = (this.state.articles.length - lost) / this.state.perPage;
-      var SpecifiedArticle = this.state.templates[this.props.template];
-
-      if (loaded < this.state.articles.length) {
-        if (this.state.page != pages) {
-          for (var i = loaded; i < loaded + this.state.perPage; i++) {
-            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i }));
-          }
-        } else {
-          for (var i = loaded; i < loaded + lost; i++) {
-            this.state.masonry.push(_react2.default.createElement(SpecifiedArticle, { data: this.state.articles[i], key: i }));
-          }
-        }
-      } else {
-        this.setState({
-          isFull: true
-        });
-      }
-
-      this.state.page = this.state.page + 1;
-      this.createGrid();
-    }
-  }, {
-    key: 'createEventListeners',
-    value: function createEventListeners() {
-      var _this5 = this;
-
-      var feed = document.querySelector('.feed');
-      this.interval = setInterval(function () {
-        if (!_this5.state.isFull) {
-          _this5.handleScroll(feed, feed.clientHeight);
-          _this5.setState({
-            scrolled: document.body.scrollTop
-          });
-        }
-      }, 1000);
-
-      var _this = this;
-      window.createGrid = new Event('createGrid');
-      document.addEventListener('createGrid', function (e) {
-        _this.createGrid();
-      }, true);
-    }
-  }, {
-    key: 'handleScroll',
-    value: function handleScroll(container, height) {
-      var scrolled = this.state.scrolled;
-      if ($(".loader.active").offset().top < $(window).scrollTop() + $(window).outerHeight()) {
-        this.pushItems();
-      }
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      clearInterval(this.interval);
-    }
-  }, {
     key: 'render',
     value: function render() {
-      //var posts = (!this.state.masonry.length) ? this.state.elements : this.state.masonry
       var posts = this.state.entries;
       return _react2.default.createElement('div', null, _react2.default.createElement('div', { className: 'grid' }, _react2.default.createElement('div', { className: 'grid-sizer' }), posts), !this.state.isFull ? _react2.default.createElement(_loader2.default, null) : '');
     }

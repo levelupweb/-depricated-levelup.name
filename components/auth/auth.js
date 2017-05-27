@@ -135,6 +135,7 @@ class Auth extends React.Component {
           <h2 className="ui header">
              Вход <small>авторизация</small>
           </h2>
+          <p>Авторизуйтесь под своим именем используя ваш логин и пароль</p>
           <div className="field">
             <input type="text" name="userLogin" placeholder="E-mail или логин" />
           </div>

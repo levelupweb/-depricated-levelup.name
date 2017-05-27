@@ -3,9 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.removeUserById = exports.updateUserById = exports.getUserById = undefined;
+exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = undefined;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
+exports.subscribeToUser = subscribeToUser;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -125,5 +126,65 @@ var removeUserById = exports.removeUserById = function () {
 
 	return function removeUserById(_x4) {
 		return _ref3.apply(this, arguments);
+	};
+}();
+
+function subscribeToUser(token, id) {
+	return (0, _axios2.default)({
+		url: _appConfig2.default.API + 'user/' + id + '/subscribe',
+		method: 'GET',
+		headers: {
+			'authorization': token
+		}
+	});
+}
+
+var getUserField = exports.getUserField = function () {
+	var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id, field) {
+		return _regenerator2.default.wrap(function _callee4$(_context4) {
+			while (1) {
+				switch (_context4.prev = _context4.next) {
+					case 0:
+						_context4.next = 2;
+						return _axios2.default.get(_appConfig2.default.API + 'user/entries/' + id + '/field/' + field);
+
+					case 2:
+						return _context4.abrupt('return', _context4.sent);
+
+					case 3:
+					case 'end':
+						return _context4.stop();
+				}
+			}
+		}, _callee4, this);
+	}));
+
+	return function getUserField(_x5, _x6) {
+		return _ref4.apply(this, arguments);
+	};
+}();
+
+var registerUser = exports.registerUser = function () {
+	var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(data) {
+		return _regenerator2.default.wrap(function _callee5$(_context5) {
+			while (1) {
+				switch (_context5.prev = _context5.next) {
+					case 0:
+						return _context5.abrupt('return', (0, _axios2.default)({
+							url: _appConfig2.default.API + 'user/add',
+							method: 'POST',
+							data: data
+						}));
+
+					case 1:
+					case 'end':
+						return _context5.stop();
+				}
+			}
+		}, _callee5, this);
+	}));
+
+	return function registerUser(_x7) {
+		return _ref5.apply(this, arguments);
 	};
 }();

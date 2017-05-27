@@ -3,6 +3,7 @@ import config from '../../app.config.js'
 import createPage from '../../utils/createPage.js'
 import fetch from 'isomorphic-fetch'
 import { setUser } from '../../actions/user'
+import { setQuery, setPageData } from '../../actions/app'
 import cookies from 'js-cookie'
 import axios from 'axios'
 import Loader from '../loader'
@@ -41,7 +42,7 @@ async function prepareData(builder, query) {
     var url = config.API + item.type + `/entries/` + encodeURI(slug);
     await fetch(url).then(async (res) => {
       data[item.type] = await res.json();
-    })
+    }) 
 
   }));
   return data;
@@ -65,6 +66,9 @@ export default function page(Component, slug, builder) {
       var token = await getToken(req);
       await store.dispatch(setUser(token));
 
+      // Добавляем query и builder в store
+      await store.dispatch(setQuery(builder, query));
+
       // Подготовка данных о странице
 	    var page = await fetch(config.API + 'page/entries/' + slug)
 	    var json = await page.json()
@@ -73,6 +77,9 @@ export default function page(Component, slug, builder) {
       if (builder) {
         var data = await prepareData(builder, query);
       }
+
+      // Добавляем pageData в store
+      await store.dispatch(setPageData(data));
 
       // Превращаем данные в props
 	    return {
@@ -84,12 +91,15 @@ export default function page(Component, slug, builder) {
   constructor(props) {
     super(props)
     this.state = {
-      isLoading: true
+      isLoading: true,
+      query: null
     };
   }
 
   componentDidMount () {
-    this.setState({ isLoading: false })
+    this.setState({ 
+      isLoading: false
+    })
   }
 
   render() {

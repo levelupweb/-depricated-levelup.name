@@ -16,11 +16,16 @@ var _user = require('./user');
 
 var _user2 = _interopRequireDefault(_user);
 
+var _app = require('./app');
+
+var _app2 = _interopRequireDefault(_app);
+
 var _redux = require('redux');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var reducers = {
+	app: _app2.default,
 	header: _header2.default,
 	usersingle: _usersingle2.default,
 	user: _user2.default

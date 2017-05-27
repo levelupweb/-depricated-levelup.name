@@ -6,56 +6,41 @@ import { connect } from 'react-redux'
 import User from './user'
 import cookies from 'js-cookie'
 import router from 'next/router'
-import { getLogout } from '../actions/user'
+import { getLogout, getUserField } from '../actions/user'
 import { UI } from '../utils/initscripts.js'
+import Loader from './loader.js'
 
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
+    this.currentUser = this.props.user.profile;
     this.state = {
-    	auth: this.props.user.isLogged,
     	subscriptions: {
-    		users: [
-    			{name: 'Алексей Ашанов', description: 'Программист', updates: 1, id: 0},
-    			{name: 'Иван Коряковцев', description: 'Веб-разработчик', updates: 0, id: 1},
-    			{name: 'Алексей Навальный', description: 'Политик, юрист', updates: 1, id: 2},
-    			{name: 'Стив Джобс', description: 'Предприниматель', updates: 0, id: 3},
-    			{name: 'Анна Ахматова', description: 'Писательница', updates: 0, id: 4}
-    		],
-
-    		blogs: [
-    			{name: 'Spark', description: 'Веб-сайт', image: '../static/img/sidebar/subscriptions/spark.png', updates: 1, id: 0},
-    			{name: 'Wylsacom', image: '../static/img/sidebar/subscriptions/apple.png', description: 'Блоггер', updates: 0, id: 1},
-    			{name: 'Habrahabr', image: '../static/img/sidebar/subscriptions/habr.png', description: 'Веб-сайт', updates: 1, id: 2}
-    		],
-
-    		tags: [
-    			{title: 'природа', id: 1},
-    			{title: 'программирование', id: 2},
-    			{title: 'seo', id: 3},
-    			{title: 'машинное обучение', id: 4},
-    			{title: 'игры', id: 5},
-    			{title: 'javascript', id: 6},
-    			{title: 'arduino', id: 7},
-    			{title: 'веб-разработка', id: 8},
-    		],
-
-    		popular: [
-    			{title: 'живопись', id: 1},
-    			{title: 'программирование', id: 2},
-    			{title: 'игры', id: 3},
-    			{title: 'музыка', id: 4},
-    			{title: 'социальные сети', id: 5},
-    			{title: 'личная эффективность', id: 6},
-    			{title: 'технологии', id: 7},
-    			{title: 'веб-разработка', id: 8},
-    		]
+    		users: null,
+    		blogs: null,
+    		tags: [],
+    		popular: ['здоровье', 'веб-разработка', 'чтиво', 'блог', 'программирование']
     	}
     }
   }
 
+
+  componentWillMount() {
+  	if(this.currentUser) {
+		getUserField(this.currentUser._id, 'userSubscriptions').then((res) => {
+			this.setState({
+				subscriptions: {
+					...this.state.subscriptions,
+					users: res.data.userSubscriptions
+				}
+			})
+		})
+	}
+  }
+
   componentDidMount() {
   	this.setFooter()
+  	UI();
   }
 
   async handleLogout() {
@@ -76,16 +61,10 @@ class Sidebar extends React.Component {
   }
 
   userBarSwitch() {
-  	UI();
   	$('.sidebar')
   	.dimmer('add content', $('.sidebar .menu.vertical'))
   	.dimmer('show');
   }
-
-  componentDidUpdate() {
-  	this.setFooter()
-  }
-
 
   render() {
     return (
@@ -102,14 +81,16 @@ class Sidebar extends React.Component {
 						</h3>
 					</div>
 					<div className="block-content">
-		      			<TagsList tags={this.state.subscriptions.popular} />
+						{(this.state.subscriptions.popular) ?
+		      				<TagsList tags={this.state.subscriptions.popular} /> : <Loader />
+		      			}
 		      		</div>
       			</div>
       		</div>
       		: 
       		<div>
 	      		<div className="profile block">
-		      		<User id={this.props.user.profile._id} />
+		      		<User />
 		      		<div className="button userbar">
 			      		<div onClick={() => {this.userBarSwitch()}} className="ui icon top left pointing button">
 						  <i className="fa fa-angle-down"></i>
@@ -141,9 +122,13 @@ class Sidebar extends React.Component {
 						</h3>
 		      		</div>
 		      		<div className="block-content">
-		      			<UserList users={this.state.subscriptions.users} />
-		      			<div className="ui section divider"></div>
-		      			<UserList users={this.state.subscriptions.blogs} />
+		      			{(this.state.subscriptions.users) ?
+		      				<UserList users={this.state.subscriptions.users} /> : <Loader />
+		      			}
+		      			<div className="ui divider"></div>
+		      			{(this.state.subscriptions.users) ?
+		      				<UserList users={this.state.subscriptions.users} /> : <Loader />
+		      			}
 		      		</div>
 		      	</div>
 
@@ -154,7 +139,9 @@ class Sidebar extends React.Component {
 						</h3>
 		      		</div>
 		      		<div className="block-content">
-		      			<TagsList tags={this.state.subscriptions.tags} />
+		      			{(this.state.subscriptions.tags) ?
+		      				<TagsList tags={this.state.subscriptions.tags} /> : <Loader />
+		      			}
 		      		</div>
 		      	</div>
 	      	</div>
@@ -162,7 +149,6 @@ class Sidebar extends React.Component {
 	      	<div className="block footer" id="footer">
 	      		<div className="block-content">
 	      			<div className="ui dropdown switcher">
-					  
 					  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
 					  <div className="menu">
 					    <div className="item">Levelupmusic</div>
@@ -186,9 +172,23 @@ class Sidebar extends React.Component {
 				.sidebar {
 					position:relative;
 					overflow-y:scroll;
+					background:#101010;
 				}
+
+				.sidebar::-webkit-scrollbar {
+					display:none;
+				}
+
+				.sidebar::-webkit-scrollbar-thumb {
+					display:none;
+				}
+
+				.sidebar-block .title .ui.header {
+					color:#fff;
+				}
+
 				.footer {
-					background:#f5f5f5;
+					background:transparent;;
 					position:absolute;
 					left:0px;
 				}
@@ -207,11 +207,11 @@ class Sidebar extends React.Component {
 		  			display:inline-block;
 					margin-right:10px;
 					margin-bottom:5px;
-					color:#000;
+					color:#c0c0c0;
 		  		}
 		  		.footer .switcher {
 		  			margin-bottom:5px;
-		  			color:#000;
+		  			color:#fff;
 		  			display:block;
 		  		}
 		  		.profile  {
@@ -223,12 +223,11 @@ class Sidebar extends React.Component {
 		  			 display:flex;
 		  			 justify-content:center;
 		  			 align-items:center;
-		  			 background:#f5f5f5;
 		  		}
 		  		.profile.simple a {
 					font-size:15px;
 					font-weight:bold;
-					color:#000;
+					color:#fff;
 		  		}
 		  		.profile .menu .profile .content .description {
 		  			color:#c0c0c0!important;
@@ -236,7 +235,6 @@ class Sidebar extends React.Component {
 		  		.profile .secondary.menu {
 					text-align:left;
 		  		}
-				
 				.profile .button {
 					position: absolute;
 					right:0px;

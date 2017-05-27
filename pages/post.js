@@ -5,28 +5,19 @@ import Post from '../components/post/'
 import Body from '../components/body'
 import Sidebar from '../components/sidebar'
 import PostAfter from '../components/post/postafter' 
-import Router from 'next/router'
-import NProgress from 'nprogress'
-import 'isomorphic-fetch';
 import { auth } from '../actions/user.js';
 import { UI } from '../utils/initscripts'
 import config from '../app.config.js'
 import createPage from '../utils/createPage.js'
 import page from '../components/HOC/page'
 
-Router.onRouteChangeStart = (url) => {
-  NProgress.start()
-}
-Router.onRouteChangeComplete = () => NProgress.done()
-Router.onRouteChangeError = () => NProgress.done()
-
-class PostPage extends React.Component {
+class Page extends React.Component {
   constructor(props) {
     super(props);
   }
 
   componentWillMount() {
-    var page = createPage(this.props.page, <Post />, null, <PostAfter />);
+    var page = createPage(this.props.page, <Post data={this.props.data} />, null, null);
     this.state = { page: page }
   }
 
@@ -45,5 +36,12 @@ class PostPage extends React.Component {
   }
 }
 
-const PostContainer = page(PostPage, 'post');
-export default withRedux(initStore, (state) => state)(PostContainer)
+const query = {
+  post: {
+    type: 'post',
+    single: true
+  }
+}
+
+const Container = page(Page, 'post', query);
+export default withRedux(initStore, (state) => state)(Container)

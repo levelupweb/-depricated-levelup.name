@@ -50,26 +50,32 @@ export default class Editor extends Component {
         'list', 'bullet', 'indent',
         'link', 'image'
       ]
-    } catch(err) { console.log(err) }
+    } catch(err) { }
   }
+
+  
 
 
   render() {
-    const Quill = this.quillreact
-    if (Quill) {
-      return (
-        <div>
-          <Quill
-            value={this.props.value}
-            placeholder="Ваш текст здесь..."
-            modules={this.modules}
-            formats={this.formats}
-            onChange={this.props.onChange}
-          />
-        </div>
-      )
+    if (this.quillreact) { 
+      const Quill = this.quillreact
+      if (Quill) {
+        return (
+          <div>
+            <Quill
+              value={this.props.value}
+              placeholder="Ваш текст здесь..."
+              modules={this.modules}
+              formats={this.formats}
+              onChange={this.props.onChange}
+            />
+          </div>
+        )
+      } else {
+        return (<Loader />)
+      }
     } else {
-      return <Loader />
+      return (<div></div>)
     }
   }
 }

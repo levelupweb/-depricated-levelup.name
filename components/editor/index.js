@@ -1,5 +1,7 @@
 import React from 'react';
-import { Avatar } from '../user.js'
+import { connect } from 'react-redux'
+import { getUserById } from '../../actions/user'
+import Avatar from 'react-avatar'
 import config from '../../app.config'
 import 'isomorphic-fetch'
 import Editor from './editor.js'
@@ -12,7 +14,7 @@ import router from 'next/router'
 // 3. Решить проблему с postDescription
 // 4. Решить проблему с загрузкой изображений в редакторе
 
-export default class EditorWrapper extends React.Component {
+class EditorWrapper extends React.Component {
 
   constructor(props) {
     super(props);
@@ -47,7 +49,13 @@ export default class EditorWrapper extends React.Component {
   }
 
   getPost() {
-    this.updateState(this.props.data.post)
+    this.setState({
+      post: {
+        ...this.state.post,
+        ...this.props.data.post,
+        postAuthor: this.props.user.profile._id
+      }
+    })
   }
 
   createStorage() {
@@ -195,8 +203,8 @@ export default class EditorWrapper extends React.Component {
 
 
   render() {
-    //console.log(this.state.post)
     var post = this.state.post;
+    var user = this.props.user.profile
     return (
       <div className="editor" ref={(editor) => {this.editor = editor}}>
       	<div className="header-wrapper" ref={(headerwrapper) => {this.headerwrapper = headerwrapper}}>
@@ -204,7 +212,7 @@ export default class EditorWrapper extends React.Component {
             <div className="header-background"><img src={post.postImage} className="header-background-img" /></div>
             <div className="header-content block">
     	      	<div className="title">
-    	      		<Avatar size="small" />
+    	      		<Avatar color={`#46978c`} round={true} size={40} name={user.slug} src={user.userImage} />
     	      		<h3 className="ui header">
     	      			<input defaultValue={post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
     	      			<span className="sub header">http://levelup.name/<input onChange={(e) => {this.handleTyping(e)}} type="text" defaultValue={post.slug} ref={(link) => {this.link = link}} /></span>
@@ -400,3 +408,6 @@ export default class EditorWrapper extends React.Component {
     );
   }
 }
+
+
+export default connect((state) => state)(EditorWrapper)

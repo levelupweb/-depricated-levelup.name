@@ -8,11 +8,26 @@ class UserSingle extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      user: null
+    }
   }
 
   componentWillMount() {
-    if(this.props.data.user !== null) {
-      console.log(this.props)
+    var data = this.props.app.pageData;
+    if(data !== null) {
+      this.setState({
+        user: data.user
+      })
+    }
+  }
+
+  componentWillReceiveProps() {
+    var data = this.props.app.pageData;
+    if(data !== null) {
+      this.setState({
+        user: data.user
+      })
     }
   }
 
@@ -35,31 +50,35 @@ class UserSingle extends React.Component {
   }
 
   render() {
-    if(this.props.data.user !== null) {
+    var user = this.state.user
+    if(this.state.user !== null) {
       return (
-        <div>
-        	<UserBar data={this.props.data} />
-        	<div className="profile-feed feed">
-      			<div id="tabs-container">
-      			    <ul className="tabs-menu">
-    			        <li className="current"><a href="#publications">Публикации <span>3</span></a></li>
-    			        <li><a href="#bookmarks">Закладки <span>23</span></a></li>
-    			        <li><a href="#comments">Комментарии <span>15</span></a></li>
-      			    </ul>
-                <div className="ui divider"></div>
-      			    <div className="tab">
-    			        <div id="publications" className="tab-content">
-    			           <Feed author={this.props.data.user._id} template="article" />
-    			        </div>
-    			        <div id="bookmarks" className="tab-content hidden">
-    			           <Feed template="listarticle" />
-    			        </div>
-    			        <div id="comments" className="tab-content hidden">
-    			           <Comments />
-    			        </div>
-      			    </div>
-      			</div>	
-  		    </div>
+        <div className="profile-feed feed">
+        	<UserBar userdata={user} />
+    			<div id="tabs-container">
+    			    <ul className="tabs-menu">
+  			        <li className="current"><a href="#publications">Публикации <span>3</span></a></li>
+  			        <li><a href="#bookmarks">Закладки <span>23</span></a></li>
+  			        <li><a href="#comments">Комментарии <span>15</span></a></li>
+    			    </ul>
+              <div className="ui divider"></div>
+    			    <div className="tab">
+  			        <div id="publications" className="tab-content">
+  			           <Feed author={user._id} template="article" />
+  			        </div>
+  			        <div id="bookmarks" className="tab-content hidden">
+  			           <Feed template="listarticle" />
+  			        </div>
+  			        <div id="comments" className="tab-content hidden">
+  			           <Comments />
+  			        </div>
+    			    </div>
+    			</div>
+          <style jsx>{`
+            #tabs-container {
+              margin-top:15px;
+            }
+          `}</style>
         </div>
       );
     } else {
@@ -70,4 +89,4 @@ class UserSingle extends React.Component {
   }
 }
 
-export default connect(state => state.usersingle)(UserSingle)
+export default connect(state => state)(UserSingle)

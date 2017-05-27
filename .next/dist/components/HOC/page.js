@@ -59,6 +59,8 @@ var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
 var _user = require('../../actions/user');
 
+var _app = require('../../actions/app');
+
 var _jsCookie = require('js-cookie');
 
 var _jsCookie2 = _interopRequireDefault(_jsCookie);
@@ -212,34 +214,42 @@ function getToken(req) {
 
                 case 5:
                   _context4.next = 7;
-                  return (0, _isomorphicFetch2.default)(_appConfig2.default.API + 'page/entries/' + slug);
+                  return store.dispatch((0, _app.setQuery)(builder, query));
 
                 case 7:
+                  _context4.next = 9;
+                  return (0, _isomorphicFetch2.default)(_appConfig2.default.API + 'page/entries/' + slug);
+
+                case 9:
                   page = _context4.sent;
-                  _context4.next = 10;
+                  _context4.next = 12;
                   return page.json();
 
-                case 10:
+                case 12:
                   json = _context4.sent;
 
                   if (!builder) {
-                    _context4.next = 15;
+                    _context4.next = 17;
                     break;
                   }
 
-                  _context4.next = 14;
+                  _context4.next = 16;
                   return prepareData(builder, query);
 
-                case 14:
+                case 16:
                   data = _context4.sent;
 
-                case 15:
+                case 17:
+                  _context4.next = 19;
+                  return store.dispatch((0, _app.setPageData)(data));
+
+                case 19:
                   return _context4.abrupt('return', {
                     page: json,
                     data: data
                   });
 
-                case 16:
+                case 20:
                 case 'end':
                   return _context4.stop();
               }
@@ -261,7 +271,8 @@ function getToken(req) {
       var _this2 = (0, _possibleConstructorReturn3.default)(this, (GetAuth.__proto__ || (0, _getPrototypeOf2.default)(GetAuth)).call(this, props));
 
       _this2.state = {
-        isLoading: true
+        isLoading: true,
+        query: null
       };
       return _this2;
     }
@@ -269,7 +280,9 @@ function getToken(req) {
     (0, _createClass3.default)(GetAuth, [{
       key: 'componentDidMount',
       value: function componentDidMount() {
-        this.setState({ isLoading: false });
+        this.setState({
+          isLoading: false
+        });
       }
     }, {
       key: 'render',

@@ -12,7 +12,7 @@ a {
 }
 
 body {
-	background:#fff;
+	background:#fafafa;
 }
 
 .hidden,
@@ -97,6 +97,7 @@ form .field input:focus {
 	box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34);
 	width:668px;
 	min-height:100%;
+	background:#fff;
 }
 
 .main.full {
@@ -107,6 +108,10 @@ form .field input:focus {
 .main .after-header,
 .main .inner {
 	min-height:100%;
+}
+
+.main .inner {
+	position: relative;
 }
 
 .site-editor .after-header >.block {
@@ -123,6 +128,7 @@ form .field input:focus {
 
 .header-wrapper {
 	background: #fff;
+	border-bottom:1px solid #eee;
 }
 
 .header-wrapper .search {
@@ -244,12 +250,19 @@ margin-top:0px;
 }
 
 .sidebar {
-	background:#fafafa;
 	width:310px;
 	height:100%;
 	position: fixed!important;
 	left:0px;
 	top:0px;
+}
+
+.sidebar a {
+	color:#fff!important;
+}
+
+.sidebar .sub.header {
+	color:#c0c0c0!important;
 }
 
 
@@ -265,6 +278,14 @@ margin-top:0px;
 	box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.75);
 	margin:0px!important;
 	z-index:10;
+}
+
+.sidebar .profile .name {
+	color:#fff
+}
+
+.sidebar .profile .description {
+	color:#c0c0c0!important;
 }
 
 .sidebar .dimmer .menu {
@@ -494,6 +515,25 @@ margin-top:0px;
 	margin-right:3px;
 }
 
+.article .content p {
+	margin:0px!important;
+}
+
+.article .content h1,
+.article .content h2,
+.article .content h3,
+.article .content h4,
+.article .content h5,
+.article .content h6 {
+	margin: 0px;
+    margin-top: 10px;
+}
+
+.article .content ul {
+	margin:0px;
+	padding:0px 20px;
+}
+
 .tabs-menu {
 	margin:0px;
 	padding:0px;
@@ -529,6 +569,40 @@ margin-top:0px;
     width:100%;
     opacity:0.2;
 }
+
+.no-content {
+	margin:15px 0px;
+}
+
+.no-content p {
+	color:#c0c0c0;
+	font-size:13px;
+	text-transform: lowercase
+}
+
+.dot.divider {
+	margin-top: 52px;
+    margin-bottom: 42px;
+    display: block;
+    border: 0;
+    text-align: center;
+}
+
+.dot.divider:before {
+	--x-height-multiplier: 0.363;
+    --baseline-multiplier: 0.157;
+    font-family: medium-content-slab-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: .6em;
+    content: '...';
+    display: inline-block;
+    color: rgba(0,0,0,.6);
+    position: relative;
+}
+
+
 
 /* EDITOR CUSTOM QUILL STYLES */
 
@@ -573,3 +647,25 @@ margin-top:0px;
 }
 
 .ql-editor::-webkit-scrollbar { width: 0 !important }
+
+.advert {
+	position: fixed;
+	display:flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items:center;
+	left:978px;
+	top:0px;
+	background:#eee;
+	width:200px;
+	height:400px;
+}
+
+.advert .title {
+	font-size:20px;
+	color:#c0c0c0;
+}
+
+.article .user .button {
+    margin-left:15px!important;
+  }
