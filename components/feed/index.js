@@ -78,14 +78,31 @@ export default class Feed extends React.Component {
   }
 
   render() {
-    var posts = this.state.entries
     return (
-    <div>
-    	<div className="grid">
-    		<div className="grid-sizer"></div>
-			   {posts}
-		  </div>
+    <div className="feed">
+      {(this.state.entries.length > 0) ? 
+        <div className="grid">
+          <div className="grid-sizer"></div>
+	         {this.state.entries}
+          </div>
+         : 
+         <h2 className="ui icon header">
+          <i className="fa fa-bars icon"></i>
+          <div className="content">
+            Упс.. :)
+            <div className="sub header">Записей не найдено</div>
+          </div>
+        </h2>
+      }
       {(!this.state.isFull) ? <Loader /> : ``}
+      <style jsx>{`
+        .header i {
+          color:#eee;
+        }
+        .feed {
+          text-align:center;
+        }
+      `}</style>
 	 </div>
     );
   }

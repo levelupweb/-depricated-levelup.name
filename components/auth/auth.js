@@ -88,7 +88,7 @@ class Auth extends React.Component {
   }
 
   handleSuccess(response) {
-    $('.form .dimmer').dimmer('show')
+    $('.login.form .dimmer').dimmer('show')
     cookie.set('x-access-token', response.user.token, { expires: 7, path: '' });
     console.log(this.props);
     console.log(response.user)
@@ -121,7 +121,7 @@ class Auth extends React.Component {
   render() { 
     let error = (this.hasError()) ? this.getError() : null;
     return (
-        <form className="ui form" id="loginForm">
+        <form className="login ui form" id="loginForm">
 
           {this.hasError() ? 
             <div className="ui negative message">
@@ -143,7 +143,6 @@ class Auth extends React.Component {
             <input type="password" name="userPassword" placeholder="Пароль" />
           </div>
           <a className="ui button circular loginButton primary">Войти</a>
-          <span className="registerButton"><a href="#">Регистрация</a></span>
 
           <div className="ui dimmer">
             <div className="content">
@@ -158,9 +157,6 @@ class Auth extends React.Component {
 
 
           <style jsx>{`
-            .form .registerButton {
-              margin-left:10px;
-            }
             .dimmer {
                padding:20px;
             }

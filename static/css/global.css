@@ -350,12 +350,11 @@ margin-top:0px;
 .main .flashpost .fa {
 	color:rgba(0,0,0,0.2);
 	font-size:19px;
-	margin:0px 15px;
 }
 
-.main .flashpost .user {
+.main .flashpost .user-image {
 	position: absolute;
-	left:25px;
+	left:10px;
 	top:50%;
 	margin-top:-20px;
 	height:40px;
@@ -372,7 +371,7 @@ margin-top:0px;
 	height:55px;
 	font-size:16px;
 	overflow:hidden;
-	padding-left:110px;
+	padding-left:60px;
 	transition: 0.2s all ease;
 }
 
@@ -429,6 +428,7 @@ margin-top:0px;
 	margin-bottom:15px;
 	border-bottom:1px solid rgba(0,0,0,0.1);
 	padding-bottom:15px;
+	text-align:left;
 }
 
 .article.hided {
@@ -447,7 +447,6 @@ margin-top:0px;
 
 .article.w-100 {
 	width:100%;
-	padding-right:20px;
 }
 
 .article.w-33 {
@@ -489,6 +488,7 @@ margin-top:0px;
 
 .article > .content {
 	margin:15px 0px;
+	text-align:left;
 }
 
 .article .content h1 {
@@ -658,7 +658,7 @@ margin-top:0px;
 	top:0px;
 	background:#eee;
 	width:200px;
-	height:400px;
+	height:100%;
 }
 
 .advert .title {

@@ -36,9 +36,6 @@ var _link2 = _interopRequireDefault(_link);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = 'E:\\www\\Levelup.name\\components\\header\\menu.js';
-
-
 var Menu = function (_React$Component) {
   (0, _inherits3.default)(Menu, _React$Component);
 
@@ -51,36 +48,7 @@ var Menu = function (_React$Component) {
   (0, _createClass3.default)(Menu, [{
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('div', { className: 'menu', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 13
-        }
-      }, _react2.default.createElement(_link2.default, { href: '/', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 14
-        }
-      }, _react2.default.createElement('a', { className: 'item', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 15
-        }
-      }, _react2.default.createElement('b', {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 15
-        }
-      }, '\u0418\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u044C'))), _react2.default.createElement('a', { className: 'item', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 17
-        }
-      }, '\u0410\u0432\u0442\u043E\u0440\u044B'), _react2.default.createElement('a', { className: 'item', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 18
-        }
-      }, '\u0411\u043B\u043E\u0433\u0438'), _react2.default.createElement('a', { className: 'item', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 19
-        }
-      }, '\u0420\u0435\u043A\u043B\u0430\u043C\u043E\u0434\u0430\u0442\u0435\u043B\u044F\u043C'));
+      return _react2.default.createElement('div', { className: 'menu' }, _react2.default.createElement(_link2.default, { href: '/' }, _react2.default.createElement('a', { className: 'item' }, _react2.default.createElement('b', null, '\u041B\u0435\u043D\u0442\u0430'))), _react2.default.createElement(_link2.default, { href: '/authors' }, _react2.default.createElement('a', { className: 'item' }, '\u0410\u0432\u0442\u043E\u0440\u044B')), _react2.default.createElement('a', { className: 'item' }, '\u0411\u043B\u043E\u0433\u0438'), _react2.default.createElement('a', { className: 'item' }, '\u0420\u0435\u043A\u043B\u0430\u043C\u043E\u0434\u0430\u0442\u0435\u043B\u044F\u043C'));
     }
   }]);
 

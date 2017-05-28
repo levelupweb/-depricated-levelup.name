@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link'
 import User from '../user'
+import { getPostCommentsByPostId } from '../../actions/comment.js'
 
 export default class Article extends React.Component {
   constructor(props) {
@@ -11,6 +12,13 @@ export default class Article extends React.Component {
   	this.setState({
   		...this.props.data
   	})
+
+    getPostCommentsByPostId(this.props.data._id).then((res) => {
+      this.setState({
+        ...this.state,
+        comments: res.data
+      })
+    })
   }
 
   componentDidMount() {
@@ -35,7 +43,14 @@ export default class Article extends React.Component {
 
   render() {
   	var post = this.state;
+    if(post.comments) { 
+      var comments = post.comments.length;
+    } else {
+      var comments = ``;
+    }
+    var likes = post.postLikes.length
   	var description = post.postContent.substring(0, 200);
+
     return (
       <article className={`article preview grid-item w-100`}>
     		<User id={post.postAuthor} />
@@ -50,9 +65,11 @@ export default class Article extends React.Component {
     		</div>
 
     		<div className="meta">
-    			<a className="item" href="#">Читать далее</a>
-    			<a className="item"><i className="fa fa-comment-o"></i> 10</a>
-    		    <a className="item"><i className="fa fa-heart-o"></i> {post.postLikes}</a>
+    			<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+            <a className="item">Читать далее</a>
+          </Link>
+    			<a className="item"><i className="fa fa-comment-o"></i> {comments}</a>
+    		    <a className="item"><i className="fa fa-heart-o"></i> {likes}</a>
     		</div>
 
     		<style jsx>{`

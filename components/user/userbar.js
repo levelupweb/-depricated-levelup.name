@@ -10,8 +10,6 @@ class UserBar extends React.Component {
     this.state = {
       user: null
     }
-
-    this.currentUser = this.props.user.profile;
   }
 
   componentWillMount() {
@@ -29,12 +27,13 @@ class UserBar extends React.Component {
   }
 
   render() {
-    var user = this.state.user
-    if(user) {
+    if(this.state.user) {
+      var user = this.state.user;
+      var currentUser = this.props.user.profile || {};
       return (
         <div className="userbar">
           <div className="left">
-            {(user._id == this.currentUser._id) ? 
+            {(user._id == currentUser._id || false) ? 
               <div className="editing">
                 <Link href={{ pathname: 'settings', query: { slug: this.state.user.slug }}}>
                   <a><i className="fa fa-cog"></i></a>
@@ -94,7 +93,7 @@ class Statistic extends React.Component {
         <div className="ui statistics">
           <div className="statistic">
             <div className="value">
-              254
+              0
             </div>
             <div className="label">
               нрав.
@@ -102,7 +101,7 @@ class Statistic extends React.Component {
           </div>
           <div className="statistic">
             <div className="value">
-              22
+              0
             </div>
             <div className="label">
               подп.
@@ -110,7 +109,7 @@ class Statistic extends React.Component {
           </div>
           <div className="statistic">
             <div className="value">
-              2
+              0
             </div>
             <div className="label">
               публ.

@@ -10,13 +10,14 @@ import { setLikeById } from '../../actions/post.js'
 import declOfNum from '../../utils/declarationOfNum.js'
 import Avatar from 'react-avatar'
 import TimeAgo from 'timeago-react';
+import { connect } from 'react-redux'
 
 Router.onRouteChangeStart = (url) => {
   window.onscroll = null;
   clearInterval(window.startInterval);
 }
 
-export default class Post extends React.Component {
+class Post extends React.Component {
 
   constructor(props) {
     super(props);
@@ -51,6 +52,7 @@ export default class Post extends React.Component {
     })
   }
 
+
   componentDidMount() {
     // Сделать PostDescription полноценным полем 
     this.content.innerHTML = this.state.post.postContent;
@@ -60,7 +62,7 @@ export default class Post extends React.Component {
         user: res.data
       })
     }).then(() => {
-      if(this.state.post.postLikes.indexOf(this.state.user._id) != -1) {
+      if(this.state.post.postLikes.indexOf(this.props.user.profile._id) != -1) {
         this.setState({
           ...this.state,
           post: {
@@ -85,6 +87,7 @@ export default class Post extends React.Component {
   }
 
   render() {
+    console.log(this.props.user)
     let user = this.state.user || '';
     let post = this.state.post;
     let tags = post.postTags.map((item) => {
@@ -96,7 +99,7 @@ export default class Post extends React.Component {
     return (
       <article className="article single">
         <div>
-          <div className="ui feed">
+          <div className="ui feed userbar">
             <div className="event">
               <div className="label">
                 <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
@@ -145,7 +148,7 @@ export default class Post extends React.Component {
             <div className="item block">
               <span onClick={() => {this.handleLike()}} className={(this.state.post.liked) ? `checked` : ``}>
                   <i className={(this.state.post.liked) ? `fa fa-heart` : `fa fa-heart-o`}></i>
-                  <span>15</span>
+                  <span>{usersWhoLikes.length}</span>
               </span>
             </div>
             <div className="item block">
@@ -199,7 +202,7 @@ export default class Post extends React.Component {
           .ui.feed {
             margin-bottom:15px!important;
           }
-          .ui.feed .content {
+          .userbar.ui.feed .content {
             margin-top:0px;
           }
 
@@ -318,3 +321,5 @@ export default class Post extends React.Component {
     );
   }
 }
+
+export default connect((store) => store)(Post)

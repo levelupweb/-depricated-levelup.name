@@ -29,6 +29,10 @@ export function getLogout() {
 	}
 }
 
+export async function getAllUsers() {
+	return await axios.get(config.API + 'user/entries')	
+}
+
 export async function getUserById(id) {
 	return await axios.get(config.API + 'user/entries/id/' + id)	
 }

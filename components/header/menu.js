@@ -12,9 +12,11 @@ class Menu extends React.Component {
     return (
     	<div className="menu">
 		  <Link href='/'>
-        <a className="item"><b>Исследовать</b></a>
+        <a className="item"><b>Лента</b></a>
       </Link>
-		  <a className="item">Авторы</a>
+      <Link href='/authors'>
+		    <a className="item">Авторы</a>
+      </Link>
 		  <a className="item">Блоги</a>
 		  <a className="item">Рекламодателям</a>
 		</div>

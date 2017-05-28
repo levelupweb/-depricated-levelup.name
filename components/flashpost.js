@@ -1,6 +1,9 @@
 import React from 'react';
+import User from './user.js'
+import { connect } from 'react-redux'
+import Link from 'next/link'
 
-export default class FlashPost extends React.Component {
+class FlashPost extends React.Component {
 
   constructor(props) {
     super(props);
@@ -24,15 +27,16 @@ export default class FlashPost extends React.Component {
       <div className={(this.state.flashpost.revealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.revealFlashPost()}}>
 			<form className="ui form">
 				<div className="field">
-					<div className="user">
-  					<i className="fa fa-paper-plane"></i>
-  					<img className="rounded image ui" src="../static/img/avatar.png" width="40px" height="40px" />
+					<div className="user-image">
+  					<User id={this.props.user.profile._id} size="dropdown" />
 			    </div>
 			    <textarea rows="2" placeholder="О чем бы вы хотели сейчас рассказать?" />
 			    <div className="bar">
-			    	<button className="medium circular ui button primary">
-					  Перейти в редактор
-					</button>
+			    	<Link href="/editor">
+              <a className="medium circular ui button primary">
+    					  Перейти в редактор
+    					</a>
+            </Link>
 			    </div>
 		  	</div>
 			</form>
@@ -40,3 +44,6 @@ export default class FlashPost extends React.Component {
     );
   }
 }
+
+
+export default connect((store) => store)(FlashPost)

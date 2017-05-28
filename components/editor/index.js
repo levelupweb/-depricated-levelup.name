@@ -27,7 +27,7 @@ class EditorWrapper extends React.Component {
         postTitle: '',
         postTags: '',
         postContent: '',
-        postLikes: 0,
+        postLikes: [],
         postFavorites: [],
         postAuthor: null
       }
@@ -331,7 +331,8 @@ class EditorWrapper extends React.Component {
       			display:flex;
       			justify-content:center;
       			align-items:center;
-      			background:rgba(0,0,0,0.7);
+      			background:rgba(0,0,0,0.03);
+            border-bottom:1px solid #eee;
             color:#c0c0c0;
       			cursor:pointer;
       			transition:0.2s all ease;
@@ -342,9 +343,6 @@ class EditorWrapper extends React.Component {
             padding-bottom:4px;
           }
 
-      		.editor .thumbnail:hover {
-      			background:rgba(0,0,0,0.8);
-      		}
 
       		.editor .thumbnail input[type="file"] {
       			display:none;

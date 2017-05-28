@@ -31,7 +31,8 @@ class Sidebar extends React.Component {
 			this.setState({
 				subscriptions: {
 					...this.state.subscriptions,
-					users: res.data.userSubscriptions
+					users: res.data.userSubscriptions,
+					blogs: [{hello: 'world'}]
 				}
 			})
 		})
@@ -110,7 +111,7 @@ class Sidebar extends React.Component {
 		      	</div>
 
 		      	<div className="block add">
-		      		<Link href="/editor" prefetch><button className="large fluid circular ui button primary">
+		      		<Link href="/editor" prefetch><button className="large basic fluid circular ui button inverted">
 					  Написать пост
 					</button></Link>
 		      	</div>
@@ -126,8 +127,8 @@ class Sidebar extends React.Component {
 		      				<UserList users={this.state.subscriptions.users} /> : <Loader />
 		      			}
 		      			<div className="ui divider"></div>
-		      			{(this.state.subscriptions.users) ?
-		      				<UserList users={this.state.subscriptions.users} /> : <Loader />
+		      			{(this.state.subscriptions.blogs) ?
+		      				<UserList users={this.state.subscriptions.blogs} /> : <Loader />
 		      			}
 		      		</div>
 		      	</div>

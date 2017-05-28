@@ -57,9 +57,9 @@ class UserSingle extends React.Component {
         	<UserBar userdata={user} />
     			<div id="tabs-container">
     			    <ul className="tabs-menu">
-  			        <li className="current"><a href="#publications">Публикации <span>3</span></a></li>
-  			        <li><a href="#bookmarks">Закладки <span>23</span></a></li>
-  			        <li><a href="#comments">Комментарии <span>15</span></a></li>
+  			        <li className="current"><a href="#publications">Публикации <span>0</span></a></li>
+  			        <li><a href="#bookmarks">Закладки <span>0</span></a></li>
+  			        <li><a href="#comments">Комментарии <span>0</span></a></li>
     			    </ul>
               <div className="ui divider"></div>
     			    <div className="tab">
