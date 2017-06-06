@@ -2,31 +2,25 @@ import React from 'react';
 import { getAllUsers } from '../../../actions/user.js'
 import Loader from '../../loader.js'
 import TimeAgo from 'timeago-react';
+import SubscribeButton from '../../subscribeButton.js'
+import Avatar from 'react-avatar'
+import Link from 'next/link'
+import { connect } from 'react-redux'
+import UserList from '../../user-list.js'
 
-export default class Authors extends React.Component {
+// Clever Component. Accepts nothing and retrieving all users from DB
+
+class Authors extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-    	entries: null,
-    	components: null,
+    	entries: [],
     	loaded: false
     }
   }
 
   componentWillMount() {
-  	var components = [];
-  	getAllUsers().then((res) => {
-  		this.setState({
-  			entries: res.data
-  		})
-  	}).then(() => {
-  		this.state.entries.map((item, i) => {
-  			components.push(<User user={item} key={i} />)
-  		})
-  		this.setState({
-  			components: components
-  		})
-  	})
+  	console.log(this.props)
   }
 
   componentDidMount() {
@@ -36,41 +30,16 @@ export default class Authors extends React.Component {
   }
 
   render() {
-  	console.log(this.state)
-  	if(this.state.loaded) {
-	    return (
-	      <div className="ui three column grid">{this.state.components}</div>
-	    )
-	} else {
-		return (<Loader />)
-	}
-  }
+    	if(this.state.loaded) {
+  	    return (
+  	      <div className="ui three column grid">
+            <UserList size="block" />
+          </div>
+  	    )
+  	  } else {
+    		return (<Loader />)
+    	}
+    }
 }
 
-var User = (props) => {
-	var user = props.user;
-	return (
-		<div className="column">
-		<div className="ui card block-shadow">
-		  <div className="image">
-		    <img src={user.userImage} width="100%" />
-		  </div>
-		  <div className="content">
-		    <a className="header">{user.userName}</a>
-		    <div className="meta">
-		      <span className="date">Присоединился <TimeAgo datetime={user.created} locale='ru' /></span>
-		    </div>
-		    <div className="description">
-		      {user.userBio}
-		    </div>
-		  </div>
-		  <div className="extra content">
-		    <a>
-		      <i className="user icon"></i>
-		      1 подписчик
-		    </a>
-		  </div>
-		</div>
-		</div>
-	)
-}
+export default connect((store) => store)(Authors)

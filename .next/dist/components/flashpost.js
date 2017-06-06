@@ -70,9 +70,13 @@ var FlashPost = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return _react2.default.createElement('div', { className: this.state.flashpost.revealed ? 'revealed flashpost' : 'flashpost', onClick: function onClick() {
-          _this2.revealFlashPost();
-        } }, _react2.default.createElement('form', { className: 'ui form' }, _react2.default.createElement('div', { className: 'field' }, _react2.default.createElement('div', { className: 'user-image' }, _react2.default.createElement(_user2.default, { id: this.props.user.profile._id, size: 'dropdown' })), _react2.default.createElement('textarea', { rows: '2', placeholder: '\u041E \u0447\u0435\u043C \u0431\u044B \u0432\u044B \u0445\u043E\u0442\u0435\u043B\u0438 \u0441\u0435\u0439\u0447\u0430\u0441 \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u0430\u0442\u044C?' }), _react2.default.createElement('div', { className: 'bar' }, _react2.default.createElement(_link2.default, { href: '/editor' }, _react2.default.createElement('a', { className: 'medium circular ui button primary' }, '\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u0432 \u0440\u0435\u0434\u0430\u043A\u0442\u043E\u0440'))))));
+      if (this.props.user.profile) {
+        return _react2.default.createElement('div', { className: this.state.flashpost.revealed ? 'revealed flashpost' : 'flashpost', onClick: function onClick() {
+            _this2.revealFlashPost();
+          } }, _react2.default.createElement('form', { className: 'ui form' }, _react2.default.createElement('div', { className: 'field' }, _react2.default.createElement('div', { className: 'user-image' }, _react2.default.createElement(_user2.default, { id: this.props.user.profile._id, size: 'dropdown' })), _react2.default.createElement('textarea', { rows: '2', placeholder: '\u041E \u0447\u0435\u043C \u0431\u044B \u0432\u044B \u0445\u043E\u0442\u0435\u043B\u0438 \u0441\u0435\u0439\u0447\u0430\u0441 \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u0430\u0442\u044C?' }), _react2.default.createElement('div', { className: 'bar' }, _react2.default.createElement(_link2.default, { href: '/editor' }, _react2.default.createElement('a', { className: 'medium circular ui button primary' }, '\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u0432 \u0440\u0435\u0434\u0430\u043A\u0442\u043E\u0440'))))));
+      } else {
+        return _react2.default.createElement('div', null);
+      }
     }
   }]);
 

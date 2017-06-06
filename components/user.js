@@ -11,6 +11,9 @@ import router from 'next/router'
 // 1. Разделить вид для владельца и для третьих лиц
 // 2. Пофиксить баг с отображением small-темплейта
 
+
+// Clever Component. Accepts UserID or accepts currentUser if UserID == null
+
 export class User extends React.Component {
 
   constructor(props) {
@@ -55,7 +58,6 @@ export class User extends React.Component {
     }
   }
 
-
   render() {
     var user = this.state.user;
     if(this.state.isLoaded && this.state.user != null) {
@@ -70,7 +72,9 @@ export class User extends React.Component {
               <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
                 <span className="name">{user.userName}</span>
               </a></Link>
-              <div className={(this.props.size == 'small') ? `hidden` : `description`}>{user.userDescription}</div>
+              <div className={(this.props.size == 'small') ? `hidden` : `description`}>
+                {(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}
+              </div>
             </div>
             
         		<style jsx>{`

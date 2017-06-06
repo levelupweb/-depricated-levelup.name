@@ -23,25 +23,29 @@ class FlashPost extends React.Component {
   }
 
   render() {
-    return (
-      <div className={(this.state.flashpost.revealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.revealFlashPost()}}>
-			<form className="ui form">
-				<div className="field">
-					<div className="user-image">
-  					<User id={this.props.user.profile._id} size="dropdown" />
-			    </div>
-			    <textarea rows="2" placeholder="О чем бы вы хотели сейчас рассказать?" />
-			    <div className="bar">
-			    	<Link href="/editor">
-              <a className="medium circular ui button primary">
-    					  Перейти в редактор
-    					</a>
-            </Link>
-			    </div>
-		  	</div>
-			</form>
-		</div>
-    );
+    if(this.props.user.profile) {
+      return (
+        <div className={(this.state.flashpost.revealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.revealFlashPost()}}>
+  			<form className="ui form">
+  				<div className="field">
+  					<div className="user-image">
+    					<User id={this.props.user.profile._id} size="dropdown" />
+  			    </div>
+  			    <textarea rows="2" placeholder="О чем бы вы хотели сейчас рассказать?" />
+  			    <div className="bar">
+  			    	<Link href="/editor">
+                <a className="medium circular ui button primary">
+      					  Перейти в редактор
+      					</a>
+              </Link>
+  			    </div>
+  		  	</div>
+  			</form>
+  		</div>
+      );
+    } else {
+      return (<div></div>)
+    }
   }
 }
 

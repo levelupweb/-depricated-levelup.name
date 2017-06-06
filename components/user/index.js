@@ -14,19 +14,19 @@ class UserSingle extends React.Component {
   }
 
   componentWillMount() {
-    var data = this.props.app.pageData;
+    var data = this.props.app.pageData.user;
     if(data !== null) {
       this.setState({
-        user: data.user
+        user: data
       })
     }
   }
 
   componentWillReceiveProps() {
-    var data = this.props.app.pageData;
+    var data = this.props.app.pageData.user;
     if(data !== null) {
       this.setState({
-        user: data.user
+        user: data
       })
     }
   }
@@ -49,9 +49,10 @@ class UserSingle extends React.Component {
     });
   }
 
+
   render() {
     var user = this.state.user
-    if(this.state.user !== null) {
+    if(user) {
       return (
         <div className="profile-feed feed">
         	<UserBar userdata={user} />
@@ -77,6 +78,9 @@ class UserSingle extends React.Component {
           <style jsx>{`
             #tabs-container {
               margin-top:15px;
+            }
+            .tabs-menu a {
+              font-weight:bold
             }
           `}</style>
         </div>

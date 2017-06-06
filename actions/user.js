@@ -1,7 +1,8 @@
 import axios from 'axios'
 import config from '../app.config.js'
 
-export function setUser(token) {
+// Old Version
+/* export function setUser(token) {
     return (dispatch) => {
         axios({
 	      url: config.API + 'user/auth',
@@ -20,6 +21,37 @@ export function setUser(token) {
 	    		}
 	    	}
 	    }) 
+	}
+} */
+
+export function getUserByToken(token) {
+	return (dispatch) => {
+		if(token) { 
+			axios({
+				url: config.API + 'user/auth',
+				method: 'GET',
+				headers: {
+					'authorization': token
+				}
+		    }).then((res) => {
+
+		    	dispatch(setUser(res.data))
+		    	return res.data
+		    })
+		} else {
+			dispatch({type: 'LOGIN_FAILURE'})
+			return false
+		}
+	}
+}
+
+export function setUser(user) {
+	return (dispatch) => {
+		if (user) {
+			dispatch({type: 'LOGIN_SUCCESS', payload: user})
+		} else {
+			dispatch({type: 'LOGIN_FAILURE'})
+		}
 	}
 }
 
@@ -47,7 +79,7 @@ export async function removeUserById(id) {
 
 export function subscribeToUser(token, id) {
 	return axios({
-		url: config.API + 'user/' + id + '/subscribe',
+		url: config.API + 'user/' + id + '/subscribe/author',
 		method: 'GET',
 		headers: {
 			'authorization': token
@@ -66,3 +98,27 @@ export async function registerUser(data) {
 		data: data,
     })
 }
+
+export async function getUserSubscriptions(userID) {
+	return await axios.get(config.API + 'user/entries/' + userID + '/getsubscriptions')	
+}
+
+export async function addSocialToUser(token, id, data) {
+	return axios({
+		url: config.API + 'user/entries/' + id + '/addsocial',
+		method: 'POST',
+		data: data,
+		headers: {
+			'authorization': token
+		}
+    })
+}
+
+export async function getUserLikesCount(userID) {
+	return await axios.get(config.API + 'user/entries/' + userID + '/getlikecount')	
+}
+
+export async function getUserPostsCount(userID) {
+	return await axios.get(config.API + 'user/entries/' + userID + '/getpostscount')	
+}
+

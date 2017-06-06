@@ -3,7 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = exports.getAllUsers = undefined;
+exports.getUserPostsCount = exports.getUserLikesCount = exports.addSocialToUser = exports.getUserSubscriptions = exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = exports.getAllUsers = undefined;
+exports.getUserByToken = getUserByToken;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
 exports.subscribeToUser = subscribeToUser;
@@ -26,25 +27,57 @@ var _appConfig2 = _interopRequireDefault(_appConfig);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function setUser(token) {
+// Old Version
+/* export function setUser(token) {
+    return (dispatch) => {
+        axios({
+	      url: config.API + 'user/auth',
+	      method: 'GET',
+	      headers: {
+	        'authorization': token
+	      }
+	    }).then((res) => {
+	    	if(token == 0) { 
+	    		dispatch({type: 'LOGIN_FAILURE'})
+	    	} else {
+	    		if (res.data) {
+	    			dispatch({type: 'LOGIN_SUCCESS', payload: res.data})
+	    		} else {
+	    			dispatch({type: 'LOGIN_FAILURE'})
+	    		}
+	    	}
+	    }) 
+	}
+} */
+
+function getUserByToken(token) {
 	return function (dispatch) {
-		(0, _axios2.default)({
-			url: _appConfig2.default.API + 'user/auth',
-			method: 'GET',
-			headers: {
-				'authorization': token
-			}
-		}).then(function (res) {
-			if (token == 0) {
-				dispatch({ type: 'LOGIN_FAILURE' });
-			} else {
-				if (res.data) {
-					dispatch({ type: 'LOGIN_SUCCESS', payload: res.data });
-				} else {
-					dispatch({ type: 'LOGIN_FAILURE' });
+		if (token) {
+			(0, _axios2.default)({
+				url: _appConfig2.default.API + 'user/auth',
+				method: 'GET',
+				headers: {
+					'authorization': token
 				}
-			}
-		});
+			}).then(function (res) {
+
+				dispatch(setUser(res.data));
+				return res.data;
+			});
+		} else {
+			dispatch({ type: 'LOGIN_FAILURE' });
+			return false;
+		}
+	};
+}
+
+function setUser(user) {
+	return function (dispatch) {
+		if (user) {
+			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+		} else {
+			dispatch({ type: 'LOGIN_FAILURE' });
+		}
 	};
 }
 
@@ -156,7 +189,7 @@ var removeUserById = exports.removeUserById = function () {
 
 function subscribeToUser(token, id) {
 	return (0, _axios2.default)({
-		url: _appConfig2.default.API + 'user/' + id + '/subscribe',
+		url: _appConfig2.default.API + 'user/' + id + '/subscribe/author',
 		method: 'GET',
 		headers: {
 			'authorization': token
@@ -211,5 +244,108 @@ var registerUser = exports.registerUser = function () {
 
 	return function registerUser(_x7) {
 		return _ref6.apply(this, arguments);
+	};
+}();
+
+var getUserSubscriptions = exports.getUserSubscriptions = function () {
+	var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(userID) {
+		return _regenerator2.default.wrap(function _callee7$(_context7) {
+			while (1) {
+				switch (_context7.prev = _context7.next) {
+					case 0:
+						_context7.next = 2;
+						return _axios2.default.get(_appConfig2.default.API + 'user/entries/' + userID + '/getsubscriptions');
+
+					case 2:
+						return _context7.abrupt('return', _context7.sent);
+
+					case 3:
+					case 'end':
+						return _context7.stop();
+				}
+			}
+		}, _callee7, this);
+	}));
+
+	return function getUserSubscriptions(_x8) {
+		return _ref7.apply(this, arguments);
+	};
+}();
+
+var addSocialToUser = exports.addSocialToUser = function () {
+	var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8(token, id, data) {
+		return _regenerator2.default.wrap(function _callee8$(_context8) {
+			while (1) {
+				switch (_context8.prev = _context8.next) {
+					case 0:
+						return _context8.abrupt('return', (0, _axios2.default)({
+							url: _appConfig2.default.API + 'user/entries/' + id + '/addsocial',
+							method: 'POST',
+							data: data,
+							headers: {
+								'authorization': token
+							}
+						}));
+
+					case 1:
+					case 'end':
+						return _context8.stop();
+				}
+			}
+		}, _callee8, this);
+	}));
+
+	return function addSocialToUser(_x9, _x10, _x11) {
+		return _ref8.apply(this, arguments);
+	};
+}();
+
+var getUserLikesCount = exports.getUserLikesCount = function () {
+	var _ref9 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9(userID) {
+		return _regenerator2.default.wrap(function _callee9$(_context9) {
+			while (1) {
+				switch (_context9.prev = _context9.next) {
+					case 0:
+						_context9.next = 2;
+						return _axios2.default.get(_appConfig2.default.API + 'user/entries/' + userID + '/getlikecount');
+
+					case 2:
+						return _context9.abrupt('return', _context9.sent);
+
+					case 3:
+					case 'end':
+						return _context9.stop();
+				}
+			}
+		}, _callee9, this);
+	}));
+
+	return function getUserLikesCount(_x12) {
+		return _ref9.apply(this, arguments);
+	};
+}();
+
+var getUserPostsCount = exports.getUserPostsCount = function () {
+	var _ref10 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10(userID) {
+		return _regenerator2.default.wrap(function _callee10$(_context10) {
+			while (1) {
+				switch (_context10.prev = _context10.next) {
+					case 0:
+						_context10.next = 2;
+						return _axios2.default.get(_appConfig2.default.API + 'user/entries/' + userID + '/getpostscount');
+
+					case 2:
+						return _context10.abrupt('return', _context10.sent);
+
+					case 3:
+					case 'end':
+						return _context10.stop();
+				}
+			}
+		}, _callee10, this);
+	}));
+
+	return function getUserPostsCount(_x13) {
+		return _ref10.apply(this, arguments);
 	};
 }();

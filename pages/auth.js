@@ -4,7 +4,7 @@ import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
 import Auth from '../components/auth/index'
 import SimpleHeader from '../components/simpleheader'
-import initScripts from '../utils/initscripts'
+import { UI } from '../utils/initscripts'
 import config from '../app.config'
 import createPage from '../utils/createPage.js'
 import page from '../components/HOC/page'
@@ -16,12 +16,12 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.page, <Auth data={this.props.data} />, <SimpleHeader />, null);
+    var page = createPage(this.props.app.pageSettings, <Auth />, <SimpleHeader />, null);
     this.state = { page: page }
   }
 
   componentDidMount() {
-    initScripts()
+    UI()
   }
 
   render() {
@@ -34,5 +34,7 @@ class Page extends React.Component {
   }
 }
 
-const Container = page(Page, 'auth')
+var query = null
+
+const Container = page(Page, 'auth', query)
 export default withRedux(initStore, (state) => state)(Container)

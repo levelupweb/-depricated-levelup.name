@@ -93,13 +93,18 @@ var prepareData = function () {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
+            if (!builder) {
+              _context3.next = 10;
+              break;
+            }
+
             data = {};
-            _context3.next = 3;
+            _context3.next = 4;
             return (0, _values2.default)(builder);
 
-          case 3:
+          case 4:
             queries = _context3.sent;
-            _context3.next = 6;
+            _context3.next = 7;
             return _promise2.default.all(queries.map(function () {
               var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(item) {
                 var slug, url;
@@ -148,10 +153,15 @@ var prepareData = function () {
               };
             }()));
 
-          case 6:
-            return _context3.abrupt('return', data);
-
           case 7:
+            return _context3.abrupt('return', new _promise2.default(function (resolve, reject) {
+              return resolve(data);
+            }));
+
+          case 10:
+            return _context3.abrupt('return', null);
+
+          case 11:
           case 'end':
             return _context3.stop();
         }
@@ -164,15 +174,8 @@ var prepareData = function () {
   };
 }();
 
-/* 
+// Добавить уровни доступа
 
-*** Функция, отвечающая за подготовку данных, которые могут понадобиться дочернему контейнеру
-
-* Component - дочерний компонент
-* slug - ключевое слово для генерируемой страницы
-* builder - объект с информацией о том, какие данные могут понадобиться дочернему контейнеру 
-
-*/
 
 /* 
 
@@ -188,73 +191,144 @@ function getToken(req) {
   } catch (err) {
     return 0;
   }
-}function page(Component, slug, builder) {
+}function canUserPass(options, user) {
+  if (user) {
+    return true;
+  } else {
+    if (options.mustBeLoggedIn) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+
+/* 
+
+*** Функция, отвечающая за подготовку данных, которые могут понадобиться дочернему контейнеру
+
+* Component - дочерний компонент
+* slug - ключевое слово для генерируемой страницы
+* builder - объект с информацией о том, какие данные могут понадобиться дочернему контейнеру 
+
+*/
+
+function page(Component, slug, builder) {
+
   return function (_Component) {
     (0, _inherits3.default)(GetAuth, _Component);
 
     (0, _createClass3.default)(GetAuth, null, [{
       key: 'getInitialProps',
       value: function () {
-        var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(_ref5) {
+        var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(_ref5) {
+          var _this3 = this;
+
           var req = _ref5.req,
               store = _ref5.store,
               query = _ref5.query;
-          var token, page, json, data;
-          return _regenerator2.default.wrap(function _callee4$(_context4) {
+          var token, user, page, isCanUserPass;
+          return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
-              switch (_context4.prev = _context4.next) {
+              switch (_context6.prev = _context6.next) {
                 case 0:
-                  _context4.next = 2;
+                  _context6.next = 2;
                   return getToken(req);
 
                 case 2:
-                  token = _context4.sent;
-                  _context4.next = 5;
-                  return store.dispatch((0, _user.setUser)(token));
+                  token = _context6.sent;
+                  _context6.next = 5;
+                  return store.dispatch((0, _user.getUserByToken)(token));
 
                 case 5:
-                  _context4.next = 7;
-                  return store.dispatch((0, _app.setQuery)(builder, query));
+                  user = _context6.sent;
+                  _context6.next = 8;
+                  return (0, _app.getPageBySlug)(slug);
 
-                case 7:
-                  _context4.next = 9;
-                  return (0, _isomorphicFetch2.default)(_appConfig2.default.API + 'page/entries/' + slug);
+                case 8:
+                  page = _context6.sent;
+                  _context6.next = 11;
+                  return canUserPass({
+                    mustBeLoggedIn: page.userMustBeLoggedIn
+                  }, user);
 
-                case 9:
-                  page = _context4.sent;
-                  _context4.next = 12;
-                  return page.json();
+                case 11:
+                  isCanUserPass = _context6.sent;
+                  _context6.next = 14;
+                  return (0, _app.getPageBySlug)(slug).then(function () {
+                    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(res) {
+                      return _regenerator2.default.wrap(function _callee5$(_context5) {
+                        while (1) {
+                          switch (_context5.prev = _context5.next) {
+                            case 0:
+                              _context5.next = 2;
+                              return prepareData(builder, query).then(function () {
+                                var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(res) {
+                                  return _regenerator2.default.wrap(function _callee4$(_context4) {
+                                    while (1) {
+                                      switch (_context4.prev = _context4.next) {
+                                        case 0:
+                                          if (!isCanUserPass) {
+                                            _context4.next = 9;
+                                            break;
+                                          }
 
-                case 12:
-                  json = _context4.sent;
+                                          _context4.next = 3;
+                                          return store.dispatch((0, _app.setQuery)(builder, query));
 
-                  if (!builder) {
-                    _context4.next = 17;
-                    break;
-                  }
+                                        case 3:
+                                          _context4.next = 5;
+                                          return store.dispatch((0, _app.setPageData)(res));
 
-                  _context4.next = 16;
-                  return prepareData(builder, query);
+                                        case 5:
+                                          _context4.next = 7;
+                                          return store.dispatch((0, _app.setPageSettings)(page.data));
 
-                case 16:
-                  data = _context4.sent;
+                                        case 7:
+                                          _context4.next = 11;
+                                          break;
 
-                case 17:
-                  _context4.next = 19;
-                  return store.dispatch((0, _app.setPageData)(data));
+                                        case 9:
+                                          _context4.next = 11;
+                                          return store.dispatch((0, _app.setAccessError)());
 
-                case 19:
-                  return _context4.abrupt('return', {
-                    page: json,
-                    data: data
+                                        case 11:
+                                        case 'end':
+                                          return _context4.stop();
+                                      }
+                                    }
+                                  }, _callee4, _this3);
+                                }));
+
+                                return function (_x7) {
+                                  return _ref7.apply(this, arguments);
+                                };
+                              }());
+
+                            case 2:
+                            case 'end':
+                              return _context5.stop();
+                          }
+                        }
+                      }, _callee5, _this3);
+                    }));
+
+                    return function (_x6) {
+                      return _ref6.apply(this, arguments);
+                    };
+                  }());
+
+                case 14:
+                  return _context6.abrupt('return', {
+                    user: user
                   });
 
-                case 20:
+                case 15:
                 case 'end':
-                  return _context4.stop();
+                  return _context6.stop();
               }
             }
-          }, _callee4, this);
+          }, _callee6, this);
         }));
 
         function getInitialProps(_x5) {
@@ -284,10 +358,21 @@ function getToken(req) {
           isLoading: false
         });
       }
+
+      // Лоадер сделать более симпотичным
+
     }, {
       key: 'render',
       value: function render() {
-        return _react2.default.createElement('div', null, this.state.isLoading ? _react2.default.createElement(_loader2.default, null) : _react2.default.createElement(Component, this.props));
+        if (this.state.isLoading) {
+          return _react2.default.createElement(_loader2.default, null);
+        } else {
+          if (this.props.app.accessable) {
+            return _react2.default.createElement(Component, this.props);
+          } else {
+            return _react2.default.createElement('div', null, '\u041D\u0435\u0442 \u0434\u043E\u0441\u0442\u0443\u043F\u0430');
+          }
+        }
       }
     }]);
 

@@ -1,9 +1,11 @@
 import React from 'react';
 import UserBar from './userbar'
 import { connect } from 'react-redux'
+import { UI } from '../../utils/initscripts.js'
 import Avatar from 'react-avatar'
 import Link from 'next/link'
-import { updateUserById } from '../../actions/user'
+import { updateUserById, addSocialToUser } from '../../actions/user'
+import cookies from 'js-cookie'
 
 class UserSingle extends React.Component {
 
@@ -21,9 +23,15 @@ class UserSingle extends React.Component {
         userPassword: null,
         userCompany: null,
         userDescription: null,
+        userSocials: [
+          {title: 'vk', link: 'http://vk.com/vanya2h'},
+          {title: 'twitter', link: 'http://twitter.com/vanya2h'}
+        ],
         userBio: null
       }
     }
+    this.token = cookies.get('x-access-token');
+    this.currentUser = this.props.user.profile;
   }
 
   componentWillMount() {
@@ -40,6 +48,18 @@ class UserSingle extends React.Component {
 
   componentDidMount() {
     this.bindChangeEvent();
+    UI()
+    $('.socials .addbutton').popup({
+       popup : $('.socials .popup'),
+       on    : 'click'
+    })
+  }
+
+  handleNewSocial() {
+    var newSocial = { title: this.newSocialTitle.innerHTML, link: this.newSocialLink.value }
+    addSocialToUser(this.token, this.currentUser._id, newSocial).then((res) => {
+      console.log(res.data)
+    }) 
   }
 
   handleSave() {
@@ -120,6 +140,51 @@ class UserSingle extends React.Component {
                     <label>Биография</label>
                     <textarea name="userBio" placeholder="Биография, пару слов о себе" rows="2" defaultValue={entry.userBio}></textarea>
                   </div>
+                  <div className="socials field">
+                    <label>Социальные сети</label>
+                      <div className="items">
+                        { entry.userSocials.map((item, i) => {
+                          var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
+                          return (<div key={i} className={slug + ' ui circular icon button item'}>
+                                  <i className={'fa-' + slug + ' fa icon'}></i>
+                                </div>)
+                        })}
+                      
+                      <div className="ui circular floating icon button basic addbutton"><i className="fa fa-plus"></i></div>
+                      <div className="ui fluid popup top left transition hidden">
+                        <div className="ui divided">
+                            <div className="field">
+                            <label>Добавление сети</label>
+                              <div className="ui rounded floating icon button basic dropdown">
+                                <span className="text" ref={(title) => {this.newSocialTitle = title}}>Сеть</span>
+                                <div className="menu">
+                                  <div className="search">
+                                    <input type="text" placeholder="Поиск..." />
+                                  </div>
+                                  <div className="divider"></div>
+                                  <div className="header">Выберите сеть</div>
+                                  <div className="scrolling menu">
+                                    <div className="item">Vk</div>
+                                    <div className="item">Github</div>
+                                    <div className="item">Facebook</div>
+                                    <div className="item">Twitter</div>
+                                    <div className="item">Google Plus</div>
+                                    <div className="item">LinkedIn</div>
+                                    <div className="item">YouTube</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="field">
+                              <input type="text" ref={(link) => {this.newSocialLink = link}} placeholder="Ссылка на профиль" />
+                            </div>
+                            <div className="field">
+                              <span onClick={() => {this.handleNewSocial()}} className="ui button rounded fluid basic">Добавить</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
                 </div>
               </div>
             <br />
@@ -129,6 +194,36 @@ class UserSingle extends React.Component {
             </Link>
           </div>
   		    </div>
+          <style jsx>{`
+            .socials-form {
+              padding:15px;
+            }
+
+            .socials .items .item {
+              margin-bottom:5px;
+            }
+      
+            .socials .divided {
+              display:flex;
+              flex-direction:column;
+            }
+
+            .socials .divided input,
+            .socials .divided .button {
+              width:100%;
+            }
+
+            .socials .dropdown .menu {
+              min-width:200px;
+              margin-top:20px;
+            }
+
+            .socials .dropdown .menu input {
+              margin:15px;
+              display:block;
+              width:185px;
+            }
+          `}</style>
         </div>
       );
     } else {
@@ -139,4 +234,4 @@ class UserSingle extends React.Component {
   }
 }
 
-export default connect(state => state.usersingle)(UserSingle)
+export default connect(state => state)(UserSingle)

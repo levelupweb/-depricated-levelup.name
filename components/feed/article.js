@@ -22,10 +22,12 @@ export default class Article extends React.Component {
   }
 
   componentDidMount() {
-  	var description = this.stripHTML(this.state.postContent.substring(0, 200))
-  	this.setState({
-  		postDescription: description
-  	})
+    if(this.state.postContent) { 
+    	var description = this.stripHTML(this.state.postContent.substring(0, 200))
+    	this.setState({
+    		postDescription: description
+    	})
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,7 +51,6 @@ export default class Article extends React.Component {
       var comments = ``;
     }
     var likes = post.postLikes.length
-  	var description = post.postContent.substring(0, 200);
 
     return (
       <article className={`article preview grid-item w-100`}>
@@ -61,7 +62,7 @@ export default class Article extends React.Component {
     			<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
     				<a><h1>{post.postTitle}</h1></a>
     			</Link>
-    			<p className="primary">{post.postDescription}</p>
+    			<p className="primary">{(post.postDescription) ? post.postDescription : ''}</p>
     		</div>
 
     		<div className="meta">

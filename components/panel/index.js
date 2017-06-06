@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import { Pages } from './pages'
 import { Users } from './users'
 import { Posts } from './posts'
+import { Tags  } from './tags'
 
 class Panel extends React.Component {
   constructor(props) {
@@ -29,6 +30,7 @@ class Panel extends React.Component {
     		  </div>
           <div className="six wide column">
             <Users />
+            <Tags />
           </div>
     		</div>
       </div>

@@ -164,6 +164,12 @@ class AddPage extends React.Component {
               <label>Включить сайдбар</label>
             </div>
           </div>
+          <div className="inline field">
+            <div className="ui checkbox">
+              <input data-type="checkbox" data-label="Обязательная авторизация" name="userMustBeLoggedIn" type="checkbox" className="hidden" />
+              <label>Обязательная авторизация</label>
+            </div>
+          </div>
           <div className="fluid ui button" onClick={() => {this.handleSubmit()}}>Отправить</div>
 		    </div>
       	<style jsx>{`
@@ -329,6 +335,12 @@ export class PagesContainer extends React.Component {
                 <label>Включить сайдбар</label>
               </div>
             </div>
+            <div className="inline field">
+            <div className="ui checkbox">
+              <input defaultChecked={entry.userMustBeLoggedIn} data-type="checkbox" data-label="Обязательная авторизация" name="userMustBeLoggedIn" type="checkbox" className="hidden" />
+              <label>Обязательная авторизация</label>
+            </div>
+          </div>
           </div>
           <br />
           <div className="button ui primary" onClick={() => {this.handleSave()}}>Сохранить</div>

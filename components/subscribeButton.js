@@ -18,11 +18,13 @@ class SubscribeButton extends React.Component {
 
   componentWillMount() {
   	let currentUser = this.props.user.profile
-  	if(currentUser.userSubscriptions.indexOf(this.props.id) != -1) {
-  		this.setState({
-  			isSubscribed: true
-  		})
-  	}  
+    if(currentUser) {
+    	if(currentUser.userSubscriptions.authors.indexOf(this.props.id) != -1) {
+    		this.setState({
+    			isSubscribed: true
+    		})
+    	}  
+    }
   }
 
   handleSubscription(token, id) {
@@ -35,16 +37,16 @@ class SubscribeButton extends React.Component {
   }
 
   render() {
-  	if(this.state.isSubscribed) {
+  	if(!this.state.isSubscribed) {
   		return (
-  			<a onClick={() => {this.handleSubscription(this.token, this.props.id)}} className="button circular small ui">
-		        Отписаться от автора
+  			<a onClick={() => {this.handleSubscription(this.token, this.props.id)}} className={`button circular ui primary ${this.props.additionalClasses}`}>
+		        {(this.props.subscribeText) ? this.props.subscribeText : 'Подписаться на автора'}
 		    </a>	
       	)
   	} else {
 	    return (
-			<a onClick={() => {this.handleSubscription(this.token, this.props.id)}} className="button circular small ui primary">
-				Подписаться на автора
+			<a onClick={() => {this.handleSubscription(this.token, this.props.id)}} className={`button circular ui ${this.props.additionalClasses}`}>
+				    {(this.props.unsubscribeText) ? this.props.unsubscribeText : 'Отписаться от автора'}
 			</a>	
 	    )
 	}

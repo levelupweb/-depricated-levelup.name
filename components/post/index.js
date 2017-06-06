@@ -82,12 +82,11 @@ class Post extends React.Component {
 
   handleSubscription(id) {
     subscribeToUser(this.token, id).then((res) => {
-      // Handle подписку
+      console.log(res)
     })
   }
 
   render() {
-    console.log(this.props.user)
     let user = this.state.user || '';
     let post = this.state.post;
     let tags = post.postTags.map((item) => {

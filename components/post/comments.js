@@ -49,7 +49,6 @@ class Comments extends React.Component {
   		commentContent: comment,
   		commentAuthor: this.currentUser._id,
   		commentPost: this.props.postId
-
   	}
   	postComment(token, data).then((res) => {
   		console.log(res.data)
@@ -90,17 +89,21 @@ class Comments extends React.Component {
 			  </div>
 			  <div className="ui divider"></div>
 			</div>
-		  	<div ref={(floating) => {this.floating = floating}} className="floating">
-		  		<div className="left">
-		  			<div className="form">
-		  				<User id={currentUser._id} size="dropdown" />
-		  				<textarea onClick={() => {this.handleReply()}} onChange={() => {this.handleTyping()}} ref={(commentForm) => {this.commentForm = commentForm}} placeholder="Ваш комментарий.."></textarea>
-		  			</div>
-		  		</div>
-		  		<div className="right">
-		  			<a href="#" onClick={() => {this.handleSubmit()}} className="ui circular button primary basic">Отправить</a>
-		  		</div>
-		  	</div>
+			{(currentUser) ? 
+			  	<div ref={(floating) => {this.floating = floating}} className="floating">
+			  		<div className="left">
+			  			<div className="form">
+			  				<User id={currentUser._id} size="dropdown" />
+			  				<textarea onClick={() => {this.handleReply()}} onChange={() => {this.handleTyping()}} ref={(commentForm) => {this.commentForm = commentForm}} placeholder="Ваш комментарий.."></textarea>
+			  			</div>
+			  		</div>
+			  		<div className="right">
+			  			<a href="#" onClick={() => {this.handleSubmit()}} className="ui circular button primary basic">Отправить</a>
+			  		</div>
+			  	</div>
+			  	: 
+			  	<div><Link href="/auth">Авторизируйтесь, чтобы оставить комментарий</Link></div>
+			  }
 
 			<style jsx>{`
 				.comments .floating {

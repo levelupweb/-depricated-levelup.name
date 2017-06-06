@@ -18,25 +18,10 @@ class Sidebar extends React.Component {
     	subscriptions: {
     		users: null,
     		blogs: null,
-    		tags: [],
-    		popular: ['здоровье', 'веб-разработка', 'чтиво', 'блог', 'программирование']
+    		tags: null,
+    		popular: null
     	}
     }
-  }
-
-
-  componentWillMount() {
-  	if(this.currentUser) {
-		getUserField(this.currentUser._id, 'userSubscriptions').then((res) => {
-			this.setState({
-				subscriptions: {
-					...this.state.subscriptions,
-					users: res.data.userSubscriptions,
-					blogs: [{hello: 'world'}]
-				}
-			})
-		})
-	}
   }
 
   componentDidMount() {
@@ -82,9 +67,7 @@ class Sidebar extends React.Component {
 						</h3>
 					</div>
 					<div className="block-content">
-						{(this.state.subscriptions.popular) ?
-		      				<TagsList tags={this.state.subscriptions.popular} /> : <Loader />
-		      			}
+		      			<TagsList />
 		      		</div>
       			</div>
       		</div>
@@ -111,7 +94,8 @@ class Sidebar extends React.Component {
 		      	</div>
 
 		      	<div className="block add">
-		      		<Link href="/editor" prefetch><button className="large basic fluid circular ui button inverted">
+		      		<Link href="/editor" prefetch><button className="large labeled icon fluid ui button primary">
+					  <i className="fa fa-pencil icon"></i>
 					  Написать пост
 					</button></Link>
 		      	</div>
@@ -123,13 +107,11 @@ class Sidebar extends React.Component {
 						</h3>
 		      		</div>
 		      		<div className="block-content">
-		      			{(this.state.subscriptions.users) ?
-		      				<UserList users={this.state.subscriptions.users} /> : <Loader />
-		      			}
+		      			<UserList subscriber={this.currentUser._id} />
 		      			<div className="ui divider"></div>
-		      			{(this.state.subscriptions.blogs) ?
+		      			{/* {(this.state.subscriptions.blogs) ?
 		      				<UserList users={this.state.subscriptions.blogs} /> : <Loader />
-		      			}
+		      			} */}
 		      		</div>
 		      	</div>
 
@@ -140,9 +122,7 @@ class Sidebar extends React.Component {
 						</h3>
 		      		</div>
 		      		<div className="block-content">
-		      			{(this.state.subscriptions.tags) ?
-		      				<TagsList tags={this.state.subscriptions.tags} /> : <Loader />
-		      			}
+		      			<TagsList subscriber={this.props.user.profile._id} />
 		      		</div>
 		      	</div>
 	      	</div>

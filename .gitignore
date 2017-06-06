@@ -46,6 +46,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.next/dist
+.next/bundles
 node_modules
 Дизайн
 .next/dist/components/body.js

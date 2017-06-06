@@ -71,12 +71,11 @@ var Body = function (_React$Component) {
   (0, _createClass3.default)(Body, [{
     key: 'render',
     value: function render() {
-      var data = this.props.page,
-          title = null,
+      var data = this.props.app.pageSettings,
           children = this.props.children;
 
       if (data.pageShowTitle) {
-        title = _react2.default.createElement('h1', { className: 'ui header' }, data.pageTitle, _react2.default.createElement('div', { className: 'sub header' }, data.pageDescription));
+        var title = _react2.default.createElement('h1', { className: 'ui header' }, data.pageTitle, _react2.default.createElement('div', { className: 'sub header' }, data.pageDescription));
       }
       return _react2.default.createElement('div', { className: data.pageShowSidebar ? data.pageClassnames + ' main' : data.pageClassnames + ' full main' }, _react2.default.createElement('div', { className: 'inner' }, data.pageShowHeader ? _react2.default.createElement(_header2.default, null) : '', _react2.default.createElement('div', { className: 'after-header' }, _react2.default.createElement('div', null, data.beforeChildren), _react2.default.createElement('div', { className: 'block' }, title, children), data.afterChildren)), _react2.default.createElement('div', { className: 'advert' }, _react2.default.createElement('div', { className: 'title' }, 'BANNER')));
     }

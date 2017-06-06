@@ -15,7 +15,7 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.page, <UserSettings data={this.props.data} />, null, null);
+    var page = createPage(this.props.app.pageSettings, <UserSettings data={this.props.app.pageData} />, null, null);
     this.state = { page: page }
   }
 

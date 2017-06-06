@@ -18,12 +18,11 @@ class Body extends React.Component {
   }
 
   render() {
-  	var data = this.props.page,
-  	    title = null,
+  	var data = this.props.app.pageSettings,
   	    children = this.props.children;
 
   	if (data.pageShowTitle) {
-      title = (
+      var title = (
         <h1 className="ui header">
     		  {data.pageTitle}
     		  <div className="sub header">{data.pageDescription}</div>
@@ -43,7 +42,7 @@ class Body extends React.Component {
       					{children}
       	      </div>
       	      {data.afterChildren}
-      		</div>
+      		  </div>
       	</div>
         <div className="advert">
           <div className="title">BANNER</div>

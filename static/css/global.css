@@ -178,6 +178,10 @@ form .field input:focus {
 	padding:18px 30px;
 }
 
+.block-vertical {
+	padding:18px 0px;
+}
+
 .block-shadow {
 	-webkit-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.9);
 	-moz-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.9);
@@ -323,24 +327,6 @@ margin-top:0px;
 	margin-bottom:5px;
 }
 
-.sidebar #tags .tag-list .tag:nth-child(3) {
-	opacity:0.8;
-}
-.sidebar #tags .tag-list .tag:nth-child(4) {
-	opacity:0.6;
-}
-.sidebar #tags .tag-list .tag:nth-child(5) {
-	opacity:0.5;
-}
-.sidebar #tags .tag-list .tag:nth-child(6) {
-	opacity:0.4;
-}
-.sidebar #tags .tag-list .tag:nth-child(7) {
-	opacity:0.3;
-}
-.sidebar #tags .tag-list .tag:nth-child(8) {
-	opacity:0.3;
-}
 
 .main .flashpost {
 	background:#fff;
