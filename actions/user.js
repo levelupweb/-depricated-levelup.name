@@ -122,3 +122,13 @@ export async function getUserPostsCount(userID) {
 	return await axios.get(config.API + 'user/entries/' + userID + '/getpostscount')	
 }
 
+export async function removeUserSocial(token, userid, data) {
+	return axios({
+		url: config.API + 'user/entries/' + userid + '/removesocial/',
+		method: 'POST',
+		data: data,
+		headers: {
+			'authorization': token
+		}
+    })
+}

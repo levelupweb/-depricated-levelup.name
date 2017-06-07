@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getUserPostsCount = exports.getUserLikesCount = exports.addSocialToUser = exports.getUserSubscriptions = exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = exports.getAllUsers = undefined;
+exports.removeUserSocial = exports.getUserPostsCount = exports.getUserLikesCount = exports.addSocialToUser = exports.getUserSubscriptions = exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = exports.getAllUsers = undefined;
 exports.getUserByToken = getUserByToken;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
@@ -347,5 +347,33 @@ var getUserPostsCount = exports.getUserPostsCount = function () {
 
 	return function getUserPostsCount(_x13) {
 		return _ref10.apply(this, arguments);
+	};
+}();
+
+var removeUserSocial = exports.removeUserSocial = function () {
+	var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11(token, userid, data) {
+		return _regenerator2.default.wrap(function _callee11$(_context11) {
+			while (1) {
+				switch (_context11.prev = _context11.next) {
+					case 0:
+						return _context11.abrupt('return', (0, _axios2.default)({
+							url: _appConfig2.default.API + 'user/entries/' + userid + '/removesocial/',
+							method: 'POST',
+							data: data,
+							headers: {
+								'authorization': token
+							}
+						}));
+
+					case 1:
+					case 'end':
+						return _context11.stop();
+				}
+			}
+		}, _callee11, this);
+	}));
+
+	return function removeUserSocial(_x14, _x15, _x16) {
+		return _ref11.apply(this, arguments);
 	};
 }();

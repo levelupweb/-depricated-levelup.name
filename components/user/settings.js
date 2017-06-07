@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { UI } from '../../utils/initscripts.js'
 import Avatar from 'react-avatar'
 import Link from 'next/link'
-import { updateUserById, addSocialToUser } from '../../actions/user'
+import { updateUserById, addSocialToUser, removeUserSocial } from '../../actions/user'
 import cookies from 'js-cookie'
 
 class UserSingle extends React.Component {
@@ -23,10 +23,7 @@ class UserSingle extends React.Component {
         userPassword: null,
         userCompany: null,
         userDescription: null,
-        userSocials: [
-          {title: 'vk', link: 'http://vk.com/vanya2h'},
-          {title: 'twitter', link: 'http://twitter.com/vanya2h'}
-        ],
+        userSocials: null,
         userBio: null
       }
     }
@@ -55,11 +52,31 @@ class UserSingle extends React.Component {
     })
   }
 
-  handleNewSocial() {
+  handleAddSocial() {
     var newSocial = { title: this.newSocialTitle.innerHTML, link: this.newSocialLink.value }
     addSocialToUser(this.token, this.currentUser._id, newSocial).then((res) => {
       console.log(res.data)
     }) 
+  }
+
+  // В будущем можно переделать на удаление через ID соц сети
+  handleRemoveSocial(slug) {
+    var lowerSlug = slug.toLowerCase().split(/[ ,]+/).join(' ');
+    var socialNode = document.querySelector('.socials .items .item.' + lowerSlug);
+    var userSocials = this.state.user.userSocials;
+    var socialIndex = -1;
+    for(var i = 0, len = userSocials.length; i < len; i++) 
+      if (userSocials[i].title == slug) { socialIndex = i; break; }
+    
+    removeUserSocial(this.token, this.currentUser._id, userSocials[socialIndex]).then((res) => {
+      if(res.data.success) {
+        socialNode.remove()
+        // Handle Success
+      } else {
+        console.log(res.data.message)
+        // Handle Error
+      }
+    })
   }
 
   handleSave() {
@@ -145,10 +162,12 @@ class UserSingle extends React.Component {
                       <div className="items">
                         { entry.userSocials.map((item, i) => {
                           var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
-                          return (<div key={i} className={slug + ' ui circular icon button item'}>
-                                  <i className={'fa-' + slug + ' fa icon'}></i>
-                                </div>)
-                        })}
+                          return (
+                            <a onClick={() => {this.handleRemoveSocial(item.title)}} key={i} className={slug + ' ui circular button item animated fade'}  tabindex="0">
+                              <div className="ui visible content"><i className={'fa-' + slug + ' fa icon'}></i></div>
+                              <div className="ui hidden content"><i className="fa fa-close icon"></i></div>
+                            </a>
+                          )})}
                       
                       <div className="ui circular floating icon button basic addbutton"><i className="fa fa-plus"></i></div>
                       <div className="ui fluid popup top left transition hidden">
@@ -179,7 +198,7 @@ class UserSingle extends React.Component {
                               <input type="text" ref={(link) => {this.newSocialLink = link}} placeholder="Ссылка на профиль" />
                             </div>
                             <div className="field">
-                              <span onClick={() => {this.handleNewSocial()}} className="ui button rounded fluid basic">Добавить</span>
+                              <span onClick={() => {this.handleAddSocial()}} className="ui button rounded fluid basic">Добавить</span>
                             </div>
                           </div>
                         </div>
@@ -199,10 +218,11 @@ class UserSingle extends React.Component {
               padding:15px;
             }
 
-            .socials .items .item {
-              margin-bottom:5px;
+            .socials .button.item:hover .hidden {
+              display:block;
+              opacity:1;
             }
-      
+
             .socials .divided {
               display:flex;
               flex-direction:column;
