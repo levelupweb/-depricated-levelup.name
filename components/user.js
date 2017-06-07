@@ -158,10 +158,30 @@ export class User extends React.Component {
           </div>
         ) 
     } else {
-      return (<div></div>)
+      return (<div><Blank /></div>)
     }
   }
 }
+
+
+export class Blank extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div className="user">
+        <div className="blank string"></div>
+        <div className="blank description"></div>
+        <style jsx>{`
+          
+        `}</style>
+      </div>
+    );
+  }
+}
+
 
 
 

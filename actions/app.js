@@ -30,6 +30,6 @@ export function getPageBySlug(slug) {
 	return axios.get(config.API + 'page/entries/' + slug)	
 }
 
-export function searchByQuery(query) {
+export function makeSearch(query) {
     return axios.get(config.API + 'search/entries/' + query)   
 }

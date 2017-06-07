@@ -654,4 +654,41 @@ margin-top:0px;
 
 .article .user .button {
     margin-left:15px!important;
+}
+
+  .blank {
+    background:#f3f3f3;
+    border-radius: 4px;
+  }
+
+  .blank.avatar {
+    width:40px;
+    height:40px;
+    border-radius:100%;
+  }
+
+  .blank.string {
+    width:200px;
+    height:15px;
+    background:#eee;
+    margin:3px 0px;
+  }
+
+  .blank.image {
+    width:100%;
+    height:220px;
+    margin:20px 0px;
+  }
+
+  .blank.header {
+    width:80%;
+    height:35px;
+    margin:10px 0px;
+    background:#eee;
+  }
+
+  .blank.description {
+    width:100%;
+    height:10px;
+    margin-top:10px;
   }

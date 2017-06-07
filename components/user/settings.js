@@ -8,7 +8,6 @@ import { updateUserById, addSocialToUser, removeUserSocial } from '../../actions
 import cookies from 'js-cookie'
 
 class UserSingle extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -27,6 +26,7 @@ class UserSingle extends React.Component {
         userBio: null
       }
     }
+
     this.token = cookies.get('x-access-token');
     this.currentUser = this.props.user.profile;
   }
@@ -34,7 +34,6 @@ class UserSingle extends React.Component {
   componentWillMount() {
     if(this.props.data.user !== null) {
       this.setState({
-        ...this.state,
         user: {
           ...this.state.user,
           ...this.props.data.user
@@ -55,7 +54,11 @@ class UserSingle extends React.Component {
   handleAddSocial() {
     var newSocial = { title: this.newSocialTitle.innerHTML, link: this.newSocialLink.value }
     addSocialToUser(this.token, this.currentUser._id, newSocial).then((res) => {
-      console.log(res.data)
+      if(res.data.success) {
+        // Добавление социальной сети в интерфейсе
+      } else {
+        // Алерт об ошибке
+      }
     }) 
   }
 
@@ -108,17 +111,23 @@ class UserSingle extends React.Component {
       var entry = this.state.user;
       return (
         <div>
-          <UserBar data={this.props.data} />
+          <Link href={{ pathname: 'user', query: { slug: entry.slug }}}>
+            <a className="ui button circular basic">
+              <i className="fa fa-angle-left icon"></i>
+              Назад
+            </a>
+          </Link>
+          <div className="ui button circular basic primary saveButton" onClick={() => {this.handleSave()}}>
+            <i className="fa fa-save icon"></i>
+            Сохранить
+          </div>
           <div className="ui divider"></div>
         	<div className="profile-feed feed">
             <div className="ui form" ref={(form) => {this.form = form}}>
               <div className="ui grid">
                 <div className="ui eight wide column">
-                  <h3 className="ui header">
-                    <div className="content">
-                      Основная информация
-                    </div>
-                  </h3>
+                  <h3 className="ui header">Основная информация</h3>
+                  <p>Редактируйте основную информацию о вашем аккаунте</p>
                   <div className="field">
                     <label>Полное имя</label>
                     <input defaultValue={entry.userName} type="text" name="userName" placeholder="Полное имя пользователя" />
@@ -127,24 +136,13 @@ class UserSingle extends React.Component {
                     <label>E-mail</label>
                     <input defaultValue={entry.userEmail} type="text" name="userEmail" placeholder="E-mail пользователя" />
                   </div>
-                  <h3 className="ui header">
-                    <div className="content">
-                      Смена пароля
-                    </div>
-                  </h3>
-                  <div className="field">
-                    <input type="password" name="userPassword" placeholder="Введите новый пароль" />
-                  </div>
-                  <div className="field">
-                    <input type="password" name="userPasswordSecond" placeholder="Новый пароль ещё раз" />
-                  </div>
+                  <h3 className="ui header">Смена пароля</h3>
+                  <p>Не уверены в безопасности своего аккаунта? Мы рекомендуем регулярно производить смену пароля</p>
+                  <a className="ui button circular basic primary">Сменить пароль</a>
                 </div>
                 <div className="ui eight wide column">
-                  <h3 className="ui header">
-                    <div className="content">
-                      Дополнительная информация
-                    </div>
-                  </h3>
+                  <h3 className="ui header">Дополнительная информация</h3>
+                  <p>Заполните свой профиль полностью, чтобы получить больше подписчиков</p>
                   <div className="field">
                     <label>Организация</label>
                     <input type="text" defaultValue={entry.userCompany} name="userCompany" placeholder="Компания, место работы" />
@@ -157,19 +155,20 @@ class UserSingle extends React.Component {
                     <label>Биография</label>
                     <textarea name="userBio" placeholder="Биография, пару слов о себе" rows="2" defaultValue={entry.userBio}></textarea>
                   </div>
+                  <div className="ui divider"></div>
                   <div className="socials field">
-                    <label>Социальные сети</label>
+                      <label>Социальные сети</label>
+                      <p>Добавьте ссылки на ваши социальные сети, чтобы читатели могли вас найти</p>
                       <div className="items">
                         { entry.userSocials.map((item, i) => {
                           var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
                           return (
-                            <a onClick={() => {this.handleRemoveSocial(item.title)}} key={i} className={slug + ' ui circular button item animated fade'}  tabindex="0">
+                            <a onClick={() => {this.handleRemoveSocial(item.title)}} key={i} className={slug + ' ui circular button item animated fade'}  tabIndex="0">
                               <div className="ui visible content"><i className={'fa-' + slug + ' fa icon'}></i></div>
                               <div className="ui hidden content"><i className="fa fa-close icon"></i></div>
                             </a>
                           )})}
-                      
-                      <div className="ui circular floating icon button basic addbutton"><i className="fa fa-plus"></i></div>
+                      <div className="ui circular floating button basic addbutton" data-inverted="" data-tooltip="Добавить социальную сеть" data-position="top left"><i className="fa fa-plus"></i></div>
                       <div className="ui fluid popup top left transition hidden">
                         <div className="ui divided">
                             <div className="field">
@@ -205,15 +204,14 @@ class UserSingle extends React.Component {
                       </div>
                   </div>
                 </div>
-              </div>
-            <br />
-            <div className="button ui primary" onClick={() => {this.handleSave()}}>Сохранить</div>
-            <Link href={{ pathname: 'user', query: { slug: entry.slug }}}>
-              <a className="button ui">Назад</a>
-            </Link>
+              </div>            
           </div>
   		    </div>
           <style jsx>{`
+            .saveButton {
+              float:right;
+            }
+
             .socials-form {
               padding:15px;
             }

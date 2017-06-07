@@ -1,10 +1,6 @@
 import React from 'react';
-import Menu from './header/menu'
 import { connect } from 'react-redux'
-import SearchBar from './searchbar'
-import Feed from './feed/'
 import Header from './header/'
-import FlashPost from './flashpost'
 
 class Body extends React.Component {
 

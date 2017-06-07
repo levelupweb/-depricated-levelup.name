@@ -28,27 +28,11 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _menu = require('./header/menu');
-
-var _menu2 = _interopRequireDefault(_menu);
-
 var _reactRedux = require('react-redux');
-
-var _searchbar = require('./searchbar');
-
-var _searchbar2 = _interopRequireDefault(_searchbar);
-
-var _feed = require('./feed/');
-
-var _feed2 = _interopRequireDefault(_feed);
 
 var _header = require('./header/');
 
 var _header2 = _interopRequireDefault(_header);
-
-var _flashpost = require('./flashpost');
-
-var _flashpost2 = _interopRequireDefault(_flashpost);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

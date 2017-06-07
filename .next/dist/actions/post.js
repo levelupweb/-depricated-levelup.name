@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.setLikeById = exports.getPostsByUserId = undefined;
+exports.getPosts = getPosts;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -21,7 +22,23 @@ var _appConfig = require('../app.config.js');
 
 var _appConfig2 = _interopRequireDefault(_appConfig);
 
+var _jsCookie = require('js-cookie');
+
+var _jsCookie2 = _interopRequireDefault(_jsCookie);
+
+var _axiosAuth = require('../utils/axiosAuth.js');
+
+var _axiosAuth2 = _interopRequireDefault(_axiosAuth);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function getPosts(token, options) {
+	return (0, _axiosAuth2.default)(token, {
+		url: 'post/entries',
+		method: 'POST',
+		data: options
+	});
+}
 
 var getPostsByUserId = exports.getPostsByUserId = function () {
 	var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(id) {

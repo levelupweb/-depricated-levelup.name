@@ -8,7 +8,7 @@ exports.setPageData = setPageData;
 exports.setPageSettings = setPageSettings;
 exports.setAccessError = setAccessError;
 exports.getPageBySlug = getPageBySlug;
-exports.searchByQuery = searchByQuery;
+exports.makeSearch = makeSearch;
 
 var _axios = require('axios');
 
@@ -49,6 +49,6 @@ function getPageBySlug(slug) {
     return _axios2.default.get(_appConfig2.default.API + 'page/entries/' + slug);
 }
 
-function searchByQuery(query) {
+function makeSearch(query) {
     return _axios2.default.get(_appConfig2.default.API + 'search/entries/' + query);
 }

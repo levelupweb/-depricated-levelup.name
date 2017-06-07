@@ -1,6 +1,6 @@
 import React from 'react';
 import UserBar from './userbar'
-import Feed from '../feed/'
+import Feed from '../feed/feed.js'
 import { connect } from 'react-redux'
 import Comments from '../comments/index'
 
@@ -65,7 +65,7 @@ class UserSingle extends React.Component {
               <div className="ui divider"></div>
     			    <div className="tab">
   			        <div id="publications" className="tab-content">
-  			           <Feed author={user._id} template="article" />
+  			          <Feed userID={user._id} />
   			        </div>
   			        <div id="bookmarks" className="tab-content hidden">
   			           <Feed template="listarticle" />

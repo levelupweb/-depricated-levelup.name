@@ -50,7 +50,7 @@ class UserBar extends React.Component {
               <div className="socials">
                 {user.userSocials.map((item, i) => {
                   var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
-                  return (<a href={item.link} target="_blank"><button className={'ui circular icon button small ' + slug}>
+                  return (<a key={i} href={item.link} target="_blank"><button className={'ui circular icon button small ' + slug}>
                           <i className={'fa icon fa-' + slug}></i>
                         </button></a>)
                 })}
@@ -251,9 +251,37 @@ class Statistic extends React.Component {
           </div>        
       )
     } else {
-      return <Loader />
+      return <Blank />
     }
   }
 }
+
+
+class Blank extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div className="statistic">
+        <div className="blank avatar"></div>
+        <div className="blank avatar"></div>
+        <div className="blank avatar"></div>
+        <style jsx>{`
+          .statistic { 
+            display:flex;
+            flex-direction:row;
+          }
+
+          .statistic .avatar {
+            margin-left:20px;
+          }
+        `}</style>
+      </div>
+    );
+  }
+}
+
 
 export default connect(state => state)(UserBar)

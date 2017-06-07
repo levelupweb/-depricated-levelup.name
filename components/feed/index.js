@@ -8,6 +8,11 @@ import axios from 'axios'
 import config from '../../app.config.js'
 import { getPostsByUserId } from '../../actions/post'
 
+// Принимает:
+// 1. userID (id пользователя, чьи посты нужно отобразить)
+// 2. posts (массив с постами)
+// default. (если ничего не передано, то загружает все посты из базы данных)
+
 export default class Feed extends React.Component {
 
   constructor(props) {
