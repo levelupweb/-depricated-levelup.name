@@ -49,10 +49,6 @@ var _appConfig = require('../../app.config.js');
 
 var _appConfig2 = _interopRequireDefault(_appConfig);
 
-var _createPage = require('../../utils/createPage.js');
-
-var _createPage2 = _interopRequireDefault(_createPage);
-
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -174,7 +170,7 @@ var prepareData = function () {
   };
 }();
 
-// Добавить уровни доступа
+// Добавить уровни доступа // Вынести в UTILS и добавить уровни доступа
 
 
 /* 
@@ -192,10 +188,10 @@ function getToken(req) {
     return 0;
   }
 }function canUserPass(options, user) {
-  if (user) {
+  if (user.isLogged) {
     return true;
   } else {
-    if (options.mustBeLoggedIn) {
+    if (options.userMustBeLoggedIn) {
       return false;
     } else {
       return true;
@@ -214,7 +210,6 @@ function getToken(req) {
 */
 
 function page(Component, slug, builder) {
-
   return function (_Component) {
     (0, _inherits3.default)(GetAuth, _Component);
 
@@ -227,7 +222,7 @@ function page(Component, slug, builder) {
           var req = _ref5.req,
               store = _ref5.store,
               query = _ref5.query;
-          var token, user, page, isCanUserPass;
+          var token, user;
           return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
               switch (_context6.prev = _context6.next) {
@@ -243,18 +238,6 @@ function page(Component, slug, builder) {
                 case 5:
                   user = _context6.sent;
                   _context6.next = 8;
-                  return (0, _app.getPageBySlug)(slug);
-
-                case 8:
-                  page = _context6.sent;
-                  _context6.next = 11;
-                  return canUserPass({
-                    mustBeLoggedIn: page.userMustBeLoggedIn
-                  }, user);
-
-                case 11:
-                  isCanUserPass = _context6.sent;
-                  _context6.next = 14;
                   return (0, _app.getPageBySlug)(slug).then(function () {
                     var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(res) {
                       return _regenerator2.default.wrap(function _callee5$(_context5) {
@@ -263,36 +246,44 @@ function page(Component, slug, builder) {
                             case 0:
                               _context5.next = 2;
                               return prepareData(builder, query).then(function () {
-                                var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(res) {
+                                var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(data) {
+                                  var state, canPass;
                                   return _regenerator2.default.wrap(function _callee4$(_context4) {
                                     while (1) {
                                       switch (_context4.prev = _context4.next) {
                                         case 0:
-                                          if (!isCanUserPass) {
-                                            _context4.next = 9;
+                                          _context4.next = 2;
+                                          return store.getState();
+
+                                        case 2:
+                                          state = _context4.sent;
+                                          canPass = canUserPass(res.data, state.user);
+
+                                          if (!canPass) {
+                                            _context4.next = 13;
                                             break;
                                           }
 
-                                          _context4.next = 3;
+                                          _context4.next = 7;
                                           return store.dispatch((0, _app.setQuery)(builder, query));
 
-                                        case 3:
-                                          _context4.next = 5;
-                                          return store.dispatch((0, _app.setPageData)(res));
-
-                                        case 5:
-                                          _context4.next = 7;
-                                          return store.dispatch((0, _app.setPageSettings)(page.data));
-
                                         case 7:
-                                          _context4.next = 11;
-                                          break;
+                                          _context4.next = 9;
+                                          return store.dispatch((0, _app.setPageData)(data));
 
                                         case 9:
                                           _context4.next = 11;
-                                          return store.dispatch((0, _app.setAccessError)());
+                                          return store.dispatch((0, _app.setPageSettings)(res.data));
 
                                         case 11:
+                                          _context4.next = 15;
+                                          break;
+
+                                        case 13:
+                                          _context4.next = 15;
+                                          return store.dispatch((0, _app.setAccessError)());
+
+                                        case 15:
                                         case 'end':
                                           return _context4.stop();
                                       }
@@ -318,12 +309,12 @@ function page(Component, slug, builder) {
                     };
                   }());
 
-                case 14:
+                case 8:
                   return _context6.abrupt('return', {
                     user: user
                   });
 
-                case 15:
+                case 9:
                 case 'end':
                   return _context6.stop();
               }
@@ -345,8 +336,7 @@ function page(Component, slug, builder) {
       var _this2 = (0, _possibleConstructorReturn3.default)(this, (GetAuth.__proto__ || (0, _getPrototypeOf2.default)(GetAuth)).call(this, props));
 
       _this2.state = {
-        isLoading: true,
-        query: null
+        isLoading: true
       };
       return _this2;
     }
@@ -358,21 +348,10 @@ function page(Component, slug, builder) {
           isLoading: false
         });
       }
-
-      // Лоадер сделать более симпотичным
-
     }, {
       key: 'render',
       value: function render() {
-        if (this.state.isLoading) {
-          return _react2.default.createElement(_loader2.default, null);
-        } else {
-          if (this.props.app.accessable) {
-            return _react2.default.createElement(Component, this.props);
-          } else {
-            return _react2.default.createElement('div', null, '\u041D\u0435\u0442 \u0434\u043E\u0441\u0442\u0443\u043F\u0430');
-          }
-        }
+        return _react2.default.createElement(Component, this.props);
       }
     }]);
 

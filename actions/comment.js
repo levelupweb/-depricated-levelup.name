@@ -1,21 +1,19 @@
 import axios from 'axios'
 import config from '../app.config.js'
+import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
-export async function getPostCommentsByPostId(id) {
-	return await axios.get(config.API + 'comment/entries/' + id)	
+export function getPostCommentsByPostId(id) {
+	return axios.get(config.API + 'comment/entries/' + id)	
 }
 
-export async function getCommentById(id) {
-	return await axios.get(config.API + 'comment/entries/' + id)	
+export function getCommentById(id) {
+	return axios.get(config.API + 'comment/entries/' + id)	
 }
 
-export function postComment(token, data) {
-	return axios({
-		url: config.API + 'comment/entries/add',
+export function addComment(token, data) {
+	return axiosAuth(token, {
+		url: 'comment/entries/add',
 		method: 'POST',
-		data: data,
-		headers: {
-			'authorization': token
-		}
+		data: data
     })
 }

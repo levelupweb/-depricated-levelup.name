@@ -1,3 +1,6 @@
+// OUTDATED
+
+
 import React from 'react';
 import Loader from '../loader'
 import Link from 'next/link'

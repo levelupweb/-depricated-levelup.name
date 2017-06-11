@@ -2,12 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux'
 import Link from 'next/link'
 import { makeSearch } from '../../actions/app.js'
+import Avatar from 'react-avatar'
+import TimeAgo from 'timeago-react';
 
 class Header extends React.Component {
   constructor(props) {
 		super(props);
 		this.state = {
-			results: null
+			results: {
+				users: [],
+				posts: [],
+				tags : []
+			}
 		}
   }
 
@@ -24,22 +30,13 @@ class Header extends React.Component {
 		var query = e.target.value;
 		makeSearch(query).then((res) => {
 			this.setState({
-				results:res.data
+				results: res.data
 			})
 		})
   }
 
   render() {
-  	console.log(this.state)
-  	var results = () => {
-  		if(this.state.results) { 
-	  		return this.state.results.users.map((item, i) => {
-				return (<User user={item} />)
-			})
-	  	} else {
-	  		return (<div></div>)
-	  	}
-  	}
+  	//console.log(this.state)
     return (
       <div className="header-wrapper">
 
@@ -49,8 +46,9 @@ class Header extends React.Component {
 		    		<div className="search-inner">
 		    			<div className="search">
 							<input onChange={(e) => {this.handleTyping(e)}} type="text" ref={input => input && input.focus()} className="search-input" placeholder="Что будем искать?" />
-				    		<div className="results">
-				    			{results}
+				    		<div className="results block">
+					    		<UserList users={this.state.results.users} />
+					    		<PostList posts={this.state.results.posts} />
 					 		</div>
 				    	</div>
 		    			<a className="ui item" onClick={() => {this.getSearch(true)}}>
@@ -87,13 +85,55 @@ class Header extends React.Component {
 						left:0px;
 						top:100%;
 						width:668px;
-						background:#fff;
+						background:transparent;
 						z-index:9999;	
 					}
 	    		`}</style>
 		</div>
     );
   }
+}
+
+class UserList extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div>
+				{(this.props.users.length > 0) ? 
+					<div>
+						<h3 className="ui header inverted">Пользователи</h3>
+						{ this.props.users.map((item, i) => {
+							return (<User user={item} key={i} />)
+						}) }
+					</div>
+					: <div></div> }
+			</div>
+		)
+	}
+}
+
+class PostList extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div>
+				{(this.props.posts.length > 0) ? 
+					<div>
+						<h3 className="ui header inverted">Посты</h3>
+						{ this.props.posts.map((item, i) => {
+							return (<Post post={item} key={i} />)
+						}) }
+					</div>
+					: <div></div> }
+			</div>
+		)
+	}
 }
 
 
@@ -103,9 +143,96 @@ class User extends React.Component {
   }
 
   render() {
-  	var user = this.state.user;
+  	var user = this.props.user;
     return (
-      <div>{user.userName} HelloWorld</div>
+      <div className="user">
+      	<div className="image">
+      		<Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
+            	<Avatar color={`#46978c`} round={true} size={90} src={user.userImage} name={user.userName} />
+            </a></Link>
+      	</div>
+      	<div className="content">
+      		<h5 className="ui header inverted">
+      			{user.userName}
+      			<div className="sub header">
+      				{(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}
+      			</div>
+      		</h5>
+      	</div>
+      	<style jsx>{`
+      		.user {
+      			display:flex;
+      			flex-direction:column;
+      			align-items:center;
+      			justify-content:center;
+      			margin-right:20px;
+      			width:20%;
+      		}
+				.content {
+					margin-top:10px;
+					color:#fff!important;	
+					text-align:center;
+				}
+
+				.image {
+					margin:auto;
+				}
+
+				.content .sub.header {
+					margin-top:10px;
+				}
+      	`}</style>
+      </div>
+    )
+  }
+}
+
+class Post extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+  	var post = this.props.post;
+    return (
+      <div className="post">
+      	<div className="image">
+      		<Link href={{ pathname: 'post', query: { slug: post.slug }}}><a>
+            	<img className="ui rounded image" src={post.postImage} width="100%" />
+            </a></Link>
+      	</div>
+      	<div className="content">
+      		<h3 className="ui header inverted">
+      			{post.postTitle}
+      			<div className="sub header">
+      				<TimeAgo datetime={post.updated} locale='ru' />
+      			</div>
+      		</h3>
+      	</div>
+      	<style jsx>{`
+      		.post {
+      			display:flex;
+      			flex-direction:column;
+      			align-items:center;
+      			justify-content:center;
+      			margin-right:20px;
+      			width:33.3%;
+      		}
+				.content {
+					margin-top:10px;
+					color:#fff!important;	
+					text-align:center;
+				}
+
+				.image {
+					margin:auto;
+				}
+
+				.content .sub.header {
+					margin-top:10px;
+				}
+      	`}</style>
+      </div>
     )
   }
 }

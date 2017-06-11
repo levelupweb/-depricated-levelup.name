@@ -1,7 +1,7 @@
 import axios from 'axios'
 import config from '../app.config.js'
 
-export default function(token, options) {
+export function axiosAuth(token, options) {
 	var authAxios = axios.create({
 		baseURL: config.API,
 		headers: {
@@ -10,4 +10,12 @@ export default function(token, options) {
 	})
 
 	return authAxios(options)
+}
+
+export function axiosNoAuth(options) {
+	var noAuthAxios = axios.create({
+		baseURL: config.API
+	})
+
+	return noAuthAxios(options)
 }

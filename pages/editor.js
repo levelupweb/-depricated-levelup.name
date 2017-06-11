@@ -14,8 +14,14 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <EditorWrapper data={this.props.app.pageData} />, null, null);
-    this.state = { page: page }
+    var page = createPage(
+      this.props.app.pageSettings, 
+      <EditorWrapper data={this.props.app.pageData} />, 
+      null, 
+      null);
+    this.setState({
+      page
+    })
   }
 
   componentDidMount() {

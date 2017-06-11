@@ -31,7 +31,7 @@ class Feed extends React.Component {
   componentWillMount() {
     if(this.props.posts != null) {
       this.setState({
-        entries: this.props.posts
+        entries: this.props.posts.post
       })
     } else if(this.props.userID) {
       this.getPosts(1, { userID: this.props.userID })
@@ -60,7 +60,13 @@ class Feed extends React.Component {
     }
   }
 
- getPosts(page, options) {
+  componentDidMount() {
+    this.setState({
+      isLoaded: true
+    })
+  }
+
+  getPosts(page, options) {
     var options = {
       ...options
     }
@@ -104,9 +110,7 @@ class Feed extends React.Component {
       } else {
         return (
           <h2 className="ui icon header">
-            <i className="fa fa-bars icon"></i>
             <div className="content">
-              Упс.. :)
               <div className="sub header">Записей не найдено</div>
             </div>
           </h2>

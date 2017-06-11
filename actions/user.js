@@ -1,5 +1,6 @@
 import axios from 'axios'
 import config from '../app.config.js'
+import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
 // Old Version
 /* export function setUser(token) {
@@ -130,5 +131,13 @@ export async function removeUserSocial(token, userid, data) {
 		headers: {
 			'authorization': token
 		}
+    })
+}
+
+export function uploadImage(token, userid, data) {
+    return axiosAuth(token, {
+		url: 'user/upload',
+		method: 'POST',
+		data: data
     })
 }

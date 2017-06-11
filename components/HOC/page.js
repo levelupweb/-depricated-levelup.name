@@ -1,6 +1,5 @@
 import React from 'react';
 import config from '../../app.config.js'
-import createPage from '../../utils/createPage.js'
 import fetch from 'isomorphic-fetch'
 import { setUser, getUserByToken } from '../../actions/user'
 import { setQuery, setPageData, getPageBySlug, setPageSettings, setAccessError } from '../../actions/app'
@@ -54,12 +53,12 @@ async function prepareData(builder, query) {
   }
 }
 
-// Добавить уровни доступа
+// Добавить уровни доступа // Вынести в UTILS и добавить уровни доступа
 function canUserPass(options, user) {
-  if(user) {
+  if(user.isLogged) {
     return true
   } else {
-    if(options.mustBeLoggedIn) {
+    if(options.userMustBeLoggedIn) {
       return false
     } else {
       return true
@@ -78,22 +77,19 @@ function canUserPass(options, user) {
 */
 
 export default function page(Component, slug, builder) {
-
   return class GetAuth extends Component {
     static async getInitialProps ({ req, store, query }) {
       var token         = await getToken(req); // находим токен
       var user          = await store.dispatch(getUserByToken(token)); // + запихиваем информацию о user в store
-      var page          = await getPageBySlug(slug); 
-      var isCanUserPass = await canUserPass({ 
-        mustBeLoggedIn: page.userMustBeLoggedIn
-      }, user) 
 
       await getPageBySlug(slug).then(async (res) => {
-          await prepareData(builder, query).then(async (res) => {
-            if (isCanUserPass) {
-              await store.dispatch(setQuery(builder, query)); // добавляем query и builder в store
-              await store.dispatch(setPageData(res));
-              await store.dispatch(setPageSettings(page.data))
+          await prepareData(builder, query).then(async (data) => {
+            var state = await store.getState();
+            var canPass = canUserPass(res.data, state.user);
+            if (canPass) {
+              await store.dispatch(setQuery(builder, query));
+              await store.dispatch(setPageData(data));
+              await store.dispatch(setPageSettings(res.data))
             } else {
               await store.dispatch(setAccessError())
             }
@@ -109,8 +105,7 @@ export default function page(Component, slug, builder) {
   constructor(props) {
     super(props)
     this.state = {
-      isLoading: true,
-      query: null
+      isLoading: true
     };
   }
 
@@ -120,26 +115,13 @@ export default function page(Component, slug, builder) {
       isLoading: false
     })
   }
-
-  // Лоадер сделать более симпотичным
   render() {
-      if(this.state.isLoading) {
-        return (
-          <Loader/>
-        )
-      } else {
-        if (this.props.app.accessable) {
-          return (
-            <Component {...this.props} />
-          )
-        } else {
-          return (
-            <div>Нет доступа</div>
-          )
-        }
-      }
+      return (
+        <Component {...this.props} />
+      )
     }
   }
 }
+  
 
 

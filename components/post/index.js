@@ -6,7 +6,7 @@ import Comments from './comments'
 import SubscribeButton from '../subscribeButton.js'
 import cookies from 'js-cookie'
 import { getUserById } from '../../actions/user.js'
-import { setLikeById } from '../../actions/post.js'
+import { setLikeById, getUsersWhoLikes } from '../../actions/post.js'
 import declOfNum from '../../utils/declarationOfNum.js'
 import Avatar from 'react-avatar'
 import TimeAgo from 'timeago-react';
@@ -23,33 +23,47 @@ class Post extends React.Component {
     super(props);
     this.state = {
       post: null,
-      user: null
+      user: null,
+      usersWhoLikes: []
     }
 
     this.token = cookies.get('x-access-token');
+    this.currentUser = this.props.user.profile;
   }
 
-  handleLike() {
-    setLikeById(this.token, this.state.post._id).then((res) => {
+  handleLike(postID, userID) {
+    setLikeById(this.token, postID).then(async (res) => {
       if(res.data.success) {
-        this.setState({
-          ...this.state,
+        await this.setState({
           post: {
             ...this.state.post,
             liked: !this.state.post.liked
           }
         })
+
+        await this.pushUserWhoLikes(userID)
       }
     })
   }
 
-  componentWillMount() {
-    this.setState({
-      post: {
-        ...this.state.post,
-        ...this.props.data.post
-      }
-    })
+  async componentWillMount() {
+    if(this.props.app.pageData) {
+      await this.setState({
+        post: {
+          ...this.state.post,
+          ...this.props.app.pageData.post
+        }
+      })
+
+      await getUsersWhoLikes(this.state.post._id)
+      .then((res) => {
+        this.setState({
+          usersWhoLikes: res.data
+        })
+      })
+    } else {
+
+    }
   }
 
 
@@ -86,18 +100,33 @@ class Post extends React.Component {
     })
   }
 
+  pushUserWhoLikes(userID) {
+    getUserById(userID)
+    .then((res) => {
+      this.setState({
+        usersWhoLikes: this.state.usersWhoLikes.push(res.data)
+      })
+    })
+  }
+
   render() {
     let user = this.state.user || '';
     let post = this.state.post;
-    let tags = post.postTags.map((item) => {
+    let tags = post.postTags.map((item, i) => {
       return (<a href="#">{item}</a>)
     })
-    let usersWhoLikes = post.postLikes.map((item) => {
-      return (<div className="label"><User size="dropdown" id={item} /></div>)
-    })
+    let usersWhoLikes = () => {
+      if(post.postLikes.length > 0) {
+        post.postLikes.map((item, i) => {
+          return (<div className="label"><User id={item} key={i} /></div>)
+        })
+      } else {
+        return (<div></div>)
+      }
+    }
     return (
       <article className="article single">
-        <div>
+        <div className="block">
           <div className="ui feed userbar">
             <div className="event">
               <div className="label">
@@ -122,20 +151,19 @@ class Post extends React.Component {
         </div>
       	<div className="image">
           <img src={post.postImage} width="100%" />
-        </div>
-        <div className="bar">
-          <div className="tags">
-            {tags}
+          <div className="bar block">
+            <div className="tags ui inverted">
+              {tags}
+            </div>
+            <h1 className="ui header inverted">
+              {post.postTitle}
+            </h1>
           </div>
-          <h1 className="ui header">
-            {post.postTitle}
-            <p className="sub header primary">{post.postDescription}</p>
-          </h1>
         </div>
-        <div className="content" ref={(content) => {this.content = content}}>
+        <div className="content block" ref={(content) => {this.content = content}}>
         </div>
 
-        <div className="user">
+        <div className="user block">
           <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
               <Avatar color={`#57c1b3`} round={true} size={32} src={user.userImage} name={user.userName} />
           </a></Link>
@@ -145,9 +173,9 @@ class Post extends React.Component {
         <div className="floating block-shadow">
           <div className="actions">
             <div className="item block">
-              <span onClick={() => {this.handleLike()}} className={(this.state.post.liked) ? `checked` : ``}>
+              <span onClick={() => {this.handleLike(this.state.post._id, this.currentUser._id)}} className={(this.state.post.liked) ? `checked` : ``}>
                   <i className={(this.state.post.liked) ? `fa fa-heart` : `fa fa-heart-o`}></i>
-                  <span>{usersWhoLikes.length}</span>
+                  <span>{post.postLikes.length}</span>
               </span>
             </div>
             <div className="item block">
@@ -165,25 +193,27 @@ class Post extends React.Component {
           </div>
         </div>
         <div className="ui divider"></div>
-        <div className="ui feed">
+        <div className="ui feed block-horizontal">
           <div className="event">
-            {usersWhoLikes}
+            {this.state.usersWhoLikes.map((item, i) => {
+              return (<div className="label"><User size="dropdown" userData={item} key={i} /></div>)
+            })}
             <div className="content">
               <div className="date">
-                 {(usersWhoLikes.length > 0) ?
-                  <span>Этот пост {declOfNum(usersWhoLikes.length, ['лайкнул','лайкнули','лайкнуло'])} {usersWhoLikes.length} {declOfNum(usersWhoLikes.length, ['человек','человека','человек'])}</span>
+                 {(this.state.usersWhoLikes.length > 0) ?
+                  <span>Этот пост {declOfNum(this.state.usersWhoLikes.length, ['лайкнул','лайкнули','лайкнуло'])} {this.state.usersWhoLikes.length} {declOfNum(this.state.usersWhoLikes.length, ['человек','человека','человек'])}</span>
                  :
                   <span>Этот пост пока никто не лайкал</span>
                 }
               </div>
             </div>
             <div className="like">
-              <span className="button primary basic ui circular" onClick={() => {this.handleLike()}}><i className={(this.state.post.liked) ? `fa fa-heart` : `fa fa-heart-o`}></i> Мне нравится</span>
+              <span className="button primary basic ui circular" onClick={() => {this.handleLike(this.state.post._id, this.currentUser._id)}}><i className={(this.state.post.liked) ? `fa fa-heart` : `fa fa-heart-o`}></i> Мне нравится</span>
             </div>
           </div>       
         </div>
 
-        <div className="comments-wrapper">
+        <div className="comments-wrapper block-horizontal">
           <Comments postId={post._id} />
         </div>
 
@@ -193,77 +223,63 @@ class Post extends React.Component {
           }
           .ui.feed .like .button {
             font-size:14px;
-
           }
           .ui.feed > .event > .content .date {
             margin:0px;
           }
-          .ui.feed {
-            margin-bottom:15px!important;
-          }
           .userbar.ui.feed .content {
             margin-top:0px;
           }
-
           .ui.feed .event .content {
             font-size:14px!important;
           }
-
           .ui.feed .event .content .summary {
             line-height: 0.9;
           }
-
           .ui.feed .event .content .summary a {
             margin-left:5px;
             margin-right:5px;
           }
-
           .article {
             margin-bottom:0px!important;
             border-bottom:0px;
           }
-
           .article .image {
             margin:0px;
             position:relative;
           }
-
+          .article .image .bar {
+            position:absolute;
+            left:0px;
+            bottom:0px;
+            background:rgba(0,0,0,0.4);
+            width:100%;
+          }
           .article .image .button {
             position:absolute;
             bottom:-8px;
             left:30px;
           }
-
           .article .user {
             display:flex;
             flex-direction:row;
             margin:20px 0px;
             align-items:flex-start;
           }
-
-          .article .bar {
-            margin-top:25px;
-          }
-
-          .article .bar .tags a {
-            margin-right:10px;
-          }
-
           .article .bar h1 {
-            margin-top:0px;
+            margin:0px!important;
             font-weight:bold;
+            border-bottom:0px;
+            padding-bottom:0px;
           }
-
           .article .bar h1 .sub {
             margin-top:10px;
           }
-
           .article .content p,
           .article .content {
             font-size:17px;
             line-height:25px;
           }
-
           .article .floating {
             position:fixed;
             left:978px;
@@ -271,14 +287,12 @@ class Post extends React.Component {
             z-index:9999;
             background:#fff;
           }
-
           .article .floating .actions {
             display:flex;
             flex-direction:column;
             align-items:center;
             justify-content:center;
           }
-
           .article .floating .actions .item {
             color:#46978c;
             opacity:0.6;
@@ -286,11 +300,9 @@ class Post extends React.Component {
             padding:15px 20px;
             border-bottom:1px solid rgba(0,0,0,0.1)
           }
-
           .article .floating .actions .item:last-child {
             margin-bottom:0px;
           }
-
           .article .floating .actions .item span {
             font-size:16px;
             display:flex;
@@ -298,17 +310,14 @@ class Post extends React.Component {
             align-items:center;
             justify-content:center;
           }
-
           .article .floating .actions .item span {
             color:#46978c;
           }
-
           .article .floating .actions .item i {
             margin-bottom:5px;
             color:#46978c;
             font-size:18px;
           }
-
           .article .floating .actions .item:hover {
             opacity:1.0;
             background:#fff;

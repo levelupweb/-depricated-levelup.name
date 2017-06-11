@@ -8,6 +8,7 @@ import Editor from './editor.js'
 import axios from 'axios'
 import randomString from '../../utils/randomString.js'
 import router from 'next/router'
+import UI from '../../utils/initscripts.js'
 
 // 1. Сделать дату добавления
 // 2. Упростить Handle Save + сделать обработчик ошибок
@@ -25,12 +26,13 @@ class EditorWrapper extends React.Component {
         postImage: null,
         postDescription: '',
         postTitle: '',
-        postTags: '',
+        postTags: [],
         postContent: '',
         postLikes: [],
         postFavorites: [],
         postAuthor: null
-      }
+      },
+      tempTag: '' 
     } 
   }
 
@@ -42,6 +44,12 @@ class EditorWrapper extends React.Component {
     // Подготовка разметки
     this.settingTextareaHeight();
     this.postTitle.focus();
+    UI();
+
+    $('.tags .add').popup({
+      popup : $('.tags .popup'),
+      on    : 'click'
+    })
 
     if(!this.state.post.storage) {
       this.createStorage();
@@ -49,13 +57,22 @@ class EditorWrapper extends React.Component {
   }
 
   getPost() {
-    this.setState({
-      post: {
-        ...this.state.post,
-        ...this.props.data.post,
-        postAuthor: this.props.user.profile._id
-      }
-    })
+    if(this.props.data.post) { 
+      this.setState({
+        post: {
+          ...this.state.post,
+          ...this.props.data.post,
+          postAuthor: this.props.user.profile._id
+        }
+      })
+    } else {
+      this.setState({
+        post: {
+          ...this.state.post,
+          postAuthor: this.props.user.profile._id
+        }
+      })
+    }
   }
 
   createStorage() {
@@ -95,7 +112,7 @@ class EditorWrapper extends React.Component {
 
   handleSave() {
     var body = this.state.post;
-    var _this = this;
+
     if(this.state.post._id) {
       var url = config.API + 'post/entries/' + this.state.post._id + '/update';
     } else {
@@ -103,13 +120,13 @@ class EditorWrapper extends React.Component {
     }
 
     axios.post(url, body)
-    .then(function (response) {
-      if(response.data) {
-        _this.handleStatus('Сохранено!')
-        _this.handleRedirect()
-        _this.getPostFromServer()
+    .then((res) => {
+      if(res.data.success) {
+        this.handleStatus('Сохранено!')
+        this.handleRedirect()
+        this.getPostFromServer()
       } else {
-        console.log(response.data)
+        console.log(response.data.errors)
       }
     })
 
@@ -174,8 +191,16 @@ class EditorWrapper extends React.Component {
     }
   }
 
-  handleTagsChange(e) {
-    this.updateState('postTags', e.target.value)
+  handleTagAdd(tag) {
+    this.setState({
+      post: {
+        ...this.state.post,
+        postTags: this.state.post.postTags.concat(tag)
+      }
+    })
+
+    this.tagInput.value = '';
+    this.tagInput.focus()
   }
 
   updateState(key, value) {
@@ -203,8 +228,12 @@ class EditorWrapper extends React.Component {
 
 
   render() {
+    console.log(this.state.post)
     var post = this.state.post;
-    var user = this.props.user.profile
+    var user = this.props.user.profile;
+    var tags = this.state.post.postTags.map((item, i) => {
+      return (<div className="ui button basic circular" key={i}>{item}</div>)
+    })
     return (
       <div className="editor" ref={(editor) => {this.editor = editor}}>
       	<div className="header-wrapper" ref={(headerwrapper) => {this.headerwrapper = headerwrapper}}>
@@ -231,7 +260,18 @@ class EditorWrapper extends React.Component {
             </div>
           </div>
           <div className="tags block">
-            <input onChange={(e) => {this.handleTagsChange(e)}} defaultValue={post.postTags} name="postTags" type="text" placeholder="Вводите теги через запятую" />
+            <div>{tags}</div>
+            <div onClick={() => {this.tagInput.focus()}} className="visible icon ui button basic circular add"><i className="fa fa-plus"></i></div>
+            <div className="ui popup top left transition">
+              <div className="form large ui">
+                <div className="field">
+                  <input ref={(input) => {this.tagInput = input}} type="text" onChange={(e) => {this.setState({tempTag: e.target.value})}} placeholder="Тэг" />
+                </div>
+                <div className="field">
+                  <div className="ui button" onClick={() => {this.handleTagAdd(this.state.tempTag)}}>Добавить</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="content">
@@ -253,12 +293,10 @@ class EditorWrapper extends React.Component {
     				align-items:center;
     			}
 
-
           .editor .header-wrapper > .header {
             position:relative;
             overflow:hidden;
             height:181px;
-            
           }
 
           .editor .header-content {
@@ -277,7 +315,6 @@ class EditorWrapper extends React.Component {
             margin-right:20px;
             color:#c0c0c0;
           }
-
 
           .header-background-img {
             width:100%;
@@ -356,14 +393,16 @@ class EditorWrapper extends React.Component {
 
           .editor .tags {
             border-bottom: 1px solid rgba(0,0,0,0.1);
+            position:relative;
+            display:flex;
+            flex-direction:row;
           }
 
-      		.editor .tags input {
-      			width:100%;
-      			background:none;
-      			border:0px;
-      			font-size:17px;
-      		}
+          .editor .tags input {
+            border:0px;
+            padding:0px;
+            font-size:24px;
+          }
 
       		.editor .tags input:focus,
       		.editor .content textarea:focus {
@@ -386,7 +425,6 @@ class EditorWrapper extends React.Component {
       			top:20px;
       			background:#fafafa;
       		}
-
 
       		.editor .content .panel .item {
 				    font-size:17px;

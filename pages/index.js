@@ -4,7 +4,7 @@ import withRedux from 'next-redux-wrapper'
 import Sidebar from '../components/sidebar'
 import Body from '../components/body'
 import FlashPost from '../components/flashpost'
-import Feed from '../components/feed/'
+import Feed from '../components/feed/feed.js'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 import { auth } from '../actions/user.js';
@@ -25,7 +25,7 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Feed template="article" data={this.props.app.pageData} />, <FlashPost />, null);
+    var page = createPage(this.props.app.pageSettings, <Feed posts={this.props.app.pageData} />, <FlashPost />, null);
     this.state = { page: page }
   }
 

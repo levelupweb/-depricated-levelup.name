@@ -3,6 +3,7 @@ import UserBar from './userbar'
 import Feed from '../feed/feed.js'
 import { connect } from 'react-redux'
 import Comments from '../comments/index'
+import { UI } from '../../utils/initscripts.js'
 
 class UserSingle extends React.Component {
 
@@ -32,6 +33,7 @@ class UserSingle extends React.Component {
   }
 
   componentDidMount() {
+    UI()
     var tabs = document.querySelectorAll('.tabs-menu a');
     tabs.forEach((item, i) => {
       item.addEventListener('click', (e) => {
@@ -56,13 +58,18 @@ class UserSingle extends React.Component {
       return (
         <div className="profile-feed feed">
         	<UserBar userdata={user} />
-    			<div id="tabs-container">
-    			    <ul className="tabs-menu">
-  			        <li className="current"><a href="#publications">Публикации <span>0</span></a></li>
-  			        <li><a href="#bookmarks">Закладки <span>0</span></a></li>
-  			        <li><a href="#comments">Комментарии <span>0</span></a></li>
-    			    </ul>
-              <div className="ui divider"></div>
+    			<div id="tabs-container" className="block block-shadow">
+              <ul className="tabs-menu">
+                <li className="current"><a href="#publications">
+                  Публикации
+                </a></li>
+                <li><a href="#bookmarks">
+                  Закладки
+                </a></li>
+                <li><a href="#comments">
+                  Комментарии
+                </a></li>
+              </ul>
     			    <div className="tab">
   			        <div id="publications" className="tab-content">
   			          <Feed userID={user._id} />
@@ -76,11 +83,27 @@ class UserSingle extends React.Component {
     			    </div>
     			</div>
           <style jsx>{`
-            #tabs-container {
-              margin-top:15px;
+            .tabs-menu {
+              display:flex;
+              align-items:center;
+              list-style-type:none;
+              padding:0px;
+              margin:0px;
             }
-            .tabs-menu a {
-              font-weight:bold
+            .tabs-menu li {
+              margin-right:14px;
+              padding-bottom:6px;
+            }
+            .tabs-menu li a {
+              font-size:16px;
+              color:#000;
+            }
+            .tabs-menu li.current {
+              border-bottom:1px solid #000;
+              padding-bottom:5px;
+            }
+            .tab {
+              margin-top:25px;
             }
           `}</style>
         </div>

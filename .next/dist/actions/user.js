@@ -8,6 +8,7 @@ exports.getUserByToken = getUserByToken;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
 exports.subscribeToUser = subscribeToUser;
+exports.uploadImage = uploadImage;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -24,6 +25,8 @@ var _axios2 = _interopRequireDefault(_axios);
 var _appConfig = require('../app.config.js');
 
 var _appConfig2 = _interopRequireDefault(_appConfig);
+
+var _axiosAuth = require('../utils/axiosAuth.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -377,3 +380,11 @@ var removeUserSocial = exports.removeUserSocial = function () {
 		return _ref11.apply(this, arguments);
 	};
 }();
+
+function uploadImage(token, userid, data) {
+	return (0, _axiosAuth.axiosAuth)(token, {
+		url: 'user/upload',
+		method: 'POST',
+		data: data
+	});
+}

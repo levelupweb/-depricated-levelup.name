@@ -24,11 +24,19 @@ export class User extends React.Component {
     }
   }
 
-  async componentWillMount() {
-    if(this.props.id) {
-      var user = await getUserById(this.props.id)
+  componentWillMount() {
+    this.getUser(this.props.id)
+  }
+
+
+  componentWillReceiveProps(nextProps) {
+    this.getUser(nextProps.id)
+  }
+
+  async getUser(id) {
+    if(id) {
+      var user = await getUserById(id)
       await this.setState({
-        ...this.state,
         user: {
           ...this.state.user,
           ...user.data
@@ -38,23 +46,15 @@ export class User extends React.Component {
         isLoaded: true
       })
     } else {
-      this.setState({
-        ...this.state,
-        user: this.props.user.profile
-      })
-      this.setState({
-        isLoaded: true
-      })
-    }
-  }
-
-
-  componentWillReceiveProps(nextProps) {
-    if(this.props.id && nextProps.app.pageData) { 
-      this.setState({
-        ...this.state,
-        user: nextProps.app.pageData.user
-      })
+      if(this.props.user.isLogged) {
+        await this.setState({
+          ...this.state,
+          user: this.props.user.profile
+        })
+        await this.setState({
+          isLoaded: true
+        })
+      } 
     }
   }
 

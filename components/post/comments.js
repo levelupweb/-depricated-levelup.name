@@ -13,8 +13,7 @@ class Comments extends React.Component {
     super(props);
     this.state = {
     	active: true,
-    	comments: null,
-    	components: null,
+    	comments: [],
     	commentForm: null
     }
     this.token = cookies.get('x-access-token')
@@ -22,18 +21,10 @@ class Comments extends React.Component {
   }
 
   componentWillMount() {
-  	var components = [];
   	getPostCommentsByPostId(this.props.postId).then((res) => {
+  		console.log(res.data)
   		this.setState({
   			comments: res.data
-  		})
-  	}).then(() => {
-  		this.state.comments.map((item) => {
-  			components.push(<Comment data={item} />)
-  		})
-  	}).then(() => {
-  		this.setState({
-  			components: components
   		})
   	})
   }
@@ -50,7 +41,7 @@ class Comments extends React.Component {
   		commentAuthor: this.currentUser._id,
   		commentPost: this.props.postId
   	}
-  	postComment(token, data).then((res) => {
+  	addComment(token, data).then((res) => {
   		console.log(res.data)
   	})
   }
@@ -64,13 +55,14 @@ class Comments extends React.Component {
 
 
   render() {
+  	console.log(this.state)
   	var currentUser = this.props.user.profile;
   	if(this.state.active) {
 	    return (
 	      <div className="comments">
 	      	<h3 className="ui header">
 	      		Комментарии пользователей
-	      		<div className="sub header">1 комментария</div>
+	      		<div className="sub header">{this.state.comments} комментарий(-ев)</div>
 	      	</h3>
 	      	<div className="ui comments" ref={(container) => {this.container = container}}>
 	      	  <form id="replyForm" ref={(reply) => {this.replyForm = reply}} className="ui reply form hidden">
@@ -85,7 +77,13 @@ class Comments extends React.Component {
 			    </div>
 			  </form>
 			  <div className="comments">
-			    {this.state.components}
+				  {(this.state.comments.length) ? 
+				  	<div>
+				    {this.state.comments.map((item, i) => {
+						return (<div key={i}><Comment comment={item} /></div>)
+					})}
+				    </div>
+				  : <div>Комментариев нет</div> }
 			  </div>
 			  <div className="ui divider"></div>
 			</div>
@@ -229,7 +227,7 @@ class Comment extends React.Component {
 
   async componentWillMount() {
   	await this.setState({
-  		comment: this.props.data
+  		comment: this.props.comment
   	})
 
   	await getUserById(this.state.comment.commentAuthor).then((res) => {
@@ -240,6 +238,7 @@ class Comment extends React.Component {
   }
 
   render() {
+  	console.log(this.props)
   	var user = this.state.user;
   	var comment = this.state.comment;
   	if(user && comment) { 
