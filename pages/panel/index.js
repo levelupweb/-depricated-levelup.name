@@ -27,7 +27,7 @@ class PanelPage extends React.Component {
 
   componentWillMount() {
     console.log(this.props)
-    var page = createPage(this.props.app.pageSettings, <Panel />, <SimpleHeader />, null);
+    var page = createPage(this.props.app.pageSettings, <Panel />, <SimpleHeader block={true} />, null);
     this.setState({ page: page })
   }
 

@@ -14,25 +14,42 @@ class SubscribeButton extends React.Component {
     	isSubscribed: false
     }
     this.token = cookies.get('x-access-token');
+    this.currentUser = this.props.user.profile;
   }
 
   componentWillMount() {
-  	let currentUser = this.props.user.profile
-    if(currentUser) {
-    	if(currentUser.userSubscriptions.authors.indexOf(this.props.id) != -1) {
-    		this.setState({
-    			isSubscribed: true
-    		})
-    	}  
+    this.isSubscribed(this.props.id, () => {
+      this.set(true)
+    }, () => {
+      this.set(false)
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.isSubscribed(nextProps.id, () => {
+      this.set(true)
+    }, () => {
+      this.set(false)
+    })
+  }
+
+  isSubscribed(id, resolve, reject) {
+    if(this.currentUser) {
+      if(this.currentUser.userSubscriptions.authors.indexOf(id) != -1) {
+        return resolve()
+      } else {
+        return reject()
+      }
     }
+  }
+
+  set(value) {
+    this.setState({isSubscribed: value})
   }
 
   handleSubscription(token, id) {
     subscribeToUser(token, id).then((res) => {
-      console.log(res.data); // Handle response
-      this.setState({
-      	isSubscribed: !this.state.isSubscribed
-      })
+      this.set(!this.state.isSubscribed)
     })
   }
 

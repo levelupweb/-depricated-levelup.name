@@ -9,6 +9,7 @@ exports.setUser = setUser;
 exports.getLogout = getLogout;
 exports.subscribeToUser = subscribeToUser;
 exports.uploadImage = uploadImage;
+exports.getUserStats = getUserStats;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -381,10 +382,17 @@ var removeUserSocial = exports.removeUserSocial = function () {
 	};
 }();
 
-function uploadImage(token, userid, data) {
+function uploadImage(token, userID, data) {
 	return (0, _axiosAuth.axiosAuth)(token, {
-		url: 'user/upload',
+		url: 'user/entries/' + userID + '/upload',
 		method: 'POST',
 		data: data
+	});
+}
+
+function getUserStats(userID) {
+	return (0, _axiosAuth.axiosNoAuth)({
+		url: 'user/entries/' + userID + '/getstats',
+		method: 'GET'
 	});
 }

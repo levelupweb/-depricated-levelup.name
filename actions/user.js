@@ -134,10 +134,18 @@ export async function removeUserSocial(token, userid, data) {
     })
 }
 
-export function uploadImage(token, userid, data) {
+export function uploadImage(token, userID, data) {
     return axiosAuth(token, {
-		url: 'user/upload',
+		url: 'user/entries/' + userID + '/upload',
 		method: 'POST',
 		data: data
+    })
+}
+
+
+export function getUserStats(userID) {
+    return axiosNoAuth({
+		url: 'user/entries/' + userID + '/getstats',
+		method: 'GET'
     })
 }

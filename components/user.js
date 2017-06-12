@@ -30,7 +30,13 @@ export class User extends React.Component {
 
 
   componentWillReceiveProps(nextProps) {
-    this.getUser(nextProps.id)
+    //this.getUser(nextProps.id)
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      user: null
+    })
   }
 
   async getUser(id) {
@@ -76,79 +82,65 @@ export class User extends React.Component {
                 {(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}
               </div>
             </div>
-            
+          
         		<style jsx>{`
       			.user {
       				display: flex;
               margin: 6px 0px;
               align-items: center;
       			}
-
             .user .image,
             .user .content {
               display:flex;
               align-items:flex-start;
               flex-direction:column;
             }
-
             .user.small {
               margin-bottom:6px;
             }
-
             .user.medium {
               margin-bottom:4px;
             }
-
             .user.small .image {
               width:20px;
               height:20px;
               margin:0px;
             }
-
             .user.medium .image {
               width:30px;
               height:30px;
             }
-
             .user.dropdown .content {
               display:none;
             }
-
             .user .image a {
               display:flex;
               justify-content:center;
               align-items:center;
             }
-
       			.user .content {
       				padding-left:12px;
       			}
-
             .user.small .content {
               padding-left:8px;
               margin:5px 0px;
             }
-
       			.user .content .name {
       				display:block;
       				font-size:16px;
       				font-weight:bold;
       			}
-
             .user.small .content .name {
               font-size:14px;
               font-weight:100;
             }
-
             .user.medium .content .name {
               font-size:14px;
             }
-
       			.user .content .description {
       				font-size:13px;
       				color:rgba(0,0,0,0.4);
       			}
-
             .user.medium .content .description {
               font-size:13px;
               margin-top:0px;
@@ -158,7 +150,7 @@ export class User extends React.Component {
           </div>
         ) 
     } else {
-      return (<div><Blank /></div>)
+      return (<Blank size={this.props.size} />)
     }
   }
 }
@@ -170,15 +162,20 @@ export class Blank extends React.Component {
   }
 
   render() {
-    return (
-      <div className="user">
-        <div className="blank string"></div>
-        <div className="blank description"></div>
-        <style jsx>{`
-          
-        `}</style>
-      </div>
-    );
+    if(this.props.size != 'dropdown') {
+      return (
+        <div className="user">
+          <div className="blank string"></div>
+          <div className="blank description"></div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="user">
+          <div className="blank avatar"></div>
+        </div>
+      )
+    }
   }
 }
 

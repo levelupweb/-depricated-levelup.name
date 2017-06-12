@@ -214,7 +214,7 @@ class Post extends React.Component {
         </div>
 
         <div className="comments-wrapper block-horizontal">
-          <Comments postId={post._id} />
+          {/* <Comments postId={post._id} /> */}
         </div>
 
         <style jsx>{`

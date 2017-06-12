@@ -1,5 +1,6 @@
 import axios from 'axios'
 import config from '../app.config.js'
+import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
 export function setQuery(builder, query) {
     return (dispatch) => {
@@ -32,4 +33,48 @@ export function getPageBySlug(slug) {
 
 export function makeSearch(query) {
     return axios.get(config.API + 'search/entries/' + query)   
+}
+
+// Обновление любого поля любого типа записей
+export function updateField(token, entryType, entryID, data) {
+    return axiosAuth(token, {
+        url: entryType + '/entries/' + entryID + '/updatefield',
+        method: 'POST',
+        data: data
+    })
+}
+
+export function updateImage(token, entryType, entryID, image) {
+    if (image) {
+      var data = new FormData();
+      data.append('image', image);
+      data.append('type', entryType);
+      data.append('id', entryID);
+      return axiosAuth(token, {
+        url: 'app/entries/' + entryID + '/upload',
+        method: 'POST',
+        data: data
+      })
+      .then((res) => {
+        if(res.data.success) { 
+            var path = config.storage + entryType+'s' + '/' + entryID + '/' + res.data.filename
+            return { path, ...res.data }
+        } else {
+            return { errors: res.data.errors }
+        }
+      })
+      .then((res) => {
+        if(res.success) { 
+            updateField(token, entryType, entryID, {
+                field: entryType + 'Image',
+                value: res.path
+            })
+            return res;
+        } else {
+            return {  errors: res.errors }
+        }
+      })
+    } else {
+        console.log('Не найдено изображение')
+    }
 }

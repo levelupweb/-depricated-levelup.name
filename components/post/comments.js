@@ -77,13 +77,7 @@ class Comments extends React.Component {
 			    </div>
 			  </form>
 			  <div className="comments">
-				  {(this.state.comments.length) ? 
-				  	<div>
-				    {this.state.comments.map((item, i) => {
-						return (<div key={i}><Comment comment={item} /></div>)
-					})}
-				    </div>
-				  : <div>Комментариев нет</div> }
+				 
 			  </div>
 			  <div className="ui divider"></div>
 			</div>
@@ -225,12 +219,12 @@ class Comment extends React.Component {
     }
   }
 
-  async componentWillMount() {
-  	await this.setState({
+  componentWillMount() {
+  	this.setState({
   		comment: this.props.comment
   	})
 
-  	await getUserById(this.state.comment.commentAuthor).then((res) => {
+  	getUserById(this.props.comment.commentAuthor).then((res) => {
   		this.setState({
   			user: res.data
   		})
@@ -238,7 +232,6 @@ class Comment extends React.Component {
   }
 
   render() {
-  	console.log(this.props)
   	var user = this.state.user;
   	var comment = this.state.comment;
   	if(user && comment) { 
