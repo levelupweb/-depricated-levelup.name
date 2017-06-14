@@ -12,6 +12,8 @@ import initScripts from '../utils/initscripts'
 import config from '../app.config.js'
 import createPage from '../utils/createPage.js'
 import page from '../components/HOC/page'
+import getToken from '../utils/getToken.js'
+import { getPersonalFeed } from '../actions/app.js'
 
 Router.onRouteChangeStart = (url) => {
   NProgress.start()
@@ -20,12 +22,13 @@ Router.onRouteChangeComplete = () => NProgress.done()
 Router.onRouteChangeError = () => NProgress.done()
 
 class Page extends React.Component {
+
   constructor(props) {
     super(props);
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Feed posts={this.props.app.pageData} />, <FlashPost />, null);
+    var page = createPage(this.props.app.pageSettings, <Feed />, <FlashPost />, null);
     this.state = { page: page }
   }
 
@@ -45,9 +48,11 @@ class Page extends React.Component {
 }
 
 const query = {
-  page: {
+  posts: {
     type: 'post',
-    single: false
+    single: false,
+    url: config.API + 'post/entries/personal',
+    custom: true
   }
 }
 

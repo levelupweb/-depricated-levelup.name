@@ -3,7 +3,7 @@ import User from '../user'
 import Link from 'next/link'
 import { connect } from 'react-redux'
 import { getUserById, updateUserById, getUserStats } from '../../actions/user.js'
-import { createBlog, getAllBlogs } from '../../actions/blog.js'
+import { createBlog, getAllBlogs, getUserBlog } from '../../actions/blog.js'
 import { updateImage } from '../../actions/app.js'
 import Loader from '../loader.js'
 import Avatar from 'react-avatar'
@@ -12,16 +12,13 @@ import cookies from 'js-cookie'
 import router from 'next/router'
 import SubscribeButton from '../subscribeButton.js'
 import Header from '../header/index.js'
+import EditableInput from '../editableInput.js'
 
 class UserBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: null,
-      tempBlog: {
-        blogTitle: null,
-        blogOwner: null
-      }
+      user: null
     }
 
     this.currentUser = this.props.user.profile;
@@ -61,40 +58,15 @@ class UserBar extends React.Component {
     })
   }
 
-  createBlog() {
-    createBlog(this.token, this.state.tempBlog).then((res) => {
-      if(res.data.success) {
-        $('.ui.modal').modal('hide')
-        router.replace('/blog?slug=' + res.data.blog.slug)
-      }      
-    })
-  }
-
   render() {
-
+    console.log(this.props)
     if(this.state.user) {
       var user = this.state.user;
       var currentUser = this.props.user.profile || {};
       return (
         <div>
-          <div className="ui modal small form-blog">
-            <div className="header">Создание блога</div>
-
-            <div className="image content">
-              <div className="ui form">
-                <p>Начните публиковать посты от имени вашей организации/компании, создав отдельную блог-страницу</p>
-                <div className="field">
-                  <input ref={(input) => {this.blogTitle = input}} onChange={(e) => {this.setState({tempBlog: { ...this.state.tempBlog, blogTitle:  e.target.value}})}} type="text" name="blogTitle" placeholder="Название блога" />
-                </div>
-              </div>
-            </div>
-            <div className="actions">
-              <div className="ui button primary" onClick={() => this.createBlog()}>Далее</div>
-            </div>
-          </div>
           <Header />
           <div className="userbar block block-shadow">
-            
             <div className="user block-vertical">
               <div className="image">
                 <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
@@ -106,15 +78,43 @@ class UserBar extends React.Component {
                 </div>
               </div>
               <div className="content">
-                <div className="description">{user.userDescription}</div>
-                <h2 className="fullname">{user.userName}</h2>
+                <EditableInput 
+                  value={user.userDescription} 
+                  entryType="user"
+                  entryID={user._id}
+                  field="userDescription"
+                  title="Должность/профессия"
+                  size="normal"
+                  align="left"
+                />
+                <EditableInput 
+                  value={user.userName} 
+                  entryType="user"
+                  entryID={user._id}
+                  field="userName"
+                  title="Полное имя пользователя"
+                  size="large"
+                  align="left"
+                />
                 <div className="actions">
-                  <SubscribeButton id={user._id} subscribeText="Подписаться" unsubscribeText="Отписаться" />
+                  <EditButton 
+                    user={user} 
+                    currentUser={this.currentUser} 
+                  />
+                  <SubscribeButton 
+                    additionalClasses="small" 
+                    entryType="user"
+                    entryID={user._id} 
+                    subscribeText="Подписаться" 
+                    unsubscribeText="Отписаться" 
+                  />
                   {user.userSocials.map((item, i) => {
                     var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
-                    return (<a key={i} href={item.link} target="_blank"><button className={'ui social circular icon button small ' }>
-                            <i className={'fa icon fa-' + slug}></i>
-                          </button></a>)
+                    return (
+                      <a key={i} href={item.link} target="_blank"><button className={'ui social circular icon button small ' }>
+                        <i className={'fa icon fa-' + slug}></i>
+                      </button></a>
+                    )
                   })}
                 </div>
               </div>
@@ -131,11 +131,6 @@ class UserBar extends React.Component {
             }
             .userbar {
               box-shadow:0px 11px 20px 0px rgba(0, 0, 0, 0.03)
-            }
-            .form-blog .form .field input {
-              font-size:25px;
-              border:0px;
-              padding:10px 0px;
             }
             .userbar .user {
               padding:0px;
@@ -154,6 +149,9 @@ class UserBar extends React.Component {
               flex-direction:row;
               align-items:center;
             }
+            .user .actions {
+              margin-top:7px;
+            }
             .user .content {
               margin-left:15px;
             }
@@ -169,11 +167,9 @@ class UserBar extends React.Component {
             .user .content .actions .social:hover {
               background:#c0c0c0;
             }
-
             .user .content .description {
               font-size:16px;
             }
-
             .user .image .edit {
               position:absolute;
               width:100%;
@@ -184,11 +180,9 @@ class UserBar extends React.Component {
               left:0px;
               top:0px;
             }
-
             .user .image {
               position:relative;
             }
-
             .user .image .edit i {
               font-size:50px;
               opacity:0;
@@ -197,7 +191,6 @@ class UserBar extends React.Component {
             .user .image .edit.visible i {
               opacity:0.05
             }
-
             .user .image .edit:hover i {
               opacity:0.5;
             }
@@ -210,15 +203,14 @@ class UserBar extends React.Component {
   }
 }
 
-
-
 // Clever Component. Accepts User ID
 
 class Statistic extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoaded: false
+      isLoaded: false,
+      blog: null
     }
   }
 
@@ -226,7 +218,8 @@ class Statistic extends React.Component {
     var id = this.props.userID;
     getUserStats(id).then((res) => {
       this.setState({ ...res.data })
-    }).then(() => {
+    })
+    .then(() => {
       this.setState({isLoaded: true})
     })
   }
@@ -261,6 +254,14 @@ class Statistic extends React.Component {
             <div className="common">
               <div className="statistic">
                 <div className="value">
+                  {this.state.subscribers}
+                </div>
+                <div className="label">
+                  подп.
+                </div>
+              </div>
+              <div className="statistic">
+                <div className="value">
                   {this.state.likes}
                 </div>
                 <div className="label">
@@ -284,13 +285,9 @@ class Statistic extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="blog" data-position="bottom right" data-tooltip="Создать блог" data-inverted="">
-              <div onClick={() => { $('.ui.modal').modal('show'); this.blogTitle.focus() }} className="image ui circular">
-                <i className="fa fa-plus"></i>
-              </div>
-            </div>
+            <UserBlog userID={this.props.userID} />
             <style jsx>{`
-              .stats {
+            .stats {
               display:flex;
               align-items:center;
               position:relative;
@@ -322,13 +319,96 @@ class Statistic extends React.Component {
             .stats .statistic .value {
               font-size:20px;
             }
-            .stats .blog {
+            `}</style>
+          </div>        
+      )
+    } else {
+      return <Blank />
+    }
+  }
+}
+
+
+class UserBlog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.token = cookies.get('x-access-token');
+    this.state = {
+      blog: null,
+      isLoaded: false,
+      tempBlog: {
+        blogTitle: null,
+        blogOwner: null
+      }
+    }
+  }
+
+  componentWillMount() {
+    this.getBlog(this.props.userID).then(() => {
+      this.setState({ isLoaded: true })
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getBlog(nextProps.userID).then(() => {
+      this.setState({ isLoaded: true })
+    })
+  }
+
+  getBlog(id) {
+    return getUserBlog(id).then((res) => {
+      this.setState({ 
+        blog: res.data,
+        tempBlog: {
+          ...this.state.tempBlog,
+          blogOwner: id
+        }
+      })
+    })
+  }
+
+  createBlog() {
+    createBlog(this.token, this.state.tempBlog).then((res) => {
+      if(res.data.success) {
+        $('.ui.modal').modal('hide')
+        router.replace('/blog?slug=' + res.data.blog.slug)
+      } else {
+        // handle error
+        console.log(res.data)
+      }      
+    })
+  }
+
+  render() {
+    var blog = this.state.blog;
+    if (blog == null) { 
+      return (
+        <div className="blog" data-position="bottom right" data-tooltip="Создать блог" data-inverted="">
+          <div className="ui modal small form-blog">
+            <div className="header">Создание блога</div>
+            <div className="image content">
+              <div className="ui form">
+                <p>Начните публиковать посты от имени вашей организации/компании, создав отдельную блог-страницу</p>
+                <div className="field">
+                  <input ref={(input) => {this.blogTitle = input}} onChange={(e) => {this.setState({tempBlog: { ...this.state.tempBlog, blogTitle:  e.target.value}})}} type="text" name="blogTitle" placeholder="Название блога" />
+                </div>
+              </div>
+            </div>
+            <div className="actions">
+              <div className="ui button primary" onClick={() => this.createBlog()}>Далее</div>
+            </div>
+          </div>
+          <div onClick={() => { $('.form-blog.modal').modal('show'); this.blogTitle.focus() }} className="image ui circular">
+            <i className="fa fa-plus"></i>
+          </div>
+          <style jsx>{`
+            .blog {
               position:absolute;
               right:0px;
               top:0px;
               padding:17px 30px;
             }
-            .stats .blog .image {
+            .blog .image {
               width:40px;
               height:40px;
               background:#eee;
@@ -338,21 +418,97 @@ class Statistic extends React.Component {
               align-items:center;
               cursor:pointer;
             }
-            .stats .blog i {
+            .blog i {
               opacity:0.1;
               transition:0.2s all ease;
             }
-            .stats .blog .image:hover i {
+            .blog .image:hover i {
               opacity:1.0;
             }
-            `}</style>
-          </div>        
-      )
+            .form-blog .form .field input {
+              font-size:25px;
+              border:0px;
+              padding:10px 0px;
+            }
+          `}</style>
+        </div>
+      );
     } else {
-      return <Blank />
+      if (this.state.isLoaded) {
+        return (
+          <div className="blog"  data-position="bottom right" data-tooltip={blog.blogTitle} data-inverted="">
+            <div className="image">
+              <Link href={{ pathname: 'blog', query: { slug: blog.slug }}}><a>
+                <Avatar color={`#46978c`} round={true} size={40} src={blog.blogImage} name={blog.blogTitle} />
+              </a></Link>
+            </div>
+            <style jsx>{`
+              .blog {
+                position:absolute;
+                right:0px;
+                top:0px;
+                padding:17px 30px;
+              }
+            `}</style>
+          </div>
+        )
+      } else {
+        return (
+          <div className="block">
+            <div className="blank avatar"></div>
+          </div>
+        )
+      }
     }
   }
 }
+
+class EditButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isOwn: false
+    }
+    this.currentUser = this.props.user.profile;
+  }
+
+  componentWillMount() {
+    if(this.isOwn(this.props.currentUser._id, this.props.user._id)) {
+      this.setState({ isOwn: true })
+    } else {
+      this.setState({ isOwn: false })
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.isOwn(this.props.currentUser._id, nextProps.user._id)) {
+      this.setState({ isOwn: true })
+    } else {
+      this.setState({ isOwn: false })
+    }
+  }
+
+  isOwn(current, id) {
+    if(current == id) {
+      return true
+    }
+  }
+
+  render() {
+    return (
+      <span>
+        {this.state.isOwn && 
+          <Link href={{ pathname: 'settings', query: { slug: this.props.user.slug }}}>
+            <a className="ui button icon circular small">
+              Ред.
+            </a>
+          </Link>
+        }
+      </span>
+    );
+  }
+}
+
 
 
 class Blank extends React.Component {

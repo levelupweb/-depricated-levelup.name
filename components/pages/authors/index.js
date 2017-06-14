@@ -6,7 +6,7 @@ import SubscribeButton from '../../subscribeButton.js'
 import Avatar from 'react-avatar'
 import Link from 'next/link'
 import { connect } from 'react-redux'
-import UserList from '../../user-list.js'
+import UserList from '../../userList.js'
 
 // Clever Component. Accepts nothing and retrieving all users from DB
 
@@ -17,10 +17,6 @@ class Authors extends React.Component {
     	entries: [],
     	loaded: false
     }
-  }
-
-  componentWillMount() {
-  	console.log(this.props)
   }
 
   componentDidMount() {

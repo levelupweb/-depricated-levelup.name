@@ -31,7 +31,6 @@ body {
 	padding-left:0px!important;
 	padding-right:0px!important;
 }
-
 .ui.message .header {
 	margin:0px!important;
 }
@@ -107,7 +106,7 @@ form .field input:focus {
 
 .main .after-header,
 .main .inner {
-	min-height:100%;
+	min-height:100vh;
 }
 
 .main .inner {
@@ -176,6 +175,10 @@ form .field input:focus {
 
 .block {
 	padding:23px 30px;
+}
+
+.block-border-bottom {
+	border-bottom:1px solid rgba(0,0,0,0.07);
 }
 
 .block-vertical {
@@ -330,75 +333,6 @@ margin-top:0px;
 	margin-right:10px;
 	margin-bottom:5px;
 }
-
-
-.main .flashpost {
-	background:#fff;
-	border-bottom:1px solid rgba(0,0,0,0.07);
-}
-
-.main .flashpost .fa {
-	color:rgba(0,0,0,0.2);
-	font-size:19px;
-}
-
-.main .flashpost .user-image {
-	position: absolute;
-	left:10px;
-	top:50%;
-	margin-top:-20px;
-	height:40px;
-	width:40px;
-	display:flex;
-	justify-content:center;
-	align-items:center;
-}
-
-.main .flashpost textarea {
-	background:transparent;
-	border:0px;
-	padding:18px;
-	height:55px;
-	font-size:16px;
-	overflow:hidden;
-	padding-left:60px;
-	transition: 0.2s all ease;
-}
-
-.main .flashpost .field {
-	position: relative;
-} 
-
-.main .flashpost .button {
-	position: absolute;
-	opacity:0;
-	bottom:-100%;
-	left:10px;
-}
-.main .flashpost.revealed .button {
-	top:auto;
-	bottom:15px;
-	opacity:1.0;
-}
-
-.main .flashpost.revealed textarea {
-	height:150px;
-	padding-left:20px;
-}
-
-.main .flashpost.revealed .user {
-	left:-200px;
-	opacity:0;
-}
-
-.main .flashpost {
-	padding:6px 18px;
-}
-
-.main .flashpost textarea:focus {
-	background:transparent;
-}
-
 
 .grid-inline {
 	display:flex;

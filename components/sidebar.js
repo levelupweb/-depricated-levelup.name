@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link'
-import UserList from './user-list'
-import TagsList from './tags-list'
+import UserList from './userList'
+import TagsList from './tagsList'
+import BlogList from './blogList'
 import { connect } from 'react-redux'
 import User from './user'
 import cookies from 'js-cookie'
@@ -93,39 +94,34 @@ class Sidebar extends React.Component {
 					</div>
 		      	</div>
 
-		      	<div className="block add">
-		      		<Link href="/editor" prefetch><button className="large labeled icon fluid ui button primary">
-					  <i className="fa fa-pencil icon"></i>
-					  Написать пост
-					</button></Link>
+		      	<div className="block-horizontal add">
+						<div className="ui vertical labeled icon buttons small fluid">
+						  <Link href="/editor" prefetch><a className="large labeled icon fluid ui button black">
+						    <i className="fa fa-pencil icon"></i>
+						    Написать пост
+						  </a></Link>
+						  <Link href="/editor" prefetch><a className="large labeled icon fluid ui button black">
+						    <i className="fa fa-camera icon"></i>
+						    Live
+						  </a></Link>
+						</div>
 		      	</div>
 
 		      	<div className="block sidebar-block" id="subscriptions">
 		      		<div className="title">
-			      		<h3 className="ui header">
+			      		<h3 className="ui header inverted">
 							Подписки <small>исследовать</small>
 						</h3>
 		      		</div>
 		      		<div className="block-content">
 		      			<UserList subscriber={this.currentUser._id} />
-		      			<div className="ui divider"></div>
-		      			{/* {(this.state.subscriptions.blogs) ?
-		      				<UserList users={this.state.subscriptions.blogs} /> : <Loader />
-		      			} */}
-		      		</div>
-		      	</div>
-
-		      	<div className="block sidebar-block" id="tags">
-		      		<div className="title">
-			      		<h3 className="ui header">
-							Темы <small>исследовать</small>
-						</h3>
-		      		</div>
-		      		<div className="block-content">
+		      			<h4 className="ui header inverted">Блоги</h4>
+		      			<BlogList subscriber={this.props.user.profile._id} />
+		      			<h4 className="ui header inverted">Темы</h4>
 		      			<TagsList subscriber={this.props.user.profile._id} />
 		      		</div>
 		      	</div>
-	      	</div>
+		    </div>
       	}
 	      	<div className="block footer" id="footer">
 	      		<div className="block-content">
@@ -147,27 +143,24 @@ class Sidebar extends React.Component {
 	      		</div>
 	      	</div>
 		  <style jsx>{`
-				.block.add {
-					padding-top:0px;
-				}
+		  		.block.add {
+		  			margin-top:0px;
+		  			padding-top:0px;
+		  		}
 				.sidebar {
 					position:relative;
 					overflow-y:scroll;
 					background:#101010;
 				}
-
 				.sidebar::-webkit-scrollbar {
 					display:none;
 				}
-
 				.sidebar::-webkit-scrollbar-thumb {
 					display:none;
 				}
-
 				.sidebar-block .title .ui.header {
 					color:#fff;
 				}
-
 				.footer {
 					background:transparent;;
 					position:absolute;
@@ -230,6 +223,7 @@ class Sidebar extends React.Component {
 					transition:0.2s all ease;
 					background:none!important;
 					height:auto;
+					color:#fff!important;
 				}
 				.button:focus {
 					background:#c0c0c0!important;

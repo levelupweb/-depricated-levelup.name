@@ -29,3 +29,12 @@ export function setLikeById(token, id) {
     })
 }
 
+
+export function postAdd(token, data) {
+    return axiosAuth(token, {
+		url: 'post/add',
+		method: 'POST',
+		data: data
+    })
+}
+

@@ -4,6 +4,7 @@ import Feed from '../feed/feed.js'
 import { connect } from 'react-redux'
 import Comments from '../comments/index'
 import { UI } from '../../utils/initscripts.js'
+import FlashPost from '../flashpost.js'
 
 class UserSingle extends React.Component {
 
@@ -58,26 +59,37 @@ class UserSingle extends React.Component {
       return (
         <div className="profile-feed feed">
         	<UserBar userdata={user} />
-    			<div id="tabs-container" className="block block-shadow">
-              <ul className="tabs-menu">
-                <li className="current"><a href="#publications">
-                  Публикации
-                </a></li>
-                <li><a href="#bookmarks">
-                  Закладки
-                </a></li>
-                <li><a href="#comments">
-                  Комментарии
-                </a></li>
-              </ul>
+    			<div id="tabs-container" className="block-shadow">
+              <div className="block block-border-bottom">
+                <ul className="tabs-menu">
+                  <li className="current"><a href="#feed">
+                    Лента
+                  </a></li>
+                  <li><a href="#publications">
+                    Публикации
+                  </a></li>
+                  <li><a href="#bookmarks">
+                    Закладки
+                  </a></li>
+                  <li><a href="#comments">
+                    Комментарии
+                  </a></li>
+                </ul>
+              </div>
     			    <div className="tab">
-  			        <div id="publications" className="tab-content">
-  			          <Feed userID={user._id} />
+                <div id="feed" className="tab-content">
+                  <FlashPost />
+                  <div className="block">
+                    <Feed options={{userID: user._id}} />
+                  </div>
+                </div>
+  			        <div id="publications" className="tab-content hidden block">
+  			          {/* <Articles userID={user._id} /> */}
   			        </div>
-  			        <div id="bookmarks" className="tab-content hidden">
+  			        <div id="bookmarks" className="tab-content hidden block">
   			           <Feed template="listarticle" />
   			        </div>
-  			        <div id="comments" className="tab-content hidden">
+  			        <div id="comments" className="tab-content hidden block">
   			           <Comments />
   			        </div>
     			    </div>
@@ -92,18 +104,16 @@ class UserSingle extends React.Component {
             }
             .tabs-menu li {
               margin-right:14px;
-              padding-bottom:6px;
+              padding:0px;
             }
             .tabs-menu li a {
               font-size:16px;
               color:#000;
+              padding:0px;
             }
             .tabs-menu li.current {
-              border-bottom:1px solid #000;
-              padding-bottom:5px;
-            }
-            .tab {
-              margin-top:25px;
+              color:#4eada0;
+              font-weight:bold;
             }
           `}</style>
         </div>

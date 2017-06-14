@@ -7,6 +7,8 @@ import Avatar from 'react-avatar'
 import EditableInput from '../editableInput.js'
 import { updateImage } from '../../actions/app.js'
 import Header from '../header/index.js'
+import SubscribeButton from '../subscribeButton.js'
+import dateFormat from 'dateformat'
   
 class Blog extends React.Component {
 
@@ -85,16 +87,21 @@ class Blog extends React.Component {
 			      		/>
 			      	</div>
 		      		<div>
-	      				<a href="#" className="ui button primary circular">Подписаться</a>
+	      				<SubscribeButton 
+		      				subscribeText="Подписаться" 
+		      				unsubscribeText="Отписаться"
+		      				entryType="blog"
+		      				entryID={blog._id}
+	      				/>
 	      				<div href="#" className="info ui button circular icon basic">
 		      				<i className="fa fa-info icon" aria-hidden="true"></i>
 		      				<div className="ui popup statistic">
 							  <div className="item">
-							  	<div className="value">27 мая 2016</div>
+							  	<div className="value">{dateFormat(blog.created, "dd.mm.yyyy")}</div>
 							  	<div className="content">Блог зарегистрирован</div>
 							  </div>
 							  <div className="item">
-							  	<div className="value">725</div>
+							  	<div className="value">{blog.blogSubscribersCount}</div>
 							  	<div className="content">Подписчика</div>
 							  </div>
 							  <div className="item">

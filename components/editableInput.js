@@ -21,6 +21,12 @@ export default class EditableInput extends React.Component {
   	})
   }
 
+  componentWillReceiveProps(nextProps) {
+  	this.setState({
+  		value: nextProps.value
+  	})
+  }
+
   componentDidMount() {
   	this.createEventListeners()
   	UI()
@@ -75,8 +81,10 @@ export default class EditableInput extends React.Component {
    var description = this.state.value;
 	if (!this.state.editing) {
 		return (
-			<p  data-inverted="" data-tooltip="Нажмите для редактирования" data-position="bottom center" 
-				className={this.props.size} 
+			<p  data-inverted="" 
+				data-tooltip="Нажмите для редактирования" 
+				data-position={(this.props.align) ? `bottom ${this.props.align}` : `bottom center`}
+				className={`${this.props.size}`}
 				onClick={() => {this.edit()}}>
 				
 				{description ? <span>{description}</span> : `Добавьте ${this.props.title.toLowerCase()}` }
@@ -119,7 +127,7 @@ export default class EditableInput extends React.Component {
 							defaultValue={description} 
 							ref={(e) => {this.input = e}}
 							type="text" 
-							className="add mini" 
+							className={`${this.props.align} add mini`} 
 							placeholder={this.props.title} 
 							autoFocus
 						/>
@@ -139,7 +147,12 @@ export default class EditableInput extends React.Component {
 						font-size:17px!important;
 						text-align:center!important;
 						padding:0px!important;
-						border-radius:999em!important;
+					}
+					input.left {
+						text-align:left!important;
+					}
+					input.center {
+						text-align:center;
 					}
 					.description .form {
 						display:flex;

@@ -11,6 +11,9 @@ exports.getPageBySlug = getPageBySlug;
 exports.makeSearch = makeSearch;
 exports.updateField = updateField;
 exports.updateImage = updateImage;
+exports.uploadImage = uploadImage;
+exports.subscribeToEntry = subscribeToEntry;
+exports.getPersonalFeed = getPersonalFeed;
 
 var _extends2 = require('babel-runtime/helpers/extends');
 
@@ -101,4 +104,40 @@ function updateImage(token, entryType, entryID, image) {
     } else {
         console.log('Не найдено изображение');
     }
+}
+
+function uploadImage(token, image) {
+    if (image) {
+        var data = new FormData();
+        data.append('image', image);
+        return (0, _axiosAuth.axiosAuth)(token, {
+            url: 'app/entries/upload',
+            method: 'POST',
+            data: data
+        }).then(function (res) {
+            if (res.data.success) {
+                var path = _appConfig2.default.storage + 'temp' + '/' + res.data.filename;
+                return (0, _extends3.default)({ path: path }, res.data);
+            } else {
+                return { errors: res.data.errors };
+            }
+        });
+    } else {
+        console.log('Не найдено изображение');
+    }
+}
+
+function subscribeToEntry(token, entryType, entryId) {
+    return (0, _axiosAuth.axiosAuth)(token, {
+        url: 'app/entries/' + entryId + '/subscribe/' + entryType,
+        method: 'GET'
+    });
+}
+
+// Обновление любого поля любого типа записей
+function getPersonalFeed(token) {
+    return (0, _axiosAuth.axiosAuth)(token, {
+        url: 'post/entries/personal',
+        method: 'GET'
+    });
 }

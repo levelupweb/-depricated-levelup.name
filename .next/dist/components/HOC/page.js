@@ -61,13 +61,15 @@ var _jsCookie = require('js-cookie');
 
 var _jsCookie2 = _interopRequireDefault(_jsCookie);
 
-var _axios = require('axios');
-
-var _axios2 = _interopRequireDefault(_axios);
-
 var _loader = require('../loader');
 
 var _loader2 = _interopRequireDefault(_loader);
+
+var _getToken = require('../../utils/getToken.js');
+
+var _getToken2 = _interopRequireDefault(_getToken);
+
+var _axiosAuth = require('../../utils/axiosAuth.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -81,7 +83,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 */
 
 var prepareData = function () {
-  var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(builder, query) {
+  var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(token, builder, query) {
     var _this = this;
 
     var data, queries;
@@ -109,21 +111,25 @@ var prepareData = function () {
                     switch (_context2.prev = _context2.next) {
                       case 0:
                         slug = item.single ? query.slug : '';
-                        url = _appConfig2.default.API + item.type + '/entries/' + encodeURI(slug);
+
+                        if (item.custom) {
+                          url = item.url;
+                        } else {
+                          url = _appConfig2.default.API + item.type + '/entries/' + encodeURI(slug);
+                        }
                         _context2.next = 4;
-                        return (0, _isomorphicFetch2.default)(url).then(function () {
+                        return (0, _axiosAuth.axiosAuth)(token, {
+                          url: url,
+                          method: 'GET'
+                        }).then(function () {
                           var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(res) {
                             return _regenerator2.default.wrap(function _callee$(_context) {
                               while (1) {
                                 switch (_context.prev = _context.next) {
                                   case 0:
-                                    _context.next = 2;
-                                    return res.json();
+                                    data[item.type] = res.data;
 
-                                  case 2:
-                                    data[item.type] = _context.sent;
-
-                                  case 3:
+                                  case 1:
                                   case 'end':
                                     return _context.stop();
                                 }
@@ -131,7 +137,7 @@ var prepareData = function () {
                             }, _callee, _this);
                           }));
 
-                          return function (_x4) {
+                          return function (_x5) {
                             return _ref3.apply(this, arguments);
                           };
                         }());
@@ -144,7 +150,7 @@ var prepareData = function () {
                 }, _callee2, _this);
               }));
 
-              return function (_x3) {
+              return function (_x4) {
                 return _ref2.apply(this, arguments);
               };
             }()));
@@ -165,7 +171,7 @@ var prepareData = function () {
     }, _callee3, this);
   }));
 
-  return function prepareData(_x, _x2) {
+  return function prepareData(_x, _x2, _x3) {
     return _ref.apply(this, arguments);
   };
 }();
@@ -173,21 +179,7 @@ var prepareData = function () {
 // Добавить уровни доступа // Вынести в UTILS и добавить уровни доступа
 
 
-/* 
-
-*** Получение токена. cookies.get - для клиента, req.cookies - для сервера
-
-* req - Объект реквеста к серверу, из которого будем брать cookies
-
-*/
-
-function getToken(req) {
-  try {
-    return _jsCookie2.default.get('x-access-token') || req.cookies['x-access-token'];
-  } catch (err) {
-    return 0;
-  }
-}function canUserPass(options, user) {
+function canUserPass(options, user) {
   if (user.isLogged) {
     return true;
   } else {
@@ -228,7 +220,7 @@ function page(Component, slug, builder) {
               switch (_context6.prev = _context6.next) {
                 case 0:
                   _context6.next = 2;
-                  return getToken(req);
+                  return (0, _getToken2.default)(req);
 
                 case 2:
                   token = _context6.sent;
@@ -245,7 +237,7 @@ function page(Component, slug, builder) {
                           switch (_context5.prev = _context5.next) {
                             case 0:
                               _context5.next = 2;
-                              return prepareData(builder, query).then(function () {
+                              return prepareData(token, builder, query).then(function () {
                                 var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(data) {
                                   var state, canPass;
                                   return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -291,7 +283,7 @@ function page(Component, slug, builder) {
                                   }, _callee4, _this3);
                                 }));
 
-                                return function (_x7) {
+                                return function (_x8) {
                                   return _ref7.apply(this, arguments);
                                 };
                               }());
@@ -304,7 +296,7 @@ function page(Component, slug, builder) {
                       }, _callee5, _this3);
                     }));
 
-                    return function (_x6) {
+                    return function (_x7) {
                       return _ref6.apply(this, arguments);
                     };
                   }());
@@ -322,7 +314,7 @@ function page(Component, slug, builder) {
           }, _callee6, this);
         }));
 
-        function getInitialProps(_x5) {
+        function getInitialProps(_x6) {
           return _ref4.apply(this, arguments);
         }
 

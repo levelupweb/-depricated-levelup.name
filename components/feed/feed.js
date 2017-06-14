@@ -3,7 +3,8 @@ import Loader from '../loader'
 import Link from 'next/link'
 import Router from 'next/router'
 import cookies from 'js-cookie'
-import Article, { Blank } from './article'
+import Article, { Blank } from './article.js'
+import Note from './note.js'
 import ListArticle from './listArticle'
 import axios from 'axios'
 import config from '../../app.config.js'
@@ -11,7 +12,7 @@ import { getPosts } from '../../actions/post'
 import { connect } from 'react-redux'
 
 // Принимает:
-// 1. userID (id пользователя, чьи посты нужно отобразить)
+// 1. options (правила выдачи постов для API)
 // 2. posts (массив с постами)
 // default. (если ничего не передано, то загружает все посты из базы данных)
 
@@ -19,40 +20,27 @@ class Feed extends React.Component {
 
   constructor(props) {
     super(props);
+    this.token = cookies.get('x-access-token')
+    this.currentUser = this.props.user.profile;
     this.state = {
     	entries: [],
       isLoaded: false
     }
-
-    this.token = cookies.get('x-access-token')
-    this.currentUser = this.props.user.profile;
   }
 
   componentWillMount() {
-    if(this.props.posts != null) {
+    if(this.props.app.pageData.post != null) {
       this.setState({
-        entries: this.props.posts.post
-      })
-    } else if(this.props.userID) {
-      this.getPosts(1, { userID: this.props.userID })
-      .then((res) => {
-        this.setState({
-          entries: res.data
-        })
-      })
-      .then(() => {
-        this.setState({
-          isLoaded: true
-        })
+        entries: this.props.app.pageData.post,
+        isLoaded: true
       })
     } else {
-      this.getPosts(1)
+      this.getPosts(1, {...this.props.options})
       .then((res) =>{
         this.setState({
           entries: res.data
         })
-      }) 
-      .then(() => {
+      }).then(() => {
         this.setState({
           isLoaded: true
         })
@@ -67,9 +55,6 @@ class Feed extends React.Component {
   }
 
   getPosts(page, options) {
-    var options = {
-      ...options
-    }
     if(!options.perPage) {
       options.perPage = 10;
     }
@@ -80,31 +65,15 @@ class Feed extends React.Component {
     })
   }
 
-  createGrid() {
-  	var Isotope = require('isotope-layout');
-  	var imagesLoaded = require('imagesloaded');
-
-  	imagesLoaded('.grid', function() {
-	  	var grid = new Isotope('.grid', {
-	  		itemSelector: '.grid-item',
-			  percentPosition: true,
-			  masonry: {
-			    columnWidth: '.grid-sizer',
-          gutterWidth: 10
-			  }
-	  	});	
-	 });
-  }
-
   render() {
+    var components = this.state.entries.map((item, i) => {
+      return (<Article article={item} key={i} />)
+    })
     if(this.state.isLoaded) {
       if(this.state.entries.length > 0) {
         return (
           <div className="grid">
-            <div className="grid-sizer"></div>
-             {this.state.entries.map((item,i) => {
-              return (<Article article={item} key={i} />)
-             })}
+            {components}
           </div>
         )
       } else {

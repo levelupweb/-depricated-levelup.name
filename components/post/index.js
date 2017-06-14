@@ -167,7 +167,13 @@ class Post extends React.Component {
           <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
               <Avatar color={`#57c1b3`} round={true} size={32} src={user.userImage} name={user.userName} />
           </a></Link>
-          <SubscribeButton id={post.postAuthor} />
+          <SubscribeButton 
+            additionalClasses="small" 
+            entryType="user"
+            entryID={user._id} 
+            subscribeText="Подписаться" 
+            unsubscribeText="Отписаться" 
+          />
         </div>
 
         <div className="floating block-shadow">

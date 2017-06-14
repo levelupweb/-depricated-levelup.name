@@ -16,7 +16,7 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Auth />, <SimpleHeader />, null);
+    var page = createPage(this.props.app.pageSettings, <Auth />, <SimpleHeader block={true} />, null);
     this.state = { page: page }
   }
 

@@ -20,3 +20,24 @@ export function getAllBlogs(token) {
 		}
     })
 }
+
+export function getUserBlog(userID) {
+	return axiosNoAuth({
+		url: 'user/entries/' + userID + '/getblog',
+		method: 'GET'
+    })
+}
+
+export function getBlogStats(blogID) {
+	return axiosNoAuth({
+		url: 'blog/entries/' + blogID + '/getstats',
+		method: 'GET'
+    })
+}
+
+export function getUserSubscriptions(blogID) {
+	return axiosNoAuth({
+		url: 'blog/entries/' + blogID + '/getsubscriptions',
+		method: 'GET'
+    })
+}

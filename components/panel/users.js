@@ -267,22 +267,21 @@ export class UsersContainer extends React.Component {
     let result = confirm('Вы действительно хотите удалить пользователя?');
     if (result) {
       removeUserById(id).then((res) => {
-        // handle success
+        console.log(res.data)
       })
     }
   }
 
   bindChangeEvent() {
-    let self = this;
     let inputs = document.querySelectorAll('.form input, .form textarea');
     inputs.forEach((input) => {
       input.addEventListener('change', (e) => {
         let property = e.target.name;
         let value = e.target.value;
-        self.setState({
-          ...self.state,
+        this.setState({
+          ...this.state,
           user: {
-            ...self.state.user,
+            ...this.state.user,
             [property]: value
           }
         })
@@ -317,6 +316,7 @@ export class UsersContainer extends React.Component {
   }
 
   render() {
+    console.log(this.state)
     var entry = this.state.user;
     return (
       <div>

@@ -30,7 +30,8 @@ class EditorWrapper extends React.Component {
         postContent: '',
         postLikes: [],
         postFavorites: [],
-        postAuthor: null
+        postAuthor: null,
+        postType: 'post'
       },
       tempTag: '' 
     } 

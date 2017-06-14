@@ -78,3 +78,41 @@ export function updateImage(token, entryType, entryID, image) {
         console.log('Не найдено изображение')
     }
 }
+
+export function uploadImage(token, image) {
+    if (image) {
+      var data = new FormData();
+      data.append('image', image);
+      return axiosAuth(token, {
+        url: 'app/entries/upload',
+        method: 'POST',
+        data: data
+      })
+      .then((res) => {
+        if(res.data.success) { 
+            var path = config.storage + 'temp' + '/' + res.data.filename
+            return { path, ...res.data }
+        } else {
+            return { errors: res.data.errors }
+        }
+      })
+    } else {
+        console.log('Не найдено изображение')
+    }
+}
+
+
+export function subscribeToEntry(token, entryType, entryId) {
+  return axiosAuth(token, {
+        url: 'app/entries/' + entryId + '/subscribe/' + entryType,
+        method: 'GET'
+    })
+}
+
+// Обновление любого поля любого типа записей
+export function getPersonalFeed(token) {
+    return axiosAuth(token, {
+        url: 'post/entries/personal',
+        method: 'GET'
+    })
+}
