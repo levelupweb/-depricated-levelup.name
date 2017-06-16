@@ -55,7 +55,7 @@ class UserSingle extends React.Component {
 
   render() {
     var user = this.state.user
-    if(user) {
+    if (user) {
       return (
         <div className="profile-feed feed">
         	<UserBar userdata={user} />
@@ -80,14 +80,14 @@ class UserSingle extends React.Component {
                 <div id="feed" className="tab-content">
                   <FlashPost />
                   <div className="block">
-                    <Feed options={{userID: user._id}} />
+                    <Feed options={{ userID : user._id }} />
                   </div>
                 </div>
   			        <div id="publications" className="tab-content hidden block">
   			          {/* <Articles userID={user._id} /> */}
   			        </div>
   			        <div id="bookmarks" className="tab-content hidden block">
-  			           <Feed template="listarticle" />
+  			           
   			        </div>
   			        <div id="comments" className="tab-content hidden block">
   			           <Comments />

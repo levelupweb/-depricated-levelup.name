@@ -41,3 +41,10 @@ export function getUserSubscriptions(blogID) {
 		method: 'GET'
     })
 }
+
+export function getBlogById(blogID) {
+	return axiosNoAuth({
+		url: 'blog/entries/' + blogID + '/byid',
+		method: 'GET'
+    })
+}

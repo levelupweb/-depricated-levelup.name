@@ -149,3 +149,10 @@ export function getUserStats(userID) {
 		method: 'GET'
     })
 }
+
+export function getUserFaces(userID) {
+    return axiosNoAuth({
+		url: 'user/entries/' + userID + '/getfaces',
+		method: 'GET'
+    })
+}

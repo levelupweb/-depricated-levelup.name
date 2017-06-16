@@ -29,7 +29,7 @@ class Feed extends React.Component {
   }
 
   componentWillMount() {
-    if(this.props.app.pageData.post != null) {
+    if(this.props.app.pageData.post) {
       this.setState({
         entries: this.props.app.pageData.post,
         isLoaded: true

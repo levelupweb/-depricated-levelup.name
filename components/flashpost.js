@@ -6,8 +6,10 @@ import { postAdd } from '../actions/post.js'
 import cookies from 'js-cookie'
 import { UI } from '../utils/initscripts.js'
 import { uploadImage } from '../actions/app.js'
+import { getUserFaces } from '../actions/user.js'
 import findURL from '../utils/findURL.js' 
 import getYouTubeId from '../utils/getYouTube.js' 
+import Avatar from 'react-avatar'
 
 class FlashPost extends React.Component {
 
@@ -17,29 +19,45 @@ class FlashPost extends React.Component {
     this.token = cookies.get('x-access-token');
     this.state = {
       errors: [],
+      faces: null,
       isRevealed: false,
       isBlocked: false,
       isDisabled: false,
       placeholder: 'О чем бы вы хотели сейчас рассказать?',
     	post: {
-        postAuthor: null,
+        postAuthor: {
+          authorType: null,
+          authorID: null
+        },
         postImage: null,
         postVideo: null,
         postLink: null,
         postContent: '',
         postType: 'note',
-    	}
+    	},
+      currentFace: {
+        faceImage: null,
+        faceTitle: null
+      }
     }
   }
 
   componentWillMount() {
     if(this.currentUser) { 
-      this.setState({
-        post: {
-          ...this.state.post,
-          postAuthor: this.currentUser._id
-        }
+      getUserFaces(this.currentUser._id).then((res) => {
+        this.setState({
+          faces: res.data,
+          post: {
+            ...this.state.post,
+            postAuthor: {
+              ...this.state.post.postAuthor,
+              authorID: this.currentUser._id,
+              authorType: this.props.defaultType
+            }
+          }
+        })
       })
+
     } 
 
     if(this.state.post.postImage || this.state.post.postVideo || this.state.post.postContent) {
@@ -51,6 +69,7 @@ class FlashPost extends React.Component {
 
   componentDidMount() {
     UI()
+    $('.ui.dropdown').dropdown();
     $('.video.button').popup({
       popup : $('.video.popup'), 
       on: 'click'
@@ -72,10 +91,10 @@ class FlashPost extends React.Component {
 
   handleTyping(e) {
     var value = e.target.value
-    if(value.length > 140) {
+    if(value.length >= 140) {
       this.setState({ isBlocked: true })
       $('.ui.form').popup({
-        popup: '.popup',
+        popup: '.limit.popup',
         hoverable: true
       });
     } else {
@@ -166,10 +185,33 @@ class FlashPost extends React.Component {
     })
   }
 
+  setType(type, item) {
+    var image = (type == 'blog') ? item.blogImage : item.userImage;
+    var name =  (type == 'blog') ? item.blogTitle : item.userTitle;
+    if(type == 'user' || type == 'blog') {
+      this.setState({
+          post: {
+            ...this.state.post,
+            postAuthor: {
+              authorType: type,
+              authorID: item._id
+            }
+          },
+          currentFace: {
+            faceImage: image,
+            faceName: name
+          }
+      })
+    } else {
+      console.log("Данного типа не существует")
+    }
+  }
+
+
   render() {
     var post = this.state.post;    
+    var user = this.currentUser;
     if (this.props.user.profile && post) {
-
       // Кнопка
       var button = (
         <span>
@@ -285,12 +327,37 @@ class FlashPost extends React.Component {
       )
 
       var symbols = 140 - this.state.post.postContent.length;
+
       return (
         <div className={(this.state.isRevealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.setState({isRevealed: true})}}>
     			<form className="ui form">
     				<div className="field">
     					<div className="image user">
-      					<User id={this.props.user.profile._id} size="dropdown" />
+                <div className="ui inline dropdown right face">                  
+                  <Avatar 
+                    color={`#46978c`} 
+                    round={true} 
+                    size={32} 
+                    src={(this.state.currentFace.faceImage) ? this.state.currentFace.faceImage : user.userImage} 
+                    name={this.state.currentFace.faceName} 
+                  />
+                  {(this.state.isRevealed) && <i className="fa fa-angle-down icon"></i> }
+                  <div className="menu left">
+                    <div className="item" onClick={() => {this.setType('user', user)}}>
+                      <Avatar color={`#46978c`} round={true} size={20} src={user.userImage} name={user.userName} />
+                      <span>{user.userName}</span>
+                    </div>
+                    {(this.state.faces) &&
+                      this.state.faces.map((item, i) => {
+                        return (
+                          <div onClick={() => {this.setType('blog', item)}} className="item" key={i}>
+                            <Avatar color={`#46978c`} round={true} size={20} src={item.blogImage} name={item.blogTitle} />
+                            <span>{item.blogTitle}</span>
+                          </div>
+                        )})
+                      }
+                  </div>
+                </div>
     			    </div>
               <div className="note">
                 <div>{image}</div>
@@ -314,7 +381,7 @@ class FlashPost extends React.Component {
                         </div>
                       </span>
                     }
-                    <div className="ui popup">
+                    <div className="ui limit popup">
                       <p>Максимальная длина короткого поста равна 140 символам. 
                       Возможно вы хотите опубликовать публикацию?</p>
                     </div>
@@ -327,6 +394,9 @@ class FlashPost extends React.Component {
     		  	</div>
     			</form>
           <style jsx>{`
+            .dropdown .menu .item span {
+              margin-left:5px;
+            }
             .note {
               padding:15px 0px;
             }
@@ -343,8 +413,6 @@ class FlashPost extends React.Component {
               left:0px;
               top:50%;
               margin-top:-20px;
-              height:40px;
-              width:40px;
               display:flex;
               justify-content:center;
               align-items:center;
@@ -396,16 +464,32 @@ class FlashPost extends React.Component {
             .flashpost.revealed textarea {
               height:150px;
               padding-left:0px!important;
+              padding-right:70px;
             }
             .flashpost.revealed .user {
-              left:-200px;
-              opacity:0;
+              right: 0px;
+              left: auto;
+              opacity: 1;
+              top: 0px;
+              margin-top: 20px;
+              z-index:999;
             }
             .flashpost {
               padding:6px 30px;
             }
             .flashpost textarea:focus {
               background:transparent;
+            }
+            .flashpost .dropdown {
+              display:flex;
+              align-items:center;
+            }
+            .flashpost .dropdown i {
+              margin-left:10px;
+            }
+            .flashpost .dropdown .menu .item {
+              display:flex;
+              align-items:center;
             }
 
           `}</style>

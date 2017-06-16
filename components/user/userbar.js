@@ -59,7 +59,6 @@ class UserBar extends React.Component {
   }
 
   render() {
-    console.log(this.props)
     if(this.state.user) {
       var user = this.state.user;
       var currentUser = this.props.user.profile || {};

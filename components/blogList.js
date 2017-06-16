@@ -80,7 +80,6 @@ class Blog extends React.Component {
 		super(props);
 	}
 	render() {
-		console.log(this.props)
 		var blog = this.props.blogData
 		if (blog) {
 			if(this.props.size != 'block') {

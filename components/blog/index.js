@@ -9,6 +9,8 @@ import { updateImage } from '../../actions/app.js'
 import Header from '../header/index.js'
 import SubscribeButton from '../subscribeButton.js'
 import dateFormat from 'dateformat'
+import FlashPost from '../flashpost.js'
+import Feed from '../feed/feed.js'
   
 class Blog extends React.Component {
 
@@ -57,7 +59,7 @@ class Blog extends React.Component {
 	      <div className="blog">
 	      	<div className="header-wrapper">
 	      		<Header />
-		        <div className="main-content block">
+		         <div className="main-content block">
 		        	<div className="image" onClick={() => {this.imageUploader.click()}} data-inverted="" data-tooltip="Загрузить изображение" data-position="top center">
 		      			<Avatar 
 		      				color={`#57c1b3`} 
@@ -112,6 +114,12 @@ class Blog extends React.Component {
 	      				</div>
 	      			</div>
 	      		</div>
+	      	</div>
+	      	<div className="feed">
+	      	   <FlashPost defaultType="blog" />
+               <div className="block">
+               	<Feed options={{blogID: blog._id}} />
+               </div>
 	      	</div>
 
 	      <style jsx>{`

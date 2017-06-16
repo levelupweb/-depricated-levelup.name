@@ -3,6 +3,7 @@ import User from '../user.js'
 import { setLikeById } from '../../actions/post.js'
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
+import Blog from '../blog.js'
 
 class Note extends React.Component {
   constructor(props) {
@@ -20,25 +21,24 @@ class Note extends React.Component {
   	if(this.currentUser) {
 	  	if(this.post.postLikes.indexOf(this.currentUser._id) != -1) {
 	     this.setState({
-	       isLiked: true,
-	       likeCounter: this.post.postLikes.length
+		      isLiked: true,
+		      likeCounter: this.post.postLikes.length
 	     })
 	   }
 	}
   }
 
-  handleLike(postID, userID) {
-    setLikeById(this.token, postID).then((res) => {
-      if(res.data.success) {
-      	console.log(res.data)
-        this.setState({
-       	...this.state.post,
-       	isLiked: !this.state.isLiked,
-       	likeCounter: res.data.counter
-        })
-      }
-    })
-  }
+  	handleLike(postID, userID) {
+    	setLikeById(this.token, postID).then((res) => {
+      	if(res.data.success) {
+	        	this.setState({
+		       	...this.state.post,
+		       	isLiked: !this.state.isLiked,
+		       	likeCounter: res.data.counter
+	        })
+      	}
+    	})
+  	}
 
   render() {
     var post = this.post;
@@ -46,17 +46,21 @@ class Note extends React.Component {
 			var likes = this.state.likeCounter;
 			return (
 				<article className={`article note preview grid-item w-100`}>
-		        <User id={post.postAuthor} />
+					{(post.postAuthor.authorType == 'user') ?
+			            <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
+			          }
 		        <div className="image">
-		        	{(post.postImage) &&
-		        		<img src={post.postImage} width="100%" className="ui image rounded" />
-		        	}
-		        	{(post.postVideo) &&
-		        		<iframe width="100%" height="315" src={post.postVideo} frameBorder="0" allowFullScreen={true}></iframe>
-		        	}
+		        	{(post.postImage) && <img src={post.postImage} width="100%" className="ui image rounded" /> }
+		        	{(post.postVideo) && <iframe width="100%" height="315" src={post.postVideo} frameBorder="0" allowFullScreen={true}></iframe> }
 		        </div>
 		        <div className="content">
 		          <p className="primary">{post.postContent}</p>
+		        </div>
+		        <div className="link">
+		        	{(post.postLink) && 
+			        	<div><i className="fa fa-link"></i>
+			        	<a href={post.postLink} target="_blank">{post.postLink}</a></div>
+		        	}
 		        </div>
 		        <div className="meta">
 		        	<span onClick={() => {this.handleLike(post._id, this.currentUser._id)}} className={(this.state.isLiked) ? `ui button circular small primary` : `ui button circular small`}>
@@ -67,6 +71,16 @@ class Note extends React.Component {
 		          .note p.primary {
 		          	font-size:17px;
 		          	color:#333;
+		          }
+		          .note .link {
+		          	padding:15px;
+		          	border:1px solid #eee;
+		          	border-radius:5px;
+		          	margin-bottom:15px;
+		          }
+		          .note .link i {
+		          	margin-right:15px;
+		          	opacity:.4;
 		          }
 		        `}</style>
 		      </article>
@@ -99,7 +113,6 @@ var Blank = (props) => {
 	          .user .content {
 	            margin-left:15px;
 	          }
-
 	          .user {
 	            display:flex;
 	            flex-direction:row;

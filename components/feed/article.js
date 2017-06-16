@@ -4,6 +4,7 @@ import User from '../user'
 import { getPostCommentsByPostId } from '../../actions/comment.js'
 import Loader from '../loader.js'
 import Note from './note.js'
+import Blog from '../blog.js'
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
 import { setLikeById } from '../../actions/post.js'
@@ -90,7 +91,9 @@ class Default extends React.Component {
       var likes = this.state.likeCounter;
       return (
         <article className={`article preview grid-item w-100`}>
-          <User id={post.postAuthor} />
+          {(post.postAuthor.authorType == 'user') ?
+            <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
+          }
           <div className="image">
             <img src={post.postImage} className="rounded ui image fluid" />
           </div>

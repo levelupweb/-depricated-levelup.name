@@ -10,6 +10,7 @@ exports.getLogout = getLogout;
 exports.subscribeToUser = subscribeToUser;
 exports.uploadImage = uploadImage;
 exports.getUserStats = getUserStats;
+exports.getUserFaces = getUserFaces;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -393,6 +394,13 @@ function uploadImage(token, userID, data) {
 function getUserStats(userID) {
 	return (0, _axiosAuth.axiosNoAuth)({
 		url: 'user/entries/' + userID + '/getstats',
+		method: 'GET'
+	});
+}
+
+function getUserFaces(userID) {
+	return (0, _axiosAuth.axiosNoAuth)({
+		url: 'user/entries/' + userID + '/getfaces',
 		method: 'GET'
 	});
 }
