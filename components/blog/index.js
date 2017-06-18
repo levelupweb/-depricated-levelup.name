@@ -115,7 +115,7 @@ class Blog extends React.Component {
 	      			</div>
 	      		</div>
 	      	</div>
-	      	<div className="feed">
+	      	<div id="feed">
 	      	   <FlashPost defaultType="blog" />
                <div className="block">
                	<Feed options={{blogID: blog._id}} />

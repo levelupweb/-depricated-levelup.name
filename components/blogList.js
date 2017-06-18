@@ -85,7 +85,7 @@ class Blog extends React.Component {
 			if(this.props.size != 'block') {
 				return (
 					<div className="item">
-						<Link href={{ pathname: 'b;pg', query: { slug: blog.slug }}}><a>
+						<Link href={{ pathname: 'blog', query: { slug: blog.slug }}}><a>
 			                <Avatar color={`#46978c`} round={true} size={32} src={blog.blogImage} name={blog.blogTitle} />
 			            </a></Link>
 			            <div className="content">
@@ -107,26 +107,40 @@ class Blog extends React.Component {
 								align-items:center;
 								flex-direction:row;
 								padding:7px 0px;
+								overflow:hidden;
+								max-width:100%;
 							}
-
+							.item .header .sub {
+								white-space:nowrap;
+								max-width:100%;
+								overflow:hidden;
+								position:relative;
+							}
+							.item:before {
+								background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6-15 */
+								background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Chrome10-25,Safari5.1-6 */
+								background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+								filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 */
+								position:absolute;
+								left:0px;
+								width:100%;
+								top:0px;
+								height:100%;
+							}
 							.item:last-child {
 								border-bottom:0px;
 							}
-
 							.item:first-child {
 								margin-top:0px;
 							}
-
 							.item .content {
 								margin-left:10px;
 							}
-
 							.item .content .sub.header {
 								font-size:13px;
 								margin-top:2px;
 								opacity:0.7;
 							}
-
 						`}</style>
 					</div>
 				) 
@@ -137,27 +151,26 @@ class Blog extends React.Component {
 					    <Avatar color={`#46978c`} round={true} size={50} src={blog.blogImage} name={blog.blogTitle} />
 					  </div>
 					  <div className="content">
-			        <div className="left">
-			  		    <Link href={{ pathname: 'blog', query: { slug: blog.slug }}}>
-			            <a className="header">{blog.blogTitle}</a> 
-			          </Link>
-			          <span className="subscribers">1 подписчик</span>
-			  		    <div className="description">
-			  		      {blog.blogDescription}
-			  		    </div>
-			        </div>
-			        <div className="right">
-			          <div className="action">
-
-			          <SubscribeButton 
-				          subscribeText="Подписаться" 
-				          unsubscribeText="Отписаться" 
-				          additionalClasses="basic small" 
-				          entryType="blog"
-				          entryID={blog._id}
-				          />
-			        </div>
-			        </div>
+				        <div className="left">
+				  		    <Link href={{ pathname: 'blog', query: { slug: blog.slug }}}>
+				            <a className="header">{blog.blogTitle}</a> 
+				          </Link>
+				          <span className="subscribers">1 подписчик</span>
+				  		    <div className="description">
+				  		      {blog.blogDescription}
+				  		    </div>
+				        </div>
+				        <div className="right">
+				          <div className="action">
+				          <SubscribeButton 
+					          subscribeText="Подписаться" 
+					          unsubscribeText="Отписаться" 
+					          additionalClasses="basic small" 
+					          entryType="blog"
+					          entryID={blog._id}
+					          />
+				        </div>
+				        </div>
 					  </div>
 
 			      <style jsx>{`
@@ -169,26 +182,21 @@ class Blog extends React.Component {
 			          border-bottom:1px solid #eee;
 			          margin:8px 0px;
 			        }
-
 			        .item .content {
 			          display:flex;
 			          justify-content:space-between;
 			          width:100%;
 			          margin-left:15px;
 			        }
-
 			        .item .content .header {
 			          font-weight:bold;
 			        }
-
 			        .item .content .subscribers {
 			          font-size:15px;
 			          font-weight:100;
 			          color:#c0c0c0;
 			          margin-left:10px;
 			        }
-
-
 			      `}</style>
 					</div>
 				)

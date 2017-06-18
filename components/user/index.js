@@ -78,7 +78,7 @@ class UserSingle extends React.Component {
               </div>
     			    <div className="tab">
                 <div id="feed" className="tab-content">
-                  <FlashPost />
+                  <FlashPost defaultType="user" />
                   <div className="block">
                     <Feed options={{ userID : user._id }} />
                   </div>

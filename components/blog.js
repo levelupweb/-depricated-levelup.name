@@ -51,11 +51,11 @@ export class Blog extends React.Component {
         })
       })
     } else {
-      if(this.props.blog.isLogged) {
+      if(this.props.user.isLogged) {
         new Promise(() => {
           this.setState({
             ...this.state,
-            blog: this.props.blog.profile
+            blog: this.props.user.profile
           })
         }).then(() =>{
           this.setState({

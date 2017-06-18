@@ -28,7 +28,7 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Feed />, <FlashPost />, null);
+    var page = createPage(this.props.app.pageSettings, <Feed options={{perPage: 10}} />, <FlashPost />, null);
     this.state = { page: page }
   }
 

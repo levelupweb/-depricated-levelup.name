@@ -125,41 +125,12 @@ form .field input:focus {
 	padding-top:0px;
 }
 
-.header-wrapper {
-	background: #fff;
-	border-bottom:1px solid #eee;
+.site-feed .after-header .block {
+	padding:23px 15px;
 }
 
-.header-wrapper .search {
-	background:#fafafa!important;
-	padding:0px!important;
-	padding-right:30px!important;
-}
-
-.header-wrapper .search-inner {
-	display:flex;
-	flex-direction:row;
-	justify-content:center;
-	width:100%;
-}
-
-.header-wrapper .search-input {
-	background:none;
-	border:0px;
-	font-size:25px;
-	outline:0px;
-	padding:10px 40px;
-	width:100%;
-	height:85px;
-}
-
-.header-wrapper .secondary.menu {
-	margin:0px!important;
-	height:85px!important;
-}
-
-.header-wrapper .secondary.menu .item {
-	background:#fafafa;
+#feed .block {
+	padding:23px 15px;
 }
 
 .main h1.header {
@@ -608,4 +579,16 @@ margin-top:0px;
 
 .serach .results > div:first-child {
 	margin-top:0px;
+}
+
+.item .header .sub:before {
+	background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 */
+	position:absolute;
+	left:0px;
+	width:100%;
+	top:0px;
+	height:100%;
 }

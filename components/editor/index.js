@@ -8,6 +8,7 @@ import Editor from './editor.js'
 import axios from 'axios'
 import randomString from '../../utils/randomString.js'
 import router from 'next/router'
+import { updateImage } from '../../actions/app.js'
 import UI from '../../utils/initscripts.js'
 
 // 1. Сделать дату добавления
@@ -16,7 +17,6 @@ import UI from '../../utils/initscripts.js'
 // 4. Решить проблему с загрузкой изображений в редакторе
 
 class EditorWrapper extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -229,7 +229,6 @@ class EditorWrapper extends React.Component {
 
 
   render() {
-    console.log(this.state.post)
     var post = this.state.post;
     var user = this.props.user.profile;
     var tags = this.state.post.postTags.map((item, i) => {
@@ -243,7 +242,9 @@ class EditorWrapper extends React.Component {
             <div className="header-content block">
     	      	<div className="title">
     	      		<Avatar color={`#46978c`} round={true} size={40} name={user.slug} src={user.userImage} />
-    	      		<h3 className="ui header">
+    	      		
+
+                <h3 className="ui header">
     	      			<input defaultValue={post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
     	      			<span className="sub header">http://levelup.name/<input onChange={(e) => {this.handleTyping(e)}} type="text" defaultValue={post.slug} ref={(link) => {this.link = link}} /></span>
     	      		</h3>

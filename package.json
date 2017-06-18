@@ -22,6 +22,7 @@
     "react-simpletabs": "^0.7.0",
     "react-tabs": "^0.8.2",
     "redux": "3.6.0",
+    "redux-infinite-scroll": "^1.0.9",
     "redux-thunk": "latest",
     "semantic-ui-dimmer": "latest",
     "semantic-ui-dropdown": "2.2.10",

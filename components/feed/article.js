@@ -117,6 +117,10 @@ class Default extends React.Component {
           <style jsx>{`
             .article {
               margin-top:15px;
+              box-shadow: 0px 3px 18px 0px rgba(34, 36, 38, 0.1);
+              padding:15px 19px;
+              border-radius:4px;
+              background:#fff;
             }
             .article .user {
               margin:15px 0px;

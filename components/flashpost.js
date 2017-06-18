@@ -7,60 +7,59 @@ import cookies from 'js-cookie'
 import { UI } from '../utils/initscripts.js'
 import { uploadImage } from '../actions/app.js'
 import { getUserFaces } from '../actions/user.js'
+import { changePostFace, savePostLocally, setPostAuthor, setPostFaces, setPost, flushPost } from '../actions/post.js'
 import findURL from '../utils/findURL.js' 
 import getYouTubeId from '../utils/getYouTube.js' 
 import Avatar from 'react-avatar'
+import UserFaces from './userFaces.js'
+
+const defaultState = {
+  isRevealed: false,
+  isBlocked: false,
+  isDisabled: false,
+  placeholder: 'О чём бы вы хотели нам рассказать сегодня?',
+  post: {
+    postImage: null,
+    postVideo: null,
+    postLink: null,
+    postContent: '',
+    postType: 'note',
+  }
+}
+
 
 class FlashPost extends React.Component {
-
   constructor(props) {
     super(props);
     this.currentUser = this.props.user.profile;
     this.token = cookies.get('x-access-token');
-    this.state = {
-      errors: [],
-      faces: null,
-      isRevealed: false,
-      isBlocked: false,
-      isDisabled: false,
-      placeholder: 'О чем бы вы хотели сейчас рассказать?',
-    	post: {
-        postAuthor: {
-          authorType: null,
-          authorID: null
-        },
-        postImage: null,
-        postVideo: null,
-        postLink: null,
-        postContent: '',
-        postType: 'note',
-    	},
-      currentFace: {
-        faceImage: null,
-        faceTitle: null
-      }
-    }
+    this.dispatch = this.props.dispatch;
+    this.state = defaultState;
   }
 
   componentWillMount() {
-    if(this.currentUser) { 
-      getUserFaces(this.currentUser._id).then((res) => {
-        this.setState({
-          faces: res.data,
-          post: {
-            ...this.state.post,
-            postAuthor: {
-              ...this.state.post.postAuthor,
-              authorID: this.currentUser._id,
-              authorType: this.props.defaultType
-            }
-          }
-        })
-      })
+    var postState = this.props.postState;
+    var post = postState.post;
 
+    if(this.currentUser) { 
+      this.dispatch(changePostFace('user', this.currentUser))
+      if(postState.faces == null) {
+        getUserFaces(this.currentUser._id).then((res) => {
+          this.dispatch(setPostFaces(res.data))
+        })
+      }
+      if(post.postAuthor.authorID != null) {
+        this.setState({
+          post
+        })
+      }
     } 
 
-    if(this.state.post.postImage || this.state.post.postVideo || this.state.post.postContent) {
+    if(  post.postImage 
+      || post.postVideo 
+      || post.postContent 
+      || post.postLink
+    ) {
       this.setState({
         isRevealed: true
       })
@@ -74,7 +73,7 @@ class FlashPost extends React.Component {
       popup : $('.video.popup'), 
       on: 'click'
     })
-    $('.video.popup input').on('keypress', (e) => {
+    $('.video.popup input').on('keydown', (e) => {
       if(e.keyCode == 13) {
         e.preventDefault();
         this.setVideo(e.target.value)
@@ -82,11 +81,26 @@ class FlashPost extends React.Component {
     })
   }
 
+  componentWillUnmount() {
+    this.dispatch(
+      savePostLocally(this.state.post)
+    );
+  }
+
   makePost() {
-    var post = this.state.post;
-    postAdd(this.token, post).then((res) => {
-      console.log(res.data)
-    })
+    this.dispatch(savePostLocally(this.state.post))
+    .then(() => {
+      postAdd(this.token, this.props.postState.post)
+      .then((res) => {
+        if(res.data.success) {
+          flushPost();
+          this.setState({
+            post: defaultState.post,
+            isRevealed: false
+          })
+        } 
+      })
+    });
   }
 
   handleTyping(e) {
@@ -139,18 +153,19 @@ class FlashPost extends React.Component {
 
   setVideo(value) {
     var id = getYouTubeId(value)
-    if(id) {
-      var url = '//www.youtube.com/embed/' + id;
+    if (id) {
       this.setState({
         placeholder: 'Подпись к видеоролику',
         post: {
           ...this.state.post,
-          postVideo: url
+          postVideo: id
         }
       })
     } else {
       this.setState({
-        errors: this.state.errors.concat(['Некорретная ссылка']),
+        errors: this.state.errors.concat(
+          ['Некорретная ссылка']
+        ),
       })
     }
   }
@@ -186,29 +201,14 @@ class FlashPost extends React.Component {
   }
 
   setType(type, item) {
-    var image = (type == 'blog') ? item.blogImage : item.userImage;
-    var name =  (type == 'blog') ? item.blogTitle : item.userTitle;
-    if(type == 'user' || type == 'blog') {
-      this.setState({
-          post: {
-            ...this.state.post,
-            postAuthor: {
-              authorType: type,
-              authorID: item._id
-            }
-          },
-          currentFace: {
-            faceImage: image,
-            faceName: name
-          }
-      })
-    } else {
-      console.log("Данного типа не существует")
-    }
+    this.props.dispatch(
+      changePostFace(type, item)
+    );
   }
 
 
   render() {
+    var postState = this.props.postState;
     var post = this.state.post;    
     var user = this.currentUser;
     if (this.props.user.profile && post) {
@@ -302,11 +302,12 @@ class FlashPost extends React.Component {
         <div>
           {(this.state.post.postVideo) &&
             <div className="video">
-              <iframe width="560" height="315" src={this.state.post.postVideo} frameBorder="0" allowFullScreen={true}></iframe>
+              <iframe width="500" height="315" src={`https://www.youtube.com/embed/${this.state.post.postVideo}`} frameBorder="0" allowFullScreen={true}></iframe>
               <i className="fa fa-close" onClick={() => {this.deleteVideo()}}></i>
               <style jsx>{`
                 .video {
                   position:relative;
+                  width:550px;
                 }
                 .video i {
                   position:absolute;
@@ -338,8 +339,8 @@ class FlashPost extends React.Component {
                     color={`#46978c`} 
                     round={true} 
                     size={32} 
-                    src={(this.state.currentFace.faceImage) ? this.state.currentFace.faceImage : user.userImage} 
-                    name={this.state.currentFace.faceName} 
+                    src={(postState.postFace.faceImage) ? postState.postFace.faceImage : user.userImage} 
+                    name={postState.postFace.faceTitle} 
                   />
                   {(this.state.isRevealed) && <i className="fa fa-angle-down icon"></i> }
                   <div className="menu left">
@@ -347,8 +348,8 @@ class FlashPost extends React.Component {
                       <Avatar color={`#46978c`} round={true} size={20} src={user.userImage} name={user.userName} />
                       <span>{user.userName}</span>
                     </div>
-                    {(this.state.faces) &&
-                      this.state.faces.map((item, i) => {
+                    {(postState.faces) &&
+                      postState.faces.map((item, i) => {
                         return (
                           <div onClick={() => {this.setType('blog', item)}} className="item" key={i}>
                             <Avatar color={`#46978c`} round={true} size={20} src={item.blogImage} name={item.blogTitle} />
@@ -363,7 +364,14 @@ class FlashPost extends React.Component {
                 <div>{image}</div>
                 <div>{video}</div>
     			      <div className="textarea">
-                  <textarea disabled={this.state.isDisabled} maxLength="140" ref={(e) => {this.textarea = e}} onChange={(e) => {this.handleTyping(e)}} defaultValue={post.postContent} rows="2" placeholder={this.state.placeholder} />
+                  <textarea 
+                    disabled={this.state.isDisabled} 
+                    maxLength="140" ref={(e) => {this.textarea = e}} 
+                    onChange={(e) => {this.handleTyping(e)}} 
+                    defaultValue={postState.post.postContent} 
+                    rows="2" 
+                    placeholder={this.state.placeholder} 
+                  />
     			        <div className="bar">
                     {button}
                     {(!this.state.post.postImage && !this.state.post.postVideo) &&
@@ -390,7 +398,12 @@ class FlashPost extends React.Component {
                 </div>
                 <div>{link}</div>
               </div>
-              <input onChange={(e) => {this.uploadImage(e)}} type="file" className="ui hidden" ref={(e) => {this.image = e}} />
+              <input 
+                onChange={(e) => {this.uploadImage(e)}} 
+                type="file" 
+                className="ui hidden" 
+                ref={(e) => {this.image = e}} 
+              />
     		  	</div>
     			</form>
           <style jsx>{`

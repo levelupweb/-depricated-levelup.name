@@ -3,6 +3,7 @@ import Link from 'next/link'
 import axios from 'axios'
 import config from '../../app.config.js'
 import Loader from '../loader'
+import getPosts from '../../utils/getPosts.js'
 
 export class Posts extends React.Component {
 
@@ -14,7 +15,8 @@ export class Posts extends React.Component {
   }
 
   componentWillMount() {
-    axios.get(config.API + `post/entries`).then((res) => {
+    getPosts(1, {}).then((res) => {
+      console.log(res.data)
       this.setState({
         entries: res.data
       })

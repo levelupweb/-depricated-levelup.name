@@ -8,8 +8,9 @@ import Note from './note.js'
 import ListArticle from './listArticle'
 import axios from 'axios'
 import config from '../../app.config.js'
-import { getPosts } from '../../actions/post'
+import getPosts from '../../utils/getPosts'
 import { connect } from 'react-redux'
+import InfiniteScroll from 'redux-infinite-scroll';
 
 // Принимает:
 // 1. options (правила выдачи постов для API)
@@ -23,19 +24,22 @@ class Feed extends React.Component {
     this.token = cookies.get('x-access-token')
     this.currentUser = this.props.user.profile;
     this.state = {
+      page: 1,
     	entries: [],
-      isLoaded: false
+      isRobot: false,
+      isLoaded: false,
+      isFull: false
     }
   }
 
   componentWillMount() {
-    if(this.props.app.pageData.post) {
+    if(this.props.app.pageData.post && this.state.isRobot) {
       this.setState({
         entries: this.props.app.pageData.post,
         isLoaded: true
       })
     } else {
-      this.getPosts(1, {...this.props.options})
+      getPosts(this.state.page, {...this.props.options})
       .then((res) =>{
         this.setState({
           entries: res.data
@@ -48,22 +52,32 @@ class Feed extends React.Component {
     }
   }
 
+  loadMore() {
+    getPosts(this.state.page + 1, {...this.props.options})
+      .then((res) => {
+        if(res.data.length > 0) {
+          this.setState({
+            entries: this.state.entries.concat(res.data)
+          })
+        } else {
+          this.setState({
+            isFull: true
+          })
+        }
+      }).then(() => {
+        this.setState({
+          isLoaded: true,
+          page: this.state.page + 1
+        })
+    })
+  }
+
   componentDidMount() {
     this.setState({
       isLoaded: true
     })
   }
 
-  getPosts(page, options) {
-    if(!options.perPage) {
-      options.perPage = 10;
-    }
-    var skip = (page - 1) * options.perPage
-    return getPosts(this.token, {
-      ...options,
-      skip
-    })
-  }
 
   render() {
     var components = this.state.entries.map((item, i) => {
@@ -73,7 +87,13 @@ class Feed extends React.Component {
       if(this.state.entries.length > 0) {
         return (
           <div className="grid">
-            {components}
+            <InfiniteScroll
+              items={components}
+              loadMore={() => {this.loadMore()}} 
+              hasMore={!this.state.isFull}
+              threshold={10}
+              elementIsScrollable={false}
+            />
           </div>
         )
       } else {

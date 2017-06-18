@@ -58,14 +58,14 @@ class Header extends React.Component {
 			    </div>
 		    </div>
 			    :
-			<div className="ui secondary menu block">
-				<div className="menu">
+			<div className="block menu primary">
+				<div className="left">
 					<Link href='/'><a className="item"><b>Лента</b></a></Link>
 			      <Link href='/authors'><a className="item">Авторы</a></Link>
 				   <Link href='/blogs'><a className="item">Блоги</a></Link>
 				   <Link href='/adv'><a className="item">Рекламодателям</a></Link>
 				</div>
-				<div className="right menu">
+				<div className="right">
 				   	<a className="ui item" onClick={() => {this.getSearch(true)}}>
 						<i className="fa fa-search"></i>
 				   	</a>
@@ -75,11 +75,29 @@ class Header extends React.Component {
 			}	
 
 			 <style jsx>{`
+			 		.menu.primary {
+						display:flex;
+						justify-content:space-between;
+						align-items:center;
+						height:80px;
+			 		}
+			 		.menu.primary .item {
+			 			margin-right:17px;
+			 			font-size:16px;
+			 			display:inline-block;
+			 			color:#000;
+			 			margin-top:5px;
+			 		}
+			 		.menu.primary .right .item {
+			 			margin-right:0px;
+			 		}
+			 		.menu.primary .item:hover {
+			 			color:#333;
+			 		}
 					.search {
 						width:100%;
 						position:relative;
 					}
-
 					.search .results {
 						position:absolute;
 						left:0px;
@@ -88,6 +106,39 @@ class Header extends React.Component {
 						background:transparent;
 						z-index:9999;	
 					}
+					.header-wrapper {
+						background: #fff;
+						border-bottom:1px solid #eee;
+					}
+
+					.header-wrapper .search {
+						background:#fafafa!important;
+						padding:0px!important;
+						padding-right:30px!important;
+					}
+					.header-wrapper .search-inner {
+						display:flex;
+						flex-direction:row;
+						justify-content:center;
+						width:100%;
+					}
+					.header-wrapper .search-input {
+						background:none;
+						border:0px;
+						font-size:25px;
+						outline:0px;
+						padding:10px 40px;
+						width:100%;
+						height:85px;
+					}
+					.header-wrapper .secondary.menu {
+						margin:0px!important;
+						height:85px!important;
+					}
+					.header-wrapper .secondary.menu .item {
+						font-size:16px;
+					}
+
 	    		`}</style>
 		</div>
     );
