@@ -40,13 +40,22 @@ export default class BlogList extends React.Component {
 		}
 	}
 
-  componentDidMount() {
-  	this.setState({
-  		isLoaded: true
-  	})
-  }
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.blogs) {
+			this.setState({
+				blogs: nextProps.blogs
+			})
+		}
+	}
+
+   componentDidMount() {
+	  	this.setState({
+	  		isLoaded: true
+	  	})
+   }
 
   render() {
+  	console.log(this.state)
   if(this.state.isLoaded) {
   	  if(this.state.blogs.length == 0) {
 	      return (
@@ -101,12 +110,11 @@ class Blog extends React.Component {
 						</div>
 						<style jsx>{`
 							.item {
-								margin:10px 0px;
 								border-bottom:1px solid rgba(255,255,255,0.2);
 								display:flex;
 								align-items:center;
 								flex-direction:row;
-								padding:7px 0px;
+
 								overflow:hidden;
 								max-width:100%;
 							}
@@ -178,9 +186,10 @@ class Blog extends React.Component {
 			          display:flex;
 			          align-items:center;
 			          width:100%;
-			          padding-bottom:8px;
 			          border-bottom:1px solid #eee;
-			          margin:8px 0px;
+			          padding:0px!important;
+						 margin:0px!important;
+						 margin-bottom:8px!important;
 			        }
 			        .item .content {
 			          display:flex;

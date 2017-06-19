@@ -96,10 +96,12 @@ class UserBar extends React.Component {
                   align="left"
                 />
                 <div className="actions">
-                  <EditButton 
-                    user={user} 
-                    currentUser={this.currentUser} 
-                  />
+                  {this.currentUser &&
+                    <EditButton 
+                      user={user} 
+                      currentUser={this.currentUser} 
+                    />
+                  }
                   <SubscribeButton 
                     additionalClasses="small" 
                     entryType="user"

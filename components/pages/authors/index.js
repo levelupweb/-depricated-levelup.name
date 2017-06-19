@@ -1,7 +1,6 @@
 import React from 'react';
 import { getAllUsers } from '../../../actions/user.js'
 import Loader from '../../loader.js'
-import TimeAgo from 'timeago-react';
 import SubscribeButton from '../../subscribeButton.js'
 import Avatar from 'react-avatar'
 import Link from 'next/link'

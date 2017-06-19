@@ -75,6 +75,14 @@ p.primary {
 	color:#57c1b3;
 }
 
+.button.default {
+	background:#fafafa;
+	transition:0.2s all ease;
+}
+.button.default:hover {
+	background:#eee;
+}
+
 form .field input {
 	border-radius:555em!important;
 	background:rgba(0,0,0,0.06)!important;
@@ -394,7 +402,7 @@ margin-top:0px;
 
 .article .meta .item {
 	margin-right:15px;
-	font-size:16px;
+	font-size:14px;
 	color:#57c1b3;
 }
 
@@ -572,10 +580,6 @@ margin-top:0px;
     margin-top:10px;
   }
 
-
-.search .results > div {
-	margin-top:25px;
-}
 
 .serach .results > div:first-child {
 	margin-top:0px;

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import config from '../app.config.js'
+import cookies from 'js-cookie'
+import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
 export async function getTagById(tagID) {
 	return await axios.get(config.API + 'tag/entries/' + tagID)	
@@ -9,8 +11,12 @@ export async function getUserTags(userID) {
 	return await axios.get(config.API + 'tag/entries/' + userID + '/byuser')	
 }
 
-export async function getAllTags() {
-	return await axios.get(config.API + 'tag/entries/')	
+export function getTags(options) {
+	return axiosNoAuth({
+		url: 'tag/entries',
+		method: 'GET',
+		params: options
+    })
 }
 
 export async function getTagSubscribers(tagID) {

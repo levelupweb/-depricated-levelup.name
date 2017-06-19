@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link'
 import User from '../user'
-import { getPostCommentsByPostId } from '../../actions/comment.js'
+import { getPostComments } from '../../actions/comment.js'
 import Loader from '../loader.js'
 import Note from './note.js'
 import Blog from '../blog.js'
@@ -19,14 +19,22 @@ class Article extends React.Component {
   }
 
   componentWillMount() {
-  	this.setState({
-  		article: {
-        ...this.props.article
+  	this.getInitialState(this.props.article)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getInitialState(nextProps.article)
+  }
+
+  getInitialState(article) {
+    this.setState({
+      article: {
+        ...article
       }
-  	})
+    })
 
     // Количество комментариев и лайков добавить в схему POST
-    getPostCommentsByPostId(this.props.article._id).then((res) => {
+    getPostComments(article._id).then((res) => {
       this.setState({
         ...this.state,
         comments: res.data

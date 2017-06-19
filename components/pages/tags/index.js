@@ -1,33 +1,30 @@
 import React from 'react';
-import { getAllTags, subscribeToTag, getTagSubscribers } from '../../../actions/tag.js'
+import { getTags, subscribeToTag, getTagSubscribers } from '../../../actions/tag.js'
 import Loader from '../../loader.js'
 import TimeAgo from 'timeago-react';
 import { connect } from 'react-redux'
 import cookies from 'js-cookie'
+import InfiniteScroll from 'redux-infinite-scroll';
+import SubscribeButton from '../../subscribeButton.js'
 
 class Tags extends React.Component {
   constructor(props) {
-    super(props);
+    super(props);    
     this.state = {
-    	entries: null,
+    	entries: [],
     	components: null,
-    	loaded: false
+    	loaded: false,
+      isFull: false,
+      perPage: 5,
+      page: 1
     }
   }
 
   componentWillMount() {
-  	var components = [];
-  	getAllTags().then((res) => {
+    var skip = (this.state.page - 1) * this.state.perPage
+  	getTags({perPage: this.state.perPage, skip: skip}).then((res) => {
   		this.setState({
   			entries: res.data
-  		})
-  	})
-    .then(() => {
-  		this.state.entries.map((item, i) => {
-        components.push(<Tag tag={item} key={i} />)
-  		})
-  		this.setState({
-  			components: components
   		})
   	})
   }
@@ -38,14 +35,43 @@ class Tags extends React.Component {
   	})
   }
 
+  loadMore() {
+    var skip = (this.state.page) * this.state.perPage
+    getTags({perPage: this.state.perPage, skip: skip})
+      .then((res) => {
+        if(res.data.length > 0) {
+          this.setState({
+            entries: this.state.entries.concat(res.data)
+          })
+        } else {
+          this.setState({
+            isFull: true
+          })
+        }
+      }).then(() => {
+        this.setState({
+          isLoaded: true,
+          page: this.state.page + 1
+        })
+    })
+  }
+
   render() {
+    var tags = this.state.entries.map((item, i) => {
+      return <Tag tag={item} key={i} />
+    })
+
   	if(this.state.loaded) {
 	    return (
-	      <div className="tags grid ui">
-          {this.state.components}
-          <style jsx>{`
-            
-          `}</style>
+	      <div>
+          <InfiniteScroll
+            items={tags}
+            loadMore={() => {this.loadMore()}} 
+            hasMore={!this.state.isFull}
+            threshold={10}
+            elementIsScrollable={false}
+            className="tags grid ui"
+          />
         </div>
 	    )
 	} else {
@@ -60,35 +86,33 @@ class Tag extends React.Component {
     this.token = cookies.get('x-access-token');
   }
 
-  handleSubscribe(id) {
-    subscribeToTag(this.token, id).then((res) => {
-      console.log(res)
-    })
-  }
-
   render() {
     var tag = this.props.tag;
     var subscribersCount = tag.tagSubscribersCount;
     return (
       <div className={(subscribersCount > 1) ? `sixteen wide column` : `eight wide column`}>
-      <div className="tag">
-        <div className="info">
-          <span>{subscribersCount} подписчиков</span>
-        </div>
-        <div className="image">
-          <img src={tag.tagImage} />
-        </div>
-        <div className="content">
-          <a className="header">{tag.tagTitle}</a>
-          <div className="meta">
-            <p>{(tag.tagDescription) ? tag.tagDescription : `У этого тега пока нет описания`}</p>
+        <div className="tag">
+          <div className="info">
+            <span>{subscribersCount} подписчиков</span>
+          </div>
+          <div className="image">
+            <img src={tag.tagImage} />
+          </div>
+          <div className="content">
+            <a className="header">{tag.tagTitle}</a>
+            <div className="meta">
+              <p>{(tag.tagDescription) ? tag.tagDescription : `У этого тега пока нет описания`}</p>
+            </div>
+          </div>
+          <div className="action">
+          <SubscribeButton 
+            subscribeText="Подписаться" 
+            unsubscribeText="Отписаться"
+            entryType="tag"
+            entryID={tag._id}
+          />
           </div>
         </div>
-        <div className="action">
-          <a href="#" onClick={() => {this.handleSubscribe(tag._id)}} className="button mini ui primary">Подписаться</a>
-        </div>
-        </div>
-
         <style jsx>{`
           .tag {
             width: 100%;
@@ -99,12 +123,10 @@ class Tag extends React.Component {
             overflow:hidden;
             background:#fafafa;
           }
-
           .tag .image img {
             width:100%;
             opacity:0.1;
           }
-
           .tag .content {
             position: absolute;
             left:0px;
@@ -112,24 +134,20 @@ class Tag extends React.Component {
             padding:15px;
             width:100%;
           }
-
           .tag .content .header {
             font-size:27px;
             font-weight:bold;
             color:#000;
           }
-
           .tag .content .header .meta p {
             color:#c0c0c0;
           }
-
           .tag .action {
             position: absolute;
             right:0px;
             padding:15px;
             top:0px;
           }
-
           .tag .info {
             position:absolute;
             left:0px;

@@ -61,7 +61,13 @@ function getPageBySlug(slug) {
 }
 
 function makeSearch(query) {
-    return _axios2.default.get(_appConfig2.default.API + 'search/entries/' + query);
+    return (0, _axiosAuth.axiosNoAuth)({
+        url: 'search/entries/',
+        method: 'GET',
+        params: {
+            query: query
+        }
+    });
 }
 
 // Обновление любого поля любого типа записей

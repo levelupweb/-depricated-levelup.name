@@ -34,17 +34,7 @@ class Page extends React.Component {
   }
 }
 
-const query = {
-  posts: {
-    type: 'post',
-  },
-  users: {
-    type: 'user'
-  },
-  tags: {
-    type: 'tag'
-  }
-}
+const query = {}
 
 const Container = page(Page, 'post', query);
 export default withRedux(initStore, (state) => state)(Container)

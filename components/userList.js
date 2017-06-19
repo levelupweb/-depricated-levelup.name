@@ -10,16 +10,16 @@ import SubscribeButton from './subscribeButton.js'
 // 3 Level: accepting nothing and retriving all users
 
 export default class UserList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: [],
-      isLoaded: false
-    }
-  } 
+   constructor(props) {
+		super(props);
+		this.state = {
+			users: [],
+			isLoaded: false
+		}
+   } 
 
 	componentWillMount() {
-		if(this.props.datausers === undefined) {
+		if(this.props.users === undefined) {
 			if(this.props.subscriber) {
 				getUserSubscriptions(this.props.subscriber).then((res) => {
 					this.setState({
@@ -35,43 +35,51 @@ export default class UserList extends React.Component {
 			}
 		} else {
 			this.setState({
-				users: this.props.datausers
+				users: this.props.users
 			})
 		}
 	}
 
-  componentDidMount() {
-  	this.setState({
-  		isLoaded: true
-  	})
-  }
-
-  render() {
-  if(this.state.isLoaded) {
-  	  if(this.state.users.length == 0) {
-	      return (
-	        <div className="no-content">
-	          <p>Список пуст</p>
-	        </div>
-	      )
-	   } else {
-	   	return (
-	       <div className="user-list">
-	         {this.state.users.map((item, i) => {
-	           return <User size={this.props.size} userData={item} key={i} />
-	         })}
-	         <style jsx>{`
-					.user-list {
-						width:100%;
-					}
-	         `}</style>
-	       </div>
-	     )
+	componentWillReceiveProps(nextProps) {
+	   if(nextProps.users) {
+	      this.setState({
+	        	users: nextProps.users
+	      })
 	   }
-   } else {
-	   return (<Loader />)
-    }
-  }
+	}
+
+   componentDidMount() {
+		this.setState({
+			isLoaded: true
+		})
+   }
+
+   render() {
+	   if(this.state.isLoaded) {
+	  	   if(this.state.users.length == 0) {
+		      return (
+		        <div className="no-content">
+		          <p>Список пуст</p>
+		        </div>
+		      )
+		   } else {
+		   	return (
+		       <div className="user-list">
+		         {this.state.users.map((item, i) => {
+		           return <User size={this.props.size} userData={item} key={i} />
+		         })}
+		         <style jsx>{`
+						.user-list {
+							width:100%;
+						}
+		         `}</style>
+		       </div>
+		     )
+		   }
+	   } else {
+		   return <Loader />
+	   }
+   }
 }
 
 
@@ -166,7 +174,9 @@ class User extends React.Component {
 			          width:100%;
 			          padding-bottom:8px;
 			          border-bottom:1px solid #eee;
-			          margin:8px 0px;
+			          padding:0px!important;
+			          margin:0px!important;
+			          margin-bottom:8px!important;
 			        }
 
 			        .item .content {

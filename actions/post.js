@@ -7,14 +7,14 @@ export function getPosts(token, options) {
 	if(typeof token == 'string') {
 		return axiosAuth(token, {
 			url: 'post/entries',
-			method: 'POST',
-			data: arguments[1]
+			method: 'GET',
+			params: arguments[1]
 	    })
 	} else {
 		return axiosNoAuth({
 			url: 'post/entries',
-			method: 'POST',
-			data: arguments[0]
+			method: 'GET',
+			params: arguments[0]
 	    })
 	}
 }

@@ -31,8 +31,14 @@ export function getPageBySlug(slug) {
 	return axios.get(config.API + 'page/entries/' + slug)	
 }
 
-export function makeSearch(query) {
-    return axios.get(config.API + 'search/entries/' + query)   
+export function makeSearch(query) {   
+    return axiosNoAuth({
+      url: 'search/entries/',
+      method: 'GET',
+      params: {
+        query: query
+      }
+    })
 }
 
 // Обновление любого поля любого типа записей

@@ -15,22 +15,22 @@ class UserSingle extends React.Component {
     }
   }
 
-  componentWillMount() {
-    var data = this.props.app.pageData.user;
-    if(data !== null) {
+  getInitialState(user) {
+    if(user !== null) {
       this.setState({
-        user: data
+        user
       })
     }
   }
 
-  componentWillReceiveProps() {
-    var data = this.props.app.pageData.user;
-    if(data !== null) {
-      this.setState({
-        user: data
-      })
+  componentWillMount() {
+    if (this.props.userProfile) {
+      this.getInitialState(this.props.userProfile)
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getInitialState(nextProps.data)
   }
 
   componentDidMount() {
@@ -58,7 +58,7 @@ class UserSingle extends React.Component {
     if (user) {
       return (
         <div className="profile-feed feed">
-        	<UserBar userdata={user} />
+        	<UserBar userdata={user} /> 
     			<div id="tabs-container" className="block-shadow">
               <div className="block block-border-bottom">
                 <ul className="tabs-menu">

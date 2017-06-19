@@ -33,14 +33,22 @@ class Feed extends React.Component {
   }
 
   componentWillMount() {
+    this.getInitialState(this.props.options)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getInitialState(nextProps.options)
+  }
+
+  getInitialState(options) {
     if(this.props.app.pageData.post && this.state.isRobot) {
       this.setState({
         entries: this.props.app.pageData.post,
         isLoaded: true
       })
     } else {
-      getPosts(this.state.page, {...this.props.options})
-      .then((res) =>{
+    getPosts(this.state.page, {...options})
+      .then((res) => {
         this.setState({
           entries: res.data
         })

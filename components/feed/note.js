@@ -15,6 +15,7 @@ import Blog from '../blog.js'
 import TimeAgo from 'timeago-react';
 import Link from 'next/link'
 import getYouTubeId from '../../utils/getYouTube.js' 
+import Comments from '../comments.js'
 
 class Note extends React.Component {
    constructor(props) {
@@ -27,7 +28,8 @@ class Note extends React.Component {
 	    	isLiked: false,
 	    	likeCounter: 0,
 	    	isEditing: false,
-	    	post: null
+	    	post: null,
+	    	isCommentsRevealed: false
 	   }
    }
 
@@ -150,6 +152,7 @@ class Note extends React.Component {
 	  	})
    }
 
+
   render() {
     var post = this.state.post;
 		if (post) {
@@ -213,6 +216,7 @@ class Note extends React.Component {
 				        		onSave={() => {this.handleSave(post._id, this.props.editingPost, this.token)}}
 				        		onUpload={(e) => {this.uploadImage(e)}}
 				        		onVideo={(url) => {this.onVideo(url)}}
+				        		onComment={() => {this.setState({isCommentsRevealed: !this.state.isCommentsRevealed})}}
 				        	/>
 				      </div>
 			         <div className="right">
@@ -220,6 +224,12 @@ class Note extends React.Component {
 			        			<TimeAgo datetime={post.updated} locale='ru' />
 			        		</span>
 		        		</div>
+			      </div>
+			      <div className="comments">
+			      	<Comments 
+			      		postID={post._id}
+			      		isRevealed={this.state.isCommentsRevealed}
+			      	/>
 			      </div>
 			      <style jsx>{`
 			        	 .note {
@@ -594,8 +604,6 @@ class ActionBar extends React.Component {
 	  	})
    }
 
-
-
    createPopup() {
 	  	this.video.addEventListener('keydown', (e) => {
 	      if(e.keyCode == 13) {
@@ -660,23 +668,35 @@ class ActionBar extends React.Component {
 		    	);
 		   } else {
 		   	return (
-	        		<span 
-	        		onClick={() => {this.props.onLike()}} 
-	        		className={(this.state.isLiked) ? 
-	        			`ui button circular small primary` : 
-	        			`ui button circular small default`}
-	        		>
-		        		<i className={(this.state.isLiked) ? 
-		        			`fa fa-heart icon` : 
-		        			`fa fa-heart-o icon`}>
-		        		</i> {this.state.likeCounter}
-		        		<style jsx>{`
+		   		<span>
+		        		<span 
+		        		onClick={() => {this.props.onLike()}} 
+		        		className={(this.state.isLiked) ? 
+		        			`ui button circular small primary` : 
+		        			`ui button circular small default`}
+		        		>
+			        		<i className={(this.state.isLiked) ? 
+			        			`fa fa-heart icon` : 
+			        			`fa fa-heart-o icon`}>
+			        		</i> {this.state.likeCounter}
+			        	</span>
+			        	<a onClick={() => {this.props.onComment()}} 
+		        			className="item">
+			        		<i className="fa fa-comment-o icon"></i> Оставить комментарий
+			        	</a>
+			        	<style jsx>{`
 							.note .meta .button.default {
 								background:#fafafa;
 								transition:0.2s all ease;
 				        	 }
 				        	 .note .meta .button.default:hover {
 				        	 	background:#eee;
+				        	 }
+				        	 .item {
+				        	 	cursor:pointer;
+				        	 	font-size:15px;
+				        	 	margin-left:15px;
+				        	 	margin-right:0px!important;
 				        	 }
 		        		`}</style>
 		        	</span>
@@ -719,8 +739,5 @@ var Blank = (props) => {
 	   </div>
 	)
 }
-
-
-connect((store) => store)(Content)
 
 export default connect((store) => store)(Note)

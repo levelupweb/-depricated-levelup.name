@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { searchByQuery } from '../../actions/app.js'
-import TagsList from '../tags-list.js'
-import UserList from '../user-list.js'
+import { makeSearch } from '../../actions/app.js'
+import TagsList from '../tagsList.js'
+import UserList from '../userList.js'
 
 class SearchContainer extends React.Component {
 
@@ -14,41 +14,59 @@ class SearchContainer extends React.Component {
   }
 
   componentWillMount() {
-  	this.setState({
-  		results: {
-  			...this.state.results,
-  			...this.props.app.pageData
-  		}
+  	makeSearch('').then((res) => {
+  		this.setState({
+  			results: res.data
+  		})
+  	})
+  }
+
+  handleTyping(e) {
+  	makeSearch(e.target.value).then((res) => {
+  		this.setState({
+  			results: res.data
+  		})
   	})
   }
 
   render() {
+  	
     return (
-	    <div>
+	    <div className="block">
 	    	<div className="search">
 	    		<div className="ui form">
 		    		<div className="field">
 			    		<label>Поиск</label>
-			    		<input type="text" name="searchQuery" placeholder="Что ищем?" />
+			    		<input onChange={(e) => {this.handleTyping(e)}} type="text" name="searchQuery" placeholder="Что ищем?" />
 			    	</div>
 			   </div>
 	    	</div>
-	    	<div className="ui divider"></div>
-	    	<div className="results">
-	    		<h2 className="ui header">
-	    			Теги
-	    			<div className="sub header">Все теги по вашему запросу</div>
-	    		</h2>
-	    		<TagsList datatags={this.state.results.tags} />
-	    	</div>
-	    	<div className="ui divider"></div>
-	    	<div className="results">
-	    		<h2 className="ui header">
-	    			Юзеры
-	    			<div className="sub header">Все пользователи по вашему запросу</div>
-	    		</h2>
-	    		<UserList size="block" datausers={this.state.results.users} />  
-	    	</div>
+	    	{this.state.results &&
+	    		<div>
+			    	<div className="ui divider"></div>
+			    	{this.state.results.tags &&
+				    	<div className="results">
+				    		<h2 className="ui header">
+				    			Теги
+				    			<div className="sub header">Все теги по вашему запросу</div>
+				    		</h2>
+				    		<TagsList datatags={this.state.results.tags} />
+				    	</div>
+				   }
+				   {this.state.results.users &&
+				   	<div>
+					    	<div className="ui divider"></div>
+					    	<div className="results">
+					    		<h2 className="ui header">
+					    			Юзеры
+					    			<div className="sub header">Все пользователи по вашему запросу</div>
+					    		</h2>
+					    		<UserList size="block" datausers={this.state.results.users} /> 
+					    	</div>
+					   </div>
+			    	}
+		    	</div>
+		   }
 	    </div>
     );
   }
