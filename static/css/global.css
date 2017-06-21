@@ -22,6 +22,16 @@ body {
 	transition:0.2s all ease;
 }
 
+img {
+	max-width:100%;
+}
+
+blockquote {
+	border-left:3px solid #333;
+	padding-left:10px;
+	margin:10px 0px!important;
+}
+
 .transition {
 	transition:0.2s all ease;
 }
@@ -329,6 +339,12 @@ margin-top:0px;
 	border-bottom:1px solid rgba(0,0,0,0.1);
 	padding-bottom:15px;
 	text-align:left;
+}
+
+.article:last-child {
+	margin-bottom:0px;
+	padding-bottom:0px;
+	border-bottom:0px;
 }
 
 .article.hided {

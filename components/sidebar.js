@@ -72,28 +72,26 @@ class Sidebar extends React.Component {
 		      		</div>
       			</div>
       		</div>
-      		: 
+      		: // Если залогинен пользователь 
       		<div>
 	      		<div className="profile block">
 		      		<User />
 		      		<div className="button userbar">
 			      		<div onClick={() => {this.userBarSwitch()}} className="ui icon top left pointing button">
-						  <i className="fa fa-angle-down"></i>
+						  		<i className="fa fa-angle-down"></i>
+							</div>
 						</div>
-					</div>
-
-				    <div className="ui secondary vertical menu block-shadow">
-				      <div className="block profile">
-						  <a className="item"><i className="fa fa-user"></i> Мой профиль</a>
-						  <a className="item"><i className="fa fa-pencil"></i> Написать пост</a>
-						  <a className="item"><i className="fa fa-cog"></i> Редактировать</a>
-						  <a className="item"><i className="fa fa-flash"></i> Статистика</a>
-						  <div className="ui divider"></div>
-						  <a onClick={() => {this.handleLogout()}} className="item"><i className="fa fa-sign-out"></i> Выход</a>
-					  </div>
-					</div>
+				    	<div className="ui secondary vertical menu block-shadow">
+					      <div className="block profile">
+							  <a className="item"><i className="fa fa-user"></i> Мой профиль</a>
+							  <a className="item"><i className="fa fa-pencil"></i> Написать пост</a>
+							  <a className="item"><i className="fa fa-cog"></i> Редактировать</a>
+							  <a className="item"><i className="fa fa-flash"></i> Статистика</a>
+							  <div className="ui divider"></div>
+							  <a onClick={() => {this.handleLogout()}} className="item"><i className="fa fa-sign-out"></i> Выход</a>
+						  	</div>
+						</div>
 		      	</div>
-
 		      	<div className="block-horizontal add">
 						<div className="ui vertical labeled icon buttons small fluid">
 						  <Link href="/editor" prefetch><a className="large labeled icon fluid ui button black">
@@ -106,43 +104,44 @@ class Sidebar extends React.Component {
 						  </a></Link>
 						</div>
 		      	</div>
-
 		      	<div className="block sidebar-block" id="subscriptions">
 		      		<div className="title">
 			      		<h3 className="ui header inverted">
-							Подписки <small>исследовать</small>
-						</h3>
+								Подписки <small>исследовать</small>
+							</h3>
 		      		</div>
 		      		<div className="block-content">
 		      			<UserList subscriber={this.currentUser._id} />
 		      			<h4 className="ui header inverted">Блоги</h4>
 		      			<BlogList subscriber={this.props.user.profile._id} />
-		      			<h4 className="ui header inverted">Темы</h4>
-		      			<TagsList subscriber={this.props.user.profile._id} />
+		      			<div className="block-vertical">
+			      			<h4 className="ui header inverted">Темы</h4>
+			      			<TagsList subscriber={this.props.user.profile._id} />
+		      			</div>
 		      		</div>
 		      	</div>
 		    </div>
       	}
-	      	<div className="block footer" id="footer">
-	      		<div className="block-content">
-	      			<div className="ui dropdown switcher">
-					  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
-					  <div className="menu">
-					    <div className="item">Levelupmusic</div>
-					    <div className="item">Levelupworlds</div>
-					    <div className="item">Levelupplace</div>
-					  </div>
-					</div>
-	      			<div className="menu">
-	      				<a href="#">помощь</a>
-	      				<a href="#">карьера</a>
-	      				<a href="#">блог</a>
-	      				<a href="#">публичность</a>
-	      				<a href="#">о проекте</a>
-	      			</div>
-	      		</div>
-	      	</div>
-		  <style jsx>{`
+      	<div className="block footer" id="footer">
+      		<div className="block-content">
+      			<div className="ui dropdown switcher">
+				  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
+				  <div className="menu">
+				    <div className="item">Levelupmusic</div>
+				    <div className="item">Levelupworlds</div>
+				    <div className="item">Levelupplace</div>
+				  </div>
+				</div>
+      			<div className="menu">
+      				<a href="#">помощь</a>
+      				<a href="#">карьера</a>
+      				<a href="#">блог</a>
+      				<a href="#">публичность</a>
+      				<a href="#">о проекте</a>
+      			</div>
+      		</div>
+      	</div>
+		  	<style jsx>{`
 		  		.block.add {
 		  			margin-top:0px;
 		  			padding-top:0px;

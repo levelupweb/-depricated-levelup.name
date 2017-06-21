@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Loader from './loader.js'
 import SubscribeButton from './subscribeButton.js'
 import TimeAgo from 'timeago-react';
+import User from './user.js'
 
 // 1 Level: accepting userlist data
 // 2 Level: accepting userID and retriving userSubscriptions
@@ -69,9 +70,11 @@ export default class PostList extends React.Component {
 		   } else {
 		   	return (
 		       <div className="post-list">
-		         {this.state.posts.map((item, i) => {
-		           return <Post size={this.props.size} post={item} key={i} />
-		         })}
+		       	<div className="ui items">
+			         {this.state.posts.map((item, i) => {
+			           return <Post size={this.props.size} post={item} key={i} />
+			         })}
+			      </div>
 		         <style jsx>{`
 						.post-list {
 							width:100%;
@@ -97,15 +100,15 @@ class Post extends React.Component {
 				return (
 					<div className="item">
 						<Link href={{ pathname: 'post', query: { slug: post.slug }}}><a>
-			                <Avatar color={`#46978c`} round={true} size={32} src={post.postImage} name={post.postTitle} />
-			            </a></Link>
-			            <div className="content">
-							<h4 className="ui header">
-								<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-									<a>{post.postTitle}</a>
-								</Link>
-								<div className="sub header">{(post.postDescription) ? post.postDescription : `Подписчиков: ${post.postSubscribersCount}`}</div>
-							</h4>
+		                <Avatar color={`#46978c`} round={true} size={32} src={post.postImage} name={post.postTitle} />
+		            </a></Link>
+		            <div className="content">
+						<h4 className="ui header">
+							<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+								<a>{post.postTitle}</a>
+							</Link>
+							<div className="sub header">{(post.postDescription) ? post.postDescription : `Подписчиков: ${post.postSubscribersCount}`}</div>
+						</h4>
 						</div>
 						<div className="updates">+1</div>
 						<style jsx>{`
@@ -119,6 +122,10 @@ class Post extends React.Component {
 								overflow:hidden;
 								max-width:100%;
 							}
+							.item:last-child {
+					        	border-bottom:0px;
+					        	padding-bottom:0px!important;
+					      }
 							.item .header .sub {
 								white-space:nowrap;
 								max-width:100%;
@@ -155,49 +162,47 @@ class Post extends React.Component {
 				) 
 			} else {
 				return (
-					<div className="item">
-					  <div className="image">
-					    <Avatar color={`#46978c`} round={true} size={50} src={post.postImage} name={post.postTitle} />
-					  </div>
-					  <div className="content">
-				        <div className="left">
-				  		    <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-				            <a className="header">{post.postTitle}</a> 
-				          </Link>
-				  		    <div className="description">
-				  		      <TimeAgo datetime={post.updated} locale='ru' />
-				  		    </div>
-				        </div>
-					  </div>
-
-			      <style jsx>{`
-			        .item {
-			          display:flex;
-			          align-items:center;
-			          width:100%;
-			          border-bottom:1px solid #eee;
-			          padding:0px!important;
-			          margin:0px!important;
-			          margin-bottom:8px!important;
-			        }
-			        .item .content {
-			          display:flex;
-			          justify-content:space-between;
-			          width:100%;
-			          margin-left:15px;
-			        }
-			        .item .content .header {
-			          font-weight:bold;
-			        }
-			        .item .content .subscribers {
-			          font-size:15px;
-			          font-weight:100;
-			          color:#c0c0c0;
-			          margin-left:10px;
-			        }
-			      `}</style>
-					</div>
-				)
+	      	<article className="article">
+		      	<div className="ui grid">
+		      		<div className="four wide column">
+		      			<div className="image">
+							<img src={post.postImage} className="rounded ui image fluid" />
+						</div>
+		      		</div>
+		  				<div className="twelve wide column">
+			  				<div className="content">
+				 				<div className="meta">
+				 					<span><TimeAgo datetime={post.updated} locale='ru' /></span>
+									<span><a><i className="fa fa-comment-o"></i> 23</a></span>
+								   <span><a><i className="fa fa-heart-o"></i> 15</a></span>
+								</div>
+				 				<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+									<a><h3>{post.postTitle}</h3></a>
+								</Link>
+								<p className="primary">{post.postDescription}</p>
+							</div>
+		  				</div>
+		      	</div>
+					<style jsx>{`
+						.article p.primary {
+							font-size:15px;
+						}
+						.article .meta span {
+							margin-right:15px;
+							font-size:14px;
+							color:#57c1b3;
+						}
+						.article .meta span .fa {
+							color:rgba(0,0,0,0.3);
+							font-size:16px;
+							margin-right:3px;
+						}
+						.article h3 {
+							margin:4px 0px;
+						}
+					`}</style>
+				</article>
+	    		);
 			}
 		} else {
 			return (<div></div>)

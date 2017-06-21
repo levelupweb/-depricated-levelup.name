@@ -210,11 +210,11 @@ class Comment extends React.Component {
   	if (comment) {
 	    return (
 	      <div className="comment">
-		      <a className="avatar">
+		      <span className="avatar">
 			     	<Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
 	               <Avatar color={`#46978c`} round={true} size={32} src={user.userImage} name={user.userName} />
 	            </a></Link>
-		    	</a>
+		    	</span>
 		    	<div className="content">
 		      	<a className="author">{user.userName}</a>
 		      <div className="metadata">

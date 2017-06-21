@@ -8,42 +8,16 @@ import Blog from '../blog.js'
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
 import { setLikeById } from '../../actions/post.js'
+import TimeAgo from 'timeago-react';
 
 class Article extends React.Component {
   constructor(props) {
     super(props);
     this.currentUser = this.props.user.profile;
-    this.state = {
-      article: null
-    }
-  }
-
-  componentWillMount() {
-  	this.getInitialState(this.props.article)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.getInitialState(nextProps.article)
-  }
-
-  getInitialState(article) {
-    this.setState({
-      article: {
-        ...article
-      }
-    })
-
-    // Количество комментариев и лайков добавить в схему POST
-    getPostComments(article._id).then((res) => {
-      this.setState({
-        ...this.state,
-        comments: res.data
-      })
-    })
   }
 
   render() {
-    var post = this.state.article;
+    var post = this.props.article;
     if (post) { 
       switch(post.postType) {
         case 'note':
@@ -112,15 +86,34 @@ class Default extends React.Component {
             <p className="primary">{(post.postDescription) ? post.postDescription : ''}</p>
           </div>
           <div className="meta">
-            <span onClick={() => {this.handleLike(this.token, post._id, this.props.currentUser._id)}} className={(this.state.isLiked) ? `ui button circular primary` : `ui button circular`}>
-              <i className={(this.state.isLiked) ? `fa fa-heart icon` : `fa fa-heart-o icon`}></i> {likes}
-            </span>
-            <span className="item">
-              <i className="fa fa-comments-o"></i> {comments}
-            </span>
-            <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-              <a className="item">Читать далее</a>
-            </Link>
+            <div className="left">
+              <span 
+              onClick={() => {this.handleLike(this.token, post._id, this.props.currentUser._id)}} 
+              className={(this.state.isLiked) ? 
+                `ui button circular small primary` : 
+                `ui button circular small default`}
+              >
+                <i className={(this.state.isLiked) ? 
+                  `fa fa-heart icon` : 
+                  `fa fa-heart-o icon`}>
+                </i> {this.state.likeCounter}
+              </span>
+              <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+                <a className="item">
+                  <i className="fa fa-comment-o icon"></i> {comments} Комментариев
+                </a>
+              </Link>
+              <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+                <a className="item">
+                  <i className="fa fa-comment-o icon"></i> Читать далее
+                </a>
+              </Link>
+            </div>
+            <div className="right">
+              <span className="time">
+                <TimeAgo datetime={post.updated} locale='ru' />
+              </span>
+            </div>
           </div>
           <style jsx>{`
             .article {
@@ -136,9 +129,15 @@ class Default extends React.Component {
             .article .meta {
               margin-top:20px;
               width:100%;
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
             }
             .article .meta .button {
               margin-right:10px;
+            }
+            .article .meta .time {
+              color:#c0c0c0;
             }
           `}</style>
         </article>

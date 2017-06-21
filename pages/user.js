@@ -15,14 +15,14 @@ class Page extends React.Component {
   }
 
   componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <UserSingle userProfile={this.props.app.pageData.user} />, null, null);
+    var page = createPage(this.props.app.pageSettings, <UserSingle />, null, null);
     this.state = { page: page }
   }
 
   componentDidMount() {
     initScripts()
   }
-
+  
   render () {
     var page = this.state.page;
     return (

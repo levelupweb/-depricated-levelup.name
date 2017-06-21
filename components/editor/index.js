@@ -10,6 +10,17 @@ import randomString from '../../utils/randomString.js'
 import router from 'next/router'
 import { updateImage } from '../../actions/app.js'
 import UI from '../../utils/initscripts.js'
+import cookies from 'js-cookie'
+
+// actions
+import { changePostFace,  
+         setPostAuthor, 
+         setPostFaces,
+         savePostLocally,
+         postAdd,
+         postUpdate } from '../../actions/post.js'
+
+import { getUserFaces } from '../../actions/user.js'
 
 // 1. Сделать дату добавления
 // 2. Упростить Handle Save + сделать обработчик ошибок
@@ -19,6 +30,9 @@ import UI from '../../utils/initscripts.js'
 class EditorWrapper extends React.Component {
   constructor(props) {
     super(props);
+    this.currentUser = this.props.user.profile;
+    this.token = cookies.get('x-access-token');
+    this.dispatch = this.props.dispatch;
     this.state = {
       post: {
         storage: null,
@@ -30,15 +44,22 @@ class EditorWrapper extends React.Component {
         postContent: '',
         postLikes: [],
         postFavorites: [],
-        postAuthor: null,
         postType: 'post'
       },
-      tempTag: '' 
+      tempTag: '',
+      isCustomSlug: false
     } 
   }
 
   componentWillMount() {
-    this.getPost()
+    this.getPost();
+    if(this.currentUser) { 
+      if(this.props.postState.faces == null) {
+        getUserFaces(this.currentUser._id).then((res) => {
+          this.dispatch(setPostFaces(res.data))
+        })
+      }
+    } 
   }
 
   componentDidMount() {
@@ -53,7 +74,22 @@ class EditorWrapper extends React.Component {
     })
 
     if(!this.state.post.storage) {
-      this.createStorage();
+      this.createStorage()
+      .then(() => {
+        this.dispatch(savePostLocally(this.state.post))
+      })
+      .then(() => {
+        this.dispatch(changePostFace('user', this.currentUser))
+        this.setState({
+          post: {
+            ...this.state.post,
+            postAuthor: {
+              authorID: this.currentUser._id,
+              authorType: 'user'
+            }
+          }
+        })
+      })
     }
   }
 
@@ -62,22 +98,23 @@ class EditorWrapper extends React.Component {
       this.setState({
         post: {
           ...this.state.post,
-          ...this.props.data.post,
-          postAuthor: this.props.user.profile._id
+          ...this.props.data.post
         }
       })
     } else {
       this.setState({
         post: {
           ...this.state.post,
-          postAuthor: this.props.user.profile._id
+          ...this.props.postState.post
         }
       })
     }
   }
 
   createStorage() {
-    this.updateState('storage', randomString(10))
+    return this.updateState(
+      'storage', randomString(10)
+    )
   }
 
   hasPost() {
@@ -99,41 +136,48 @@ class EditorWrapper extends React.Component {
   settingTextareaHeight() {
   	var clientHeight = document.body.clientHeight;
   	var headerHeight = this.headerwrapper.clientHeight;
-  	document.querySelector('.quill').style.height = clientHeight - headerHeight + 'px';
+  	document.querySelector('.quill').style.height = 
+      clientHeight - headerHeight + 'px';
   }
 
   handleTyping(e) {
     var value = e.target.value
-  	var link = value.replace(/\s/g, '-').toLowerCase()
-  	this.link.value = link;
-    this.updateState('postTitle', value).then(() => {
-      this.updateState('slug', link)
-    })
+    if(!this.state.isCustomSlug) {
+    	var link = value.replace(/\s/g, '-').toLowerCase()
+    	this.link.value = link;
+      this.updateState('postTitle', value).then(() => {
+        this.updateState('slug', link)
+      })
+    } else {
+      this.updateState('postTitle', value)
+    }
   }
 
   handleSave() {
-    var body = this.state.post;
-
-    if(this.state.post._id) {
-      var url = config.API + 'post/entries/' + this.state.post._id + '/update';
+    if(this.state.post._id == undefined) {
+      this.dispatch(savePostLocally(this.state.post))
+      .then(() => {
+        postAdd(this.token, this.props.postState.post)
+        .then((res) => {
+          if(res.data.success) {
+            this.handleStatus('Пост опубликован!')
+            this.handleRedirect()
+            this.getPostFromServer()
+          }
+        })
+      });
     } else {
-      var url = config.API + 'post/add';
+      this.dispatch(savePostLocally(this.state.post))
+      .then(() => {
+        postUpdate(this.token, this.props.postState.post._id, this.props.postState.post)
+        .then((res) => {
+          if(res.data.success) {
+            this.handleStatus('Сохранено!')
+            this.getPostFromServer()
+          }
+        })
+      });
     }
-
-    axios.post(url, body)
-    .then((res) => {
-      if(res.data.success) {
-        this.handleStatus('Сохранено!')
-        this.handleRedirect()
-        this.getPostFromServer()
-      } else {
-        console.log(response.data.errors)
-      }
-    })
-
-    .catch(function (error) {
-      // Handle Error
-    });
   }
 
   getPostFromServer() {
@@ -227,10 +271,19 @@ class EditorWrapper extends React.Component {
     })
   }
 
+  setType(type, item) {
+    this.props.dispatch(
+      changePostFace(type, item)
+    );
+  }
+
 
   render() {
+
     var post = this.state.post;
     var user = this.props.user.profile;
+    var postState = this.props.postState;
+    console.log(this.props.postState.post.postAuthor)
     var tags = this.state.post.postTags.map((item, i) => {
       return (<div className="ui button basic circular" key={i}>{item}</div>)
     })
@@ -241,12 +294,39 @@ class EditorWrapper extends React.Component {
             <div className="header-background"><img src={post.postImage} className="header-background-img" /></div>
             <div className="header-content block">
     	      	<div className="title">
-    	      		<Avatar color={`#46978c`} round={true} size={40} name={user.slug} src={user.userImage} />
-    	      		
+    	      		{/* <Avatar color={`#46978c`} round={true} size={40} name={user.slug} src={user.userImage} /> */}
 
+                <div className="image user">
+                  <div className="ui inline dropdown right face">                  
+                    <Avatar 
+                      color={`#46978c`} 
+                      round={true} 
+                      size={32} 
+                      src={(postState.postFace.faceImage) ? postState.postFace.faceImage : user.userImage} 
+                      name={postState.postFace.faceTitle} 
+                    />
+                    <i className="fa fa-angle-down icon"></i>
+                    <div className="menu left">
+                      <div className="item" onClick={() => {this.setType('user', user)}}>
+                        <Avatar color={`#46978c`} round={true} size={20} src={user.userImage} name={user.userName} />
+                        <span>{user.userName}</span>
+                      </div>
+                      {(postState.faces) &&
+                        postState.faces.map((item, i) => {
+                          return (
+                            <div onClick={() => {this.setType('blog', item)}} className="item" key={i}>
+                              <Avatar color={`#46978c`} round={true} size={20} src={item.blogImage} name={item.blogTitle} />
+                              <span>{item.blogTitle}</span>
+                            </div>
+                          )})
+                        }
+                    </div>
+                  </div>
+                </div>
+    	      	
                 <h3 className="ui header">
     	      			<input defaultValue={post.postTitle} name="postTitle" ref={(postTitle) => {this.postTitle = postTitle}} onChange={(e) => {this.handleTyping(e)}} type="text" placeholder="Ваш заголовок" />
-    	      			<span className="sub header">http://levelup.name/<input onChange={(e) => {this.handleTyping(e)}} type="text" defaultValue={post.slug} ref={(link) => {this.link = link}} /></span>
+    	      			<span className="sub header">http://levelup.name/<input onClick={() => {this.setState({isCustomSlug: true})}} onChange={(e) => {this.handleTyping(e)}} type="text" defaultValue={post.slug} ref={(link) => {this.link = link}} /></span>
     	      		</h3>
     	      	</div>
     	      	<div className="action">
@@ -366,7 +446,7 @@ class EditorWrapper extends React.Component {
             bottom:0px;
       			height:100px;
       			width:100%;
-            z-index:10;
+            z-index:0;
       			display:flex;
       			justify-content:center;
       			align-items:center;
@@ -441,6 +521,17 @@ class EditorWrapper extends React.Component {
             margin:0px
           }
 
+          .editor .header .dropdown {
+            display:flex;
+            align-items:center;
+          }
+          .editor .header .dropdown i {
+            margin-left:10px;
+          }
+          .editor .header .dropdown .menu .item {
+            editor:flex;
+            align-items:center;
+          }
       	`}</style>
       </div>
     );

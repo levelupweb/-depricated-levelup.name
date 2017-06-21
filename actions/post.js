@@ -19,6 +19,8 @@ export function getPosts(token, options) {
 	}
 }
 
+
+
 export function getPostsByUserId(id) {
 	return axios.get(config.API + 'user/' + id + '/posts')	
 }
@@ -43,6 +45,14 @@ export function postAdd(token, data) {
 		url: 'post/add',
 		method: 'POST',
 		data: data
+    })
+}
+
+export function postUpdate(token, postID, postData) {
+    return axiosAuth(token, {
+		url: 'post/entries/' + postID + '/update',
+		method: 'POST',
+		data: postData
     })
 }
 

@@ -11,7 +11,6 @@ var defaultState = {
       postVideo: null,
       postLink: null,
       postContent: '',
-      postType: 'note',
    },
    postFace: {
       faceImage: null,

@@ -109,14 +109,16 @@ class UserBar extends React.Component {
                     subscribeText="Подписаться" 
                     unsubscribeText="Отписаться" 
                   />
-                  {user.userSocials.map((item, i) => {
-                    var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
-                    return (
-                      <a key={i} href={item.link} target="_blank"><button className={'ui social circular icon button small ' }>
-                        <i className={'fa icon fa-' + slug}></i>
-                      </button></a>
-                    )
-                  })}
+                  {user.userSocials &&
+                    user.userSocials.map((item, i) => {
+                      var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
+                      return (
+                        <a key={i} href={item.link} target="_blank"><button className={'ui social circular icon button small ' }>
+                          <i className={'fa icon fa-' + slug}></i>
+                        </button></a>
+                      )
+                    })
+                  }
                 </div>
               </div>
             </div>

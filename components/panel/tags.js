@@ -6,7 +6,7 @@ import serializeForm from '../../utils/serializeForm'
 import config from '../../app.config'
 import Loader from '../loader'
 import Avatar from 'react-avatar'
-import { getAllTags, addTag, updateTagById, removeTagById } from '../../actions/tag'
+import { getTags, addTag, updateTagById, removeTagById } from '../../actions/tag'
  
 export class Tags extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ export class Tags extends React.Component {
   }
 
   componentWillMount() {
-    getAllTags().then((tags) => {
+    getTags().then((tags) => {
       this.setState({
         tags: tags.data
       })

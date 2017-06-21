@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "dangerously-set-inner-html": "^2.0.0",
     "dateformat": "^2.0.0",
     "faster-react-tabs": "^1.0.4",
     "imagesloaded": "4.1.1",

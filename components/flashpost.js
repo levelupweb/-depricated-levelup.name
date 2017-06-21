@@ -7,7 +7,12 @@ import cookies from 'js-cookie'
 import { UI } from '../utils/initscripts.js'
 import { uploadImage } from '../actions/app.js'
 import { getUserFaces } from '../actions/user.js'
-import { changePostFace, savePostLocally, setPostAuthor, setPostFaces, setPost, flushPost } from '../actions/post.js'
+import { changePostFace, 
+         savePostLocally, 
+         setPostAuthor, 
+         setPostFaces, 
+         setPost, 
+         flushPost } from '../actions/post.js'
 import findURL from '../utils/findURL.js' 
 import getYouTubeId from '../utils/getYouTube.js' 
 import Avatar from 'react-avatar'

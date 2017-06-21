@@ -17,7 +17,7 @@ export default class TagsList extends React.Component {
   }
 
   componentWillMount() {
-    if(this.props.tagsdata === undefined) {
+    if(this.props.tags === undefined) {
       if(this.props.subscriber === undefined) {
         getTags({perPage: 10}).then((res) => {
           this.setState({
@@ -33,7 +33,7 @@ export default class TagsList extends React.Component {
       }
     } else {
       this.setState({
-        tags: this.props.tagsdata
+        tags: this.props.tags
       })
     }
   }
@@ -65,7 +65,7 @@ export default class TagsList extends React.Component {
         return (
           <div className="tag-list">
             {this.state.tags.map((item) => {
-              return <Tag size={this.props.size} tagData={item} key={item._id} />
+              return <Tag size={this.props.size} tag={item} key={item._id} />
             })}
           </div>
         )
@@ -84,7 +84,7 @@ class Tag extends React.Component {
   }
 
   render() {
-    var tag = this.props.tagData;
+    var tag = this.props.tag;
     if(this.props.size == 'block') {
       return (
         <div className="tag">
@@ -96,7 +96,7 @@ class Tag extends React.Component {
               <img src={tag.tagImage} />
             </div>
             <div className="content">
-              <Link href={{ pathname: 'explore', query: { search: tag.slug }}}>
+              <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
                 <a className="header">{tag.tagTitle}</a>
               </Link>
               <div className="meta">
@@ -146,7 +146,7 @@ class Tag extends React.Component {
     } else {
       return (
         <div className="tag">
-          <Link href={{ pathname: 'explore', query: { search: tag.slug }}}>
+          <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
             <a>{tag.tagTitle}</a>
           </Link>
         </div>

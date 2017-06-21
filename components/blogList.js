@@ -55,7 +55,6 @@ export default class BlogList extends React.Component {
    }
 
   render() {
-  	console.log(this.state)
   if(this.state.isLoaded) {
   	  if(this.state.blogs.length == 0) {
 	      return (
@@ -190,6 +189,10 @@ class Blog extends React.Component {
 			          padding:0px!important;
 						 margin:0px!important;
 						 margin-bottom:8px!important;
+			        }
+			        .item:last-child {
+			        	border-bottom:0px;
+			        	padding-bottom:0px!important;
 			        }
 			        .item .content {
 			          display:flex;

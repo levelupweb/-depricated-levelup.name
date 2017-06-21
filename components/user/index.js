@@ -11,26 +11,28 @@ class UserSingle extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: null
+      userPage: null
     }
   }
 
   getInitialState(user) {
-    if(user !== null) {
+    if (user) {
       this.setState({
-        user
+        userPage: user
       })
     }
   }
 
   componentWillMount() {
-    if (this.props.userProfile) {
-      this.getInitialState(this.props.userProfile)
-    }
+    this.getInitialState(
+      this.props.app.pageData.user
+    )
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getInitialState(nextProps.data)
+    this.getInitialState(
+      this.props.app.pageData.user
+    )
   }
 
   componentDidMount() {
@@ -54,7 +56,7 @@ class UserSingle extends React.Component {
 
 
   render() {
-    var user = this.state.user
+    var user = this.state.userPage
     if (user) {
       return (
         <div className="profile-feed feed">

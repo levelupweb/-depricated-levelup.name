@@ -26,9 +26,9 @@ class Feed extends React.Component {
     this.state = {
       page: 1,
     	entries: [],
-      isRobot: false,
       isLoaded: false,
-      isFull: false
+      isFull: false,
+      isFound: true
     }
   }
 
@@ -38,25 +38,41 @@ class Feed extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.getInitialState(nextProps.options)
+
   }
 
   getInitialState(options) {
-    if(this.props.app.pageData.post && this.state.isRobot) {
-      this.setState({
-        entries: this.props.app.pageData.post,
-        isLoaded: true
-      })
-    } else {
-    getPosts(this.state.page, {...options})
-      .then((res) => {
-        this.setState({
-          entries: res.data
+    var data = this.props.app.pageData;
+    if (data) {
+      if(data.post) {
+        if(data.post.length > 0) {
+          this.setState({
+            entries: data.post,
+            isLoaded: true
+          })
+        } else {
+          this.setState({
+            isFound: false
+          })
+        }
+      } else {
+      getPosts(1, {...options})
+        .then((res) => {
+          if(res.data.length > 0) {
+            this.setState({
+              entries: res.data
+            })
+          } else {
+            this.setState({
+              isFound: false
+            })
+          }
+        }).then(() => {
+          this.setState({
+            isLoaded: true
+          })
         })
-      }).then(() => {
-        this.setState({
-          isLoaded: true
-        })
-      })
+      }
     }
   }
 
@@ -91,8 +107,8 @@ class Feed extends React.Component {
     var components = this.state.entries.map((item, i) => {
       return (<Article article={item} key={i} />)
     })
-    if(this.state.isLoaded) {
-      if(this.state.entries.length > 0) {
+    if(this.state.isFound) {
+      if(this.state.isLoaded) {
         return (
           <div className="grid">
             <InfiniteScroll
@@ -105,16 +121,16 @@ class Feed extends React.Component {
           </div>
         )
       } else {
-        return (
+        return <Blank />
+      }
+    } else {
+      return (
           <h2 className="ui icon header">
             <div className="content">
               <div className="sub header">Записей не найдено</div>
             </div>
           </h2>
         )
-      }
-    } else {
-      return (<Blank />)
     }
   }
 }

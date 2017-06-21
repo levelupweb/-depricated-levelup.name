@@ -116,25 +116,20 @@ class User extends React.Component {
 								flex-direction:row;
 								padding:7px 0px;
 							}
-
 							.item:last-child {
 								border-bottom:0px;
 							}
-
 							.item:first-child {
 								margin-top:0px;
 							}
-
 							.item .content {
 								margin-left:10px;
 							}
-
 							.item .content .sub.header {
 								font-size:13px;
 								margin-top:2px;
 								opacity:0.7;
 							}
-
 						`}</style>
 					</div>
 				) 
@@ -172,32 +167,31 @@ class User extends React.Component {
 			          display:flex;
 			          align-items:center;
 			          width:100%;
-			          padding-bottom:8px;
 			          border-bottom:1px solid #eee;
 			          padding:0px!important;
 			          margin:0px!important;
 			          margin-bottom:8px!important;
+			          padding-bottom:8px!important;
 			        }
-
+			        .item:last-child {
+			        	border-bottom:0px;
+			        	padding-bottom:0px!important;
+			        }
 			        .item .content {
 			          display:flex;
 			          justify-content:space-between;
 			          width:100%;
 			          margin-left:15px;
 			        }
-
 			        .item .content .header {
 			          font-weight:bold;
 			        }
-
 			        .item .content .subscribers {
 			          font-size:15px;
 			          font-weight:100;
 			          color:#c0c0c0;
 			          margin-left:10px;
 			        }
-
-
 			      `}</style>
 					</div>
 				)
