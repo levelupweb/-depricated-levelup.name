@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.removeUserSocial = exports.getUserPostsCount = exports.getUserLikesCount = exports.addSocialToUser = exports.getUserSubscriptions = exports.registerUser = exports.getUserField = exports.removeUserById = exports.updateUserById = exports.getUserById = exports.getAllUsers = undefined;
-exports.getUserByToken = getUserByToken;
+exports.authenticateUser = authenticateUser;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
 exports.subscribeToUser = subscribeToUser;
@@ -55,21 +55,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 	}
 } */
 
-function getUserByToken(token) {
+function authenticateUser(token) {
 	return function (dispatch) {
 		if (token) {
-			(0, _axios2.default)({
-				url: _appConfig2.default.API + 'user/auth',
-				method: 'GET',
-				headers: {
-					'authorization': token
-				}
+			(0, _axiosAuth.axiosAuth)(token, {
+				url: 'user/auth',
+				method: 'GET'
 			}).then(function (res) {
-
+				// Записываем пользователя в Store
 				dispatch(setUser(res.data));
+				// Возвращаем пользователя
 				return res.data;
 			});
 		} else {
+			// Записываем ошибку в Store
 			dispatch({ type: 'LOGIN_FAILURE' });
 			return false;
 		}

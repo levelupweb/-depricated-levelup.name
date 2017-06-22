@@ -1,38 +1,35 @@
+// Important
 import React from 'react'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
-import Post from '../components/post/'
-import Body from '../components/body'
-import Sidebar from '../components/sidebar'
-import PostAfter from '../components/post/postafter' 
-import { auth } from '../actions/user.js';
-import { UI } from '../utils/initscripts'
+import Container from '../components/container'
+import Router from 'next/router'
+import NProgress from 'nprogress'
 import config from '../app.config.js'
-import createPage from '../utils/createPage.js'
-import page from '../components/HOC/page'
+import HOC from '../components/HOC.js'
+
+// Components
+import Post from '../components/sections/post/index.js'
+
+Router.onRouteChangeStart = (url) => NProgress.start()
+Router.onRouteChangeComplete = () => NProgress.done()
+Router.onRouteChangeError = () => NProgress.done()
 
 class Page extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Post data={this.props.app.pageData} />, null, null);
-    this.state = { page: page }
-  }
-
-  componentDidMount() {
-    UI()
+    this.options = {
+      ...this.props.app.pageSettings,
+      child: <Post post={this.props.app.pageData.post} />,
+      beforeChildren : null,
+      afterChildren : null
+    }
   }
 
   render () {
-    var page = this.state.page;
-    return (
-      <div>
-        <Sidebar />
-        <Body page={page}>{page.child}</Body>
-      </div>
-    )
+    return <Container module={this.options}>
+      {this.options.child}
+    </Container>
   }
 }
 
@@ -43,5 +40,10 @@ const query = {
   }
 }
 
-const Container = page(Page, 'post', query);
-export default withRedux(initStore, (state) => state)(Container)
+const Component = HOC(Page, 'post', query);
+export default withRedux(initStore, (state) => state)(Component)
+
+
+
+
+

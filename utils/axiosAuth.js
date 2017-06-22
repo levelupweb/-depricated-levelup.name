@@ -8,7 +8,6 @@ export function axiosAuth(token, options) {
 			authorization: token
 		}
 	})
-
 	return authAxios(options)
 }
 

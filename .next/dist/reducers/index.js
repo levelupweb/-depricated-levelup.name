@@ -4,17 +4,9 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _header = require('./header');
+var _currentUser = require('./currentUser');
 
-var _header2 = _interopRequireDefault(_header);
-
-var _usersingle = require('./usersingle');
-
-var _usersingle2 = _interopRequireDefault(_usersingle);
-
-var _user = require('./user');
-
-var _user2 = _interopRequireDefault(_user);
+var _currentUser2 = _interopRequireDefault(_currentUser);
 
 var _app = require('./app');
 
@@ -34,9 +26,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var reducers = {
 	app: _app2.default,
-	header: _header2.default,
-	usersingle: _usersingle2.default,
-	user: _user2.default,
+	currentUser: _currentUser2.default,
 	postState: _post2.default,
 	editingPost: _editingPost2.default
 };

@@ -7,7 +7,7 @@ exports.setQuery = setQuery;
 exports.setPageData = setPageData;
 exports.setPageSettings = setPageSettings;
 exports.setAccessError = setAccessError;
-exports.getPageBySlug = getPageBySlug;
+exports.getModule = getModule;
 exports.makeSearch = makeSearch;
 exports.updateField = updateField;
 exports.updateImage = updateImage;
@@ -56,8 +56,8 @@ function setAccessError() {
     };
 }
 
-function getPageBySlug(slug) {
-    return _axios2.default.get(_appConfig2.default.API + 'page/entries/' + slug);
+function getModule(slug) {
+    return _axios2.default.get(_appConfig2.default.API + 'module/entries/' + slug);
 }
 
 function makeSearch(query) {

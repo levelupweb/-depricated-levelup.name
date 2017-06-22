@@ -1,50 +1,47 @@
+// Important
 import React from 'react'
 import { initStore } from '../../store'
 import withRedux from 'next-redux-wrapper'
-import Sidebar from '../../components/sidebar'
 import Body from '../../components/body'
-import Panel from '../../components/panel/'
-import SimpleHeader from '../../components/simpleheader'
 import Router from 'next/router'
 import NProgress from 'nprogress'
-import fetch from 'isomorphic-fetch';
-import { auth } from '../../actions/user.js';
-import initScripts from '../../utils/initscripts'
-import createPage from '../../utils/createPage.js'
-import config from '../../app.config'
-import page from '../../components/HOC/page'
+import { UI } from '../../utils/initscripts'
+import config from '../../app.config.js'
+import HOC from '../../components/HOC/page'
 
-Router.onRouteChangeStart = (url) => {
-  NProgress.start()
-}
+// For Page
+import Panel from '../../components/panel/'
+
+// Router with Progress Bar
+Router.onRouteChangeStart = (url) => NProgress.start()
 Router.onRouteChangeComplete = () => NProgress.done()
 Router.onRouteChangeError = () => NProgress.done()
 
-class PanelPage extends React.Component {
+class Page extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentWillMount() {
-    console.log(this.props)
-    var page = createPage(this.props.app.pageSettings, <Panel />, <SimpleHeader block={true} />, null);
-    this.setState({ page: page })
-  }
-
-
-  componentDidMount() {
-    initScripts()
+    this.options = {
+      ...this.props.app.pageSettings,
+      child: <Panel />,
+      beforeChildren : null,
+      afterChildren : null
+    }
   }
 
   render () {
-    var page = this.state.page;
-    return (
-      <div>
-        <Body page={page}>{page.child}</Body>
-      </div>
-    )
+    return <Body page={this.options}>
+      {this.options.child}
+    </Body>
   }
 }
 
-const PanelContainer = page(PanelPage, 'panel');
-export default withRedux(initStore, (state) => state)(PanelContainer)
+
+const Container = HOC(Page, 'panel');
+export default withRedux(initStore, (state) => state)(Container)
+
+
+
+
+
+
+

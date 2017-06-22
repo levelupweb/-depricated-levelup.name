@@ -27,8 +27,8 @@ export function setAccessError() {
 	}
 }
 
-export function getPageBySlug(slug) {
-	return axios.get(config.API + 'page/entries/' + slug)	
+export function getModule(slug) {
+	return axios.get(config.API + 'module/entries/' + slug)	
 }
 
 export function makeSearch(query) {   

@@ -1,43 +1,38 @@
+// Important
 import React from 'react'
 import { initStore } from '../../store'
 import withRedux from 'next-redux-wrapper'
 import Body from '../../components/body'
-import { PagesContainer } from '../../components/panel/pages'
-import SimpleHeader from '../../components/simpleheader'
 import Router from 'next/router'
 import NProgress from 'nprogress'
-import fetch from 'isomorphic-fetch';
-import { auth } from '../../actions/user.js';
-import initScripts from '../../utils/initscripts'
-import createPage from '../../utils/createPage.js'
-import config from '../../app.config'
-import page from '../../components/HOC/page'
-import axios from 'axios'
+import { UI } from '../../utils/initscripts'
+import config from '../../app.config.js'
+import HOC from '../../components/HOC/page'
+import { PagesContainer } from '../../components/panel/pages'
+
+// For Page
+import Panel from '../../components/panel/'
+
+// Router with Progress Bar
+Router.onRouteChangeStart = (url) => NProgress.start()
+Router.onRouteChangeComplete = () => NProgress.done()
+Router.onRouteChangeError = () => NProgress.done()
 
 class Page extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      entry: null
+    this.options = {
+      ...this.props.app.pageSettings,
+      child: <PagesContainer data={this.props.app.pageData} />,
+      beforeChildren : null,
+      afterChildren : null
     }
   }
 
-  componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <PagesContainer data={this.props.app.pageData} />, <SimpleHeader />, null);
-    this.state = { page: page }
-  }
-
-  componentDidMount() {
-    initScripts()
-  }
-
   render () {
-    var page = this.state.page;
-    return (
-      <div>
-        <Body page={page}>{page.child}</Body>
-      </div>
-    )
+    return <Body page={this.options}>
+      {this.options.child}
+    </Body>
   }
 }
 
@@ -48,5 +43,13 @@ const query = {
   }
 }
 
-const Container = page(Page, 'pages', query);
+
+const Container = HOC(Page, 'pages', query);
 export default withRedux(initStore, (state) => state)(Container)
+
+
+
+
+
+
+

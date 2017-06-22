@@ -1,47 +1,50 @@
+// Important
 import React from 'react'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
-import Body from '../components/body'
-import Blogs from '../components/pages/blogs/index.js'
-import initScripts from '../utils/initscripts'
+import Container from '../components/container'
+import Router from 'next/router'
+import NProgress from 'nprogress'
 import config from '../app.config.js'
-import createPage from '../utils/createPage.js'
-import page from '../components/HOC/page'
-import Sidebar from '../components/sidebar.js'
+import HOC from '../components/HOC.js'
+
+// For Page
+import Blogs from '../components/sections/blog/list/index.js'
+
+// Router with Progress Bar
+Router.onRouteChangeStart = (url) => NProgress.start()
+Router.onRouteChangeComplete = () => NProgress.done()
+Router.onRouteChangeError = () => NProgress.done()
 
 class Page extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentWillMount() {
-    var page = createPage(this.props.app.pageSettings, <Blogs />, null, null);
-    this.state = { page: page }
-  }
-
-  componentDidMount() {
-    initScripts()
+    this.options = {
+      ...this.props.app.pageSettings,
+      child: <Blogs blogs={this.props.app.pageData.blog} />,
+      beforeChildren : null,
+      afterChildren : null
+    }
   }
 
   render () {
-    var page = this.state.page;
-    return (
-      <div>
-        <Sidebar />
-        <Body page={page}>{page.child}</Body>
-      </div>
-    )
+    return <Container module={this.options}>
+      {this.options.child}
+    </Container>
   }
 }
 
-var query = {
+const query = {
   blogs: {
-    type: 'blog'
+    type: 'blog',
+    single: false
   }
 }
 
-const Container = page(Page, 'blogs', query)
-export default withRedux(initStore, (state) => state)(Container)
+const Component = HOC(Page, 'blogs', query);
+export default withRedux(initStore, (state) => state)(Component)
+
+
 
 
 

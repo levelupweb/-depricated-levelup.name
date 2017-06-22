@@ -25,21 +25,20 @@ import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 	}
 } */
 
-export function getUserByToken(token) {
+export function authenticateUser(token) {
 	return (dispatch) => {
 		if(token) { 
-			axios({
-				url: config.API + 'user/auth',
-				method: 'GET',
-				headers: {
-					'authorization': token
-				}
+			axiosAuth(token, {
+				url: 'user/auth',
+				method: 'GET'
 		    }).then((res) => {
-
+		    	// Записываем пользователя в Store
 		    	dispatch(setUser(res.data))
+		    	// Возвращаем пользователя
 		    	return res.data
 		    })
 		} else {
+			// Записываем ошибку в Store
 			dispatch({type: 'LOGIN_FAILURE'})
 			return false
 		}
