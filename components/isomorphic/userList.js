@@ -106,17 +106,12 @@ class User extends React.Component {
 								<div className="sub header">{(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}</div>
 							</h4>
 						</div>
-						<div className="updates">
-							+1
-						</div>
 						<style jsx>{`
 							.item {
-								margin:10px 0px;
 								border-bottom:1px solid rgba(255,255,255,0.2);
 								display:flex;
 								align-items:center;
 								flex-direction:row;
-								padding:7px 0px;
 							}
 							.item:last-child {
 								border-bottom:0px;
@@ -172,12 +167,12 @@ class User extends React.Component {
 			          border-bottom:1px solid #eee;
 			          padding:0px!important;
 			          margin:0px!important;
-			          margin-bottom:8px!important;
 			          padding-bottom:8px!important;
 			        }
 			        .item:last-child {
 			        	border-bottom:0px;
 			        	padding-bottom:0px!important;
+			        	margin-bottom:0px!important;
 			        }
 			        .item .content {
 			          display:flex;

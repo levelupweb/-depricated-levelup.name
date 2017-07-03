@@ -20,7 +20,7 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <Post post={this.props.app.pageData.post} />,
+      child: <Post defaultPost={this.props.app.pageData.post} />,
       beforeChildren : null,
       afterChildren : null
     }

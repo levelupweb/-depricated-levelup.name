@@ -85,6 +85,7 @@ function updateImage(token, entryType, entryID, image) {
         data.append('image', image);
         data.append('type', entryType);
         data.append('id', entryID);
+
         return (0, _axiosAuth.axiosAuth)(token, {
             url: 'app/entries/' + entryID + '/upload',
             method: 'POST',

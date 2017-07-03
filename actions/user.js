@@ -2,29 +2,6 @@ import axios from 'axios'
 import config from '../app.config.js'
 import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
-// Old Version
-/* export function setUser(token) {
-    return (dispatch) => {
-        axios({
-	      url: config.API + 'user/auth',
-	      method: 'GET',
-	      headers: {
-	        'authorization': token
-	      }
-	    }).then((res) => {
-	    	if(token == 0) { 
-	    		dispatch({type: 'LOGIN_FAILURE'})
-	    	} else {
-	    		if (res.data) {
-	    			dispatch({type: 'LOGIN_SUCCESS', payload: res.data})
-	    		} else {
-	    			dispatch({type: 'LOGIN_FAILURE'})
-	    		}
-	    	}
-	    }) 
-	}
-} */
-
 export function authenticateUser(token) {
 	return (dispatch) => {
 		if(token) { 
@@ -61,20 +38,20 @@ export function getLogout() {
 	}
 }
 
-export async function getAllUsers() {
-	return await axios.get(config.API + 'user/entries')	
+export function getAllUsers() {
+	return axios.get(config.API + 'user/entries')	
 }
 
-export async function getUserById(id) {
-	return await axios.get(config.API + 'user/entries/id/' + id)	
+export function getUserById(id) {
+	return axios.get(config.API + 'user/entries/id/' + id)	
 }
 
-export async function updateUserById(id, data) {
-	return await axios.post(config.API + 'user/entries/' + id + '/update', data)
+export function updateUserById(id, data) {
+	return axios.post(config.API + 'user/entries/' + id + '/update', data)
 }
 
-export async function removeUserById(id) {
-	return await axios.get(config.API + `user/entries/` + id + `/remove`)
+export function removeUserById(id) {
+	return axios.get(config.API + `user/entries/` + id + `/remove`)
 }
 
 export function subscribeToUser(token, id) {
@@ -87,11 +64,11 @@ export function subscribeToUser(token, id) {
     })
 }
 
-export async function getUserField(id, field) {
-	return await axios.get(config.API + `user/entries/` + id + `/field/` + field)
+export function getUserField(id, field) {
+	return axios.get(config.API + `user/entries/` + id + `/field/` + field)
 }
 
-export async function registerUser(data) {
+export function registerUser(data) {
 	return axios({
 		url: config.API + 'user/add',
 		method: 'POST',
@@ -99,11 +76,11 @@ export async function registerUser(data) {
     })
 }
 
-export async function getUserSubscriptions(userID) {
-	return await axios.get(config.API + 'user/entries/' + userID + '/getsubscriptions')	
+export function getUserSubscriptions(userID) {
+	return axios.get(config.API + 'user/entries/' + userID + '/getsubscriptions')	
 }
 
-export async function addSocialToUser(token, id, data) {
+export function addSocialToUser(token, id, data) {
 	return axios({
 		url: config.API + 'user/entries/' + id + '/addsocial',
 		method: 'POST',
@@ -114,15 +91,15 @@ export async function addSocialToUser(token, id, data) {
     })
 }
 
-export async function getUserLikesCount(userID) {
-	return await axios.get(config.API + 'user/entries/' + userID + '/getlikecount')	
+export function getUserLikesCount(userID) {
+	return axios.get(config.API + 'user/entries/' + userID + '/getlikecount')	
 }
 
-export async function getUserPostsCount(userID) {
-	return await axios.get(config.API + 'user/entries/' + userID + '/getpostscount')	
+export function getUserPostsCount(userID) {
+	return axios.get(config.API + 'user/entries/' + userID + '/getpostscount')	
 }
 
-export async function removeUserSocial(token, userid, data) {
+export function removeUserSocial(token, userid, data) {
 	return axios({
 		url: config.API + 'user/entries/' + userid + '/removesocial/',
 		method: 'POST',
@@ -149,9 +126,33 @@ export function getUserStats(userID) {
     })
 }
 
-export function getUserFaces(userID) {
-    return axiosNoAuth({
-		url: 'user/entries/' + userID + '/getfaces',
-		method: 'GET'
-    })
+// Faces Reducer
+
+function setFaces(faces) {
+	return (dispatch) => {
+		dispatch({type: 'SET_FACES', payload: faces});
+	}
+}
+
+export function setFace(face) {
+	return (dispatch) => {
+		return Promise.all([
+			dispatch({type: 'SET_FACE', payload: face}),
+			dispatch({type: 'SET_POST_FIELD', payload: {field: 'postAuthor', value: {
+				authorID: face._id,
+				authorType: face.type
+			}}})
+		])
+	}
+}
+
+export function setUserFaces(user) {
+	return (dispatch) => {
+	   return axiosNoAuth({
+			url: 'user/entries/' + user._id + '/getfaces',
+			method: 'GET'
+	   }).then((res) => {
+	    	dispatch(setFaces(res.data.concat(user)))
+	   })
+	}
 }

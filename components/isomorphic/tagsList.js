@@ -152,6 +152,7 @@ class Tag extends React.Component {
           <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
             <a>{tag.tagTitle}</a>
           </Link>
+          
         </div>
       );
     }

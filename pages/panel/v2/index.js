@@ -1,17 +1,16 @@
 // Important
 import React from 'react'
-import { initStore } from '../store'
+import { initStore } from '../../../store.js'
 import withRedux from 'next-redux-wrapper'
-import Body from '../components/body'
+import Container from '../../../components/container.js'
 import Router from 'next/router'
 import NProgress from 'nprogress'
-import { UI } from '../utils/initscripts'
-import config from '../app.config.js'
-import HOC from '../components/HOC/page'
+import { UI } from '../../../utils/initScripts.js'
+import config from '../../../app.config.js'
+import HOC from '../../../components/HOC.js'
 
 // For Page
-import FlashPost from '../components/flashpost'
-import Feed from '../components/feed/feed.js'
+import Panel from '../../../components/sections/panel/v2/index.js'
 
 // Router with Progress Bar
 Router.onRouteChangeStart = (url) => NProgress.start()
@@ -23,27 +22,18 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <Feed options={{perPage: 10}} />,
-      beforeChildren : <FlashPost />,
+      child: <Panel />,
+      beforeChildren : null,
       afterChildren : null
     }
   }
 
   render () {
-    return <Body page={this.options}>
+    return <Container page={this.options}>
       {this.options.child}
-    </Body>
+    </Container>
   }
 }
 
-const query = {
-  posts: {
-    type: 'post',
-    single: false,
-    url: config.API + 'post/entries/personal',
-    custom: true
-  }
-}
-
-const Container = HOC(Page, 'panel-index', query);
-export default withRedux(initStore, (state) => state)(Container)
+const Component = HOC(Page, 'auth');
+export default withRedux(initStore, (state) => state)(Component)

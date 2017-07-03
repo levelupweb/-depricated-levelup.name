@@ -16,6 +16,7 @@ import Link from 'next/link'
 export class Blog extends React.Component {
   constructor(props) {
     super(props);
+    this.currentUser = this.props.currentUser;
     this.state = {
       isLoaded: false,
       blog: null
@@ -49,11 +50,11 @@ export class Blog extends React.Component {
         })
       })
     } else {
-      if(this.props.user.isLogged) {
+      if(this.currentUser.isLogged) {
         new Promise(() => {
           this.setState({
             ...this.state,
-            blog: this.props.user.profile
+            blog: this.currentUser
           })
         }).then(() =>{
           this.setState({

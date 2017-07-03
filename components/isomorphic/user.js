@@ -28,7 +28,7 @@ export class User extends React.Component {
 
 
   componentWillReceiveProps(nextProps) {
-    //this.getUser(nextProps.id)
+    this.getUser(nextProps.id)
   }
 
   componentWillUnmount() {
@@ -66,10 +66,10 @@ export class User extends React.Component {
     var user = this.state.user;
     if(this.state.isLoaded && this.state.user != null) {
         return (
-          <div className={`${this.props.size} user`}>
+          <div className={`${this.props.size} user ${this.props.classNames}`}>
             <div className="image">
               <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-                <Avatar color={`#46978c`} round={true} size={32} src={user.userImage} name={user.userName} />
+                <Avatar color={`#46978c`} round={true} size={this.props.imageSize || 32} src={user.userImage} name={user.userName} />
               </a></Link>
             </div>
             <div className="content">
@@ -142,6 +142,10 @@ export class User extends React.Component {
             .user.medium .content .description {
               font-size:13px;
               margin-top:0px;
+            }
+            .user.inverted .content .name,
+            .user.inverted .content .description {
+              color:#fff;
             }
 
         		`}</style>

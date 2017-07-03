@@ -6,20 +6,23 @@ import { connect } from 'react-redux'
 // Actions
 import { addComment } from '../../../actions/comment.js'
 
-export default class ReplyForm extends React.Component {
+// Components
+import Link from 'next/link'
+import Avatar from 'react-avatar'
 
+const defaultState = {
+	comment: {
+		commentContent: '',
+		commentAuthor: null,
+		commentPost: null
+	}
+}
+
+export default class ReplyForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.token = cookies.get('x-access-token')
-		this.defaultState = {
-			isRevealed: false,
-			comment: {
-				commentContent: '',
-				commentAuthor: null,
-				commentPost: null
-			}
-		}
-		this.state = this.defaultState
+		this.state = defaultState
 	}
 
 	componentWillMount() {
@@ -44,6 +47,7 @@ export default class ReplyForm extends React.Component {
 		addComment(token, comment).then((res) => {
 			if(res.data.success) {
 				this.flushForm()
+				this.props.onSubmit(res.data.comment)
 				console.log(res.data)
 			} else {
 				console.log(res.data)
@@ -62,7 +66,7 @@ export default class ReplyForm extends React.Component {
 
 	render() {
 		var user = this.props.user
-		if(this.props.isRevealed) {
+		if (this.props.isRevealed) {
 			return (
 				<form className="ui reply form">
 			     	<div className="field">
@@ -86,13 +90,19 @@ export default class ReplyForm extends React.Component {
 			      	
 			    	</div>
 			    	<style jsx>{`
+			    		.reply {
+							border-top:1px solid #eee;
+							padding-top:20px;
+			    		}
 						.form textarea {
 							border:0px;
-							height:40px;
-							background:#fafafa;
+							height:30px;
+							background:#fff;
+							padding:0px;
+							min-height:30px;
 						}
 						.reply {
-							margin-top:30px;
+							margin-top:15px;
 						}
 						.form .field {
 							display:flex;
@@ -100,15 +110,15 @@ export default class ReplyForm extends React.Component {
 						.form .field .textarea {
 							position:relative;
 							width:100%;
+							padding-top:7px;
 						}
 						.form .field .user {
 							margin-right:15px;
 						}
 						.form .field .button {
 							position:absolute;
-							left:0px;
-							bottom:0px;
-							margin:10px;
+							right:0px;
+							top:0px;
 						}
 			    	`}</style>
 			   </form>

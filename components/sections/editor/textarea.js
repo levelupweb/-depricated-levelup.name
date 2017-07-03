@@ -64,7 +64,7 @@ export default class Textarea extends Component {
               placeholder="Ваш текст здесь..."
               modules={this.modules}
               formats={this.formats}
-              onChange={this.props.onChange}
+              onChange={(value) => {this.props.onChange(value)}}
             />
           </div>
         )
@@ -72,7 +72,7 @@ export default class Textarea extends Component {
         return (<Loader />)
       }
     } else {
-      return (<div></div>)
+      return null
     }
   }
 }

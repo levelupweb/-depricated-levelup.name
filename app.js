@@ -1,19 +1,23 @@
-const express = require('express')
-const next = require('next')
-const cookie = require('react-cookie')
 const { parse } = require('url')
+const app = require('express')()
+const server = require('http').Server(app)
+const next = require('next')
 const cookieParser = require('cookie-parser')
-const app = next({ dev: true, dir: process.cwd() })
-const handle = app.getRequestHandler()
 
-app.prepare().then(() => {
-  const server = express()
-  server.use(cookieParser())
+const dev = process.env.NODE_ENV !== 'production'
+const nextApp = next({ dev: true, dir: process.cwd() })
+const nextHandler = nextApp.getRequestHandler()
 
-  server.get('*', (req, res) => {
+nextApp.prepare().then(() => {
+  app.use(cookieParser())
+  app.get('/messages', (req, res) => {
+    res.json(messages)
+  })
+
+  app.get('*', (req, res) => {
     const parsedUrl = parse(req.url, true)
     const { pathname, query } = parsedUrl 
-    return handle(req, res)
+    return nextHandler(req, res)
   })
 
   server.listen(3000, (err) => {

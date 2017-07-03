@@ -2,6 +2,7 @@
 import React from 'react';
 import config from '../app.config.js'
 import cookies from 'js-cookie'
+import queryString from 'query-string';
 
 // Actions
 import { setUser, authenticateUser } from '../actions/user'
@@ -30,9 +31,13 @@ async function prepareData(builder, query) {
     await Promise.all(queries.map(async (item) => {
       var slug = (item.single) ? query.slug : ``;
       if(item.custom) {
-        var url = item.url
+        var url = item.type + '/' + item.url
       } else {
-        var url = config.API + item.type + `/entries/` + encodeURI(slug);
+        if(!item.options) {
+          var url = item.type + `/entries/` + encodeURI(slug)
+        } else {
+          var url = item.type + `/entries?` + queryString.stringify(item.options)
+        }
       }
       await axiosNoAuth({
           url: url,

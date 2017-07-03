@@ -2,20 +2,16 @@
 import React from 'react';
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
+import dynamic from 'next/dynamic'
 
 // Actions
 import { uploadImage } from '../../../../actions/app.js'
-import { setLikeById, 
-			removePostById } from '../../../../actions/post.js'
-import { startPostEditing, 
-			updatePostContent,
-			updatePostImage, 
-			updatePostLink, 
-			updatePostVideo, 
-			updatePost  } from '../../../../actions/editingPost.js'
+import { setLikeById, removePostById, postUpdate } from '../../../../actions/post.js'
 
 // Utils 
 import getYouTubeId from '../../../../utils/getYouTube.js' 
+import findURL from '../../../../utils/findURL.js' 
+import { UI } from '../../../../utils/initScripts.js'
 
 // Components
 import Comments from '../../comments/index.js'
@@ -23,47 +19,61 @@ import User from '../../user.js'
 import Blog from '../../blog.js'
 import TimeAgo from 'timeago-react';
 import Link from 'next/link'
+import Loader from '../../loader.js'
 
+// Dynamics
+var BlurImageLoader = dynamic(import('react-blur-image-loader'))
+
+const defaultState = {
+	isLiked: false,
+ 	likeCounter: 0,
+ 	isEditing: false,
+ 	post: null,
+ 	isCommentsRevealed: false
+}
 
 class Note extends React.Component {
    constructor(props) {
 	   super(props);
 	   this.token = cookies.get('x-access-token')
-	   this.currentUser = this.currentUser;
-	   this.post = this.props.post;
+	   this.currentUser = this.props.currentUser;
 	   this.dispatch = this.props.dispatch;
-	   this.state = {
-	    	isLiked: false,
-	    	likeCounter: 0,
-	    	isEditing: false,
-	    	post: null,
-	    	isCommentsRevealed: false
-	   }
+	   this.state = defaultState;
    }
+
+   // React Lifecycle
 
   	componentWillMount() {
 	  	if(this.currentUser) {
-		  	if(this.post.postLikes.indexOf(this.currentUser._id) != -1) {
-		     this.setState({
-			      isLiked: true,
-			      likeCounter: this.post.postLikes.length
-		     })
+		  	if(this.props.post.postLikes.indexOf(this.currentUser._id) != -1) {
+		      this.setState({
+			      isLiked: true
+		      })
 		   }
-		}
-		if(this.post.postContent) {
-			this.setState({
-			 	post: this.post
-			})
-		}
+		}		
+		this.setState({
+			likeCounter: this.props.post.postLikes.length,
+			post: this.props.post
+		})
    }
 
    componentDidMount() {
-   	$('.ui.dropdown').dropdown({
-	  		on: 'hover'
-	  	})
+   	UI();
+   	$('.ui.dropdown').dropdown();
    }
 
-  	// добавить токен
+   // Specific Methods
+
+   handleTyping(value) {
+      if(findURL(value).length == 0) {
+        this.changeField(value, 'postContent')
+      } else {
+        	this.changeField(findURL(value)[0], 'postLink').then(() => {
+        		this.changeField(value, 'postContent')
+        	})
+      }
+  	}
+
    handleRemove(id) {
       var result = confirm('Вы действительно хотите удалить запись?');
       if (result) {
@@ -75,19 +85,6 @@ class Note extends React.Component {
       }
    }
 
-  	handleEditing(post) {
-  		this.dispatch(startPostEditing({
-  			postContent: post.postContent,
-  			postImage: post.postImage,
-  			postVideo: post.postVideo,
-  			postLink: post.postLink
-  		})).then(() => {
-  			this.setState({
-	  			isEditing: true
-	  		})
-  		})
-  	}
-
   	handleLike(postID, userID) {
     	setLikeById(this.token, postID).then((res) => {
       	if(res.data.success) {
@@ -96,134 +93,119 @@ class Note extends React.Component {
 		       	isLiked: !this.state.isLiked,
 		       	likeCounter: res.data.counter
 	        })
+      	} else {
+      		console.log(res.data)
       	}
     	})
   	}
 
-  	uploadImage(e) {
-	   var image = e.target.files[0];
-	   uploadImage(this.token, image).then((res) => {
-	   	this.dispatch(updatePostImage(res.path)).then(() => {
-	   		this.setState({
-	   			post: {
-			         ...this.state.post,
-			         postImage: res.path,
-			      }
-	   		})
-	   	})
+  	handleImage(token, image) {
+	   uploadImage(token, image).then((res) => {
+	   	if(res.path && res.success) {
+	   		this.changeField(res.path, 'postImage');
+	   	}
 	   })
    }
 
-  	handleSave(id, data, token) {
-  		this.dispatch(updatePost(id, data, token)).then(() => {
-  			this.setState({
-  				isEditing: false,
-  				post: {
-  					...this.state.post,
-  					...data
-  				}
-  			})
+  	handleSave(token, id, data) {
+  		postUpdate(token, id, data).then((res) => {
+  			if(res.data.success) {
+  				this.setState({
+	  				isEditing: false
+	  			})
+  			}
   		})
   	}
 
-  	removeImage() {
-  		this.dispatch(updatePostImage(null)).then(() =>{
-  			this.setState({
-  				post: {
-  					...this.state.post,
-  					postImage: null
-  				}
-  			})
-  		})
-  	}
-
-  	removeVideo() {
-  		this.dispatch(updatePostVideo(null)).then(() =>{
-  			this.setState({
-  				post: {
-  					...this.state.post,
-  					postVideo: null
-  				}
-  			})
-  		})
-  	}
-
-  	onVideo(url) {
+  	handleVideo(url) {
 	   var id = getYouTubeId(url)
-	  	this.props.dispatch(updatePostVideo(id)).then(() => {
-	  		this.setState({
-	  			post: {
-  					...this.state.post,
-  					postVideo: id
-  				}
-	  		})
-	  	})
+	  	this.changeField(id, 'postVideo')
    }
 
+   // Isomorphic Methods
 
-  render() {
-    var post = this.state.post;
+   changeField(value, target) {
+   	return new Promise((resolve) => {
+   		this.setState({
+	   		post: {
+	   			...this.state.post,
+	   			[target]: value
+	   		}
+	   	})
+	   	resolve(true)
+   	})
+   }
+
+   removeField(field) {
+  		this.setState({
+			post: {
+				...this.state.post,
+				[field]: null
+			}
+		})
+  	}
+
+   render() {
+    	var post = this.state.post;
 		if (post) {
-			var likes = this.state.likeCounter;
 			return (
-				<article className={`article note preview post-${post._id}`}>
-					<div className="user">
+				<article className={`article block-item note preview post-${post._id}`}>
+					<div className="user"> 
 						<div className="left">
 							{(post.postAuthor.authorType == 'user') ?
 					         <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
 					      }
 				      </div>
 			         <div className="right">
-			        	<div className="ui dropdown">
-							<i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-							  <div className="menu">
-							  	 <div className="item" onClick={() => {this.handleEditing(post)}}>Редактировать</div>
-							  	 <div className="item">Пожаловаться</div>
-							    <div className="item" onClick={() => {this.handleRemove(post._id)}}>Удалить</div>
+				        	<div className="ui dropdown">
+								<i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+								  <div className="menu">
+								  	 <div className="item" onClick={() => {this.setState({isEditing: true})}}>Редактировать</div>
+								  	 <div className="item" onClick={() => {console.log('*modal')}}>Пожаловаться</div>
+								    <div className="item" onClick={() => {this.handleRemove(post._id)}}>Удалить</div>
+								</div>
 							</div>
-						</div>
 			         </div>
 				   </div>
-			      <div className="image">
+			      <div className="media">
 			        	<Image 
 			        		url={post.postImage}
-			        		dispatch={this.dispatch}
-			        		editing={this.state.isEditing}
-			        		onRemove={() => {this.removeImage()}}
+			        		isEditing={this.state.isEditing}
+			        		onRemove={(field) => {this.removeField(field)}}
 			        	/>
 			        	<Video 
-			        		video={post.postVideo}
-			        		dispatch={this.dispatch}
-			        		editing={this.state.isEditing}
-			        		onRemove={() => {this.removeVideo()}}
+			        		id={post.postVideo}
+			        		isEditing={this.state.isEditing}
+			        		onRemove={(field) => {this.removeField(field)}}
 			        	/>
 			      </div>
 			      <div className="content">
 			        	 <Content 
 			        	 	text={post.postContent} 
-			        	 	editing={this.state.isEditing}
-			        	 	dispatch={this.dispatch}
+			        	 	isEditing={this.state.isEditing}
+			        	 	onChange={(value) => {this.handleTyping(value)}}
 			        	 />
 			      </div>
 			      <div className="link">
 			      	<Url 
 			      		link={post.postLink}
-			      		dispatch={this.dispatch}
-			      		editing={this.state.isEditing}
+			      		isEditing={this.state.isEditing}
+			      		onRemove={(field) => {this.removeField(field)}}
+			      		onChange={(value, target) => {this.changeField(value, target)}}
 			      	/>
 			      </div>
 			      <div className="meta">
 			        	<div className="left">
 				        	<ActionBar 
-				        		dispatch={this.dispatch}
-				        		parentState={this.state}
 				        		post={post}
-				        		editing={this.state.isEditing}
-				        		onCancel={() => {this.setState({isEditing: false})}}
+				        		isLiked={this.state.isLiked}
+				        		likeCounter={this.state.likeCounter}
+				        		isEditing={this.state.isEditing}
+				        		onCancel={() => {this.setState({isEditing: false, post: this.props.post})}}
 				        		onLike={() => {this.handleLike(post._id, this.currentUser._id)}}
-				        		onSave={() => {this.handleSave(post._id, this.props.editingPost, this.token)}}
-				        		onUpload={(e) => {this.uploadImage(e)}}
-				        		onVideo={(url) => {this.onVideo(url)}}
+				        		onSave={() => {this.handleSave(this.token, post._id, this.state.post)}}
+				        		onUpload={(file) => {this.handleImage(this.token, file)}}
+				        		onVideo={(url) => {this.handleVideo(url)}}
 				        		onComment={() => {this.setState({isCommentsRevealed: !this.state.isCommentsRevealed})}}
 				        	/>
 				      </div>
@@ -240,38 +222,45 @@ class Note extends React.Component {
 			      	/>
 			      </div>
 			      <style jsx>{`
-			        	 .note {
-			        	 	box-shadow: 0px 3px 18px 0px rgba(34, 36, 38, 0.1);
-			        	 	padding:15px 19px;
-			        	 	border-radius:4px;
-			        	 	background:#fff;
-			        	 }
-			          .note .user,
-			          .note .meta {
+			         .note .user,
+			         .note .meta {
 			          	display:flex;
 			          	align-items:center;
 			          	justify-content:space-between;
-			          }
-			          .note .user .dropdown i {
-			          	color:#c0c0c0;
+			         }
+			         .note .meta {
+			          	margin-top:15px;
+			          	padding-top:15px;
+			          	border-top:1px solid #eee;
+			         }
+			         .note .media {
+			         	margin-top:10px;
+			         }
+			         .note .user .dropdown i {
+			         	color:#c0c0c0;
 			          	font-size:16px;
 			          	transition:0.2s all ease;
-			          }
-			          .note .user .dropdown i:hover {
+			         }
+			         .note .user .dropdown i:hover {
 			          	color:#000;
-			          }
-			          .note .user .dropdown .menu {
+			         }
+			         .note .user .dropdown .menu {
 			          	left:auto!important;
 			          	right:-15px!important;
-			          }
-			          .note .meta .time {
+			         }
+			         .note .meta .time {
 							color:#c0c0c0;
 							font-size:13px;
-			          }
-			          .note p.primary {
+			         }
+			         .note .content {
+			          	word-wrap: break-word;
+							overflow-wrap: break-word;
+							margin:15px 0px;
+			         }
+			         .note p.primary {
 			          	font-size:17px;
 			          	color:#333;
-			          }
+			         }
 			      `}</style>
 		   	</article>
 			)
@@ -284,41 +273,21 @@ class Note extends React.Component {
 class Video extends React.Component {
    constructor(props) {
 	   super(props);
-	   this.state = {
-	   	isEditing: false,
-	   	link: null
-	   }
-   }
-
-   componentWillMount() {
-   	if(this.props.video) {
-	   	this.setState({
-	   		link: this.props.video,
-	   		isEditing: this.props.editing
-	   	})
-	   }
-   }
-
-   componentWillReceiveProps(nextProps) {
-   	this.setState({
-   		link: nextProps.video,
-   		isEditing: nextProps.editing
-   	})
    }
 
    render() {
-   	if(this.state.link) {
-   		if(this.state.isEditing) {
+   	if(this.props.id) {
+   		if(this.props.isEditing) {
    			return (
 			      <div className="video">
 			      	<iframe 
 				      	width="100%" 
 				      	height="315" 
-				      	src={`https://www.youtube.com/embed/${this.state.link}`} 
+				      	src={`https://www.youtube.com/embed/${this.props.id}`} 
 				      	frameBorder="0" 
 				      	allowFullScreen={true}>
 				      </iframe>
-				      <i onClick={() => {this.props.onRemove()}} 
+				      <i onClick={() => {this.props.onRemove('postVideo')}} 
 				      	className="fa fa-close">
 				      </i>
 				      <style jsx>{`
@@ -345,7 +314,7 @@ class Video extends React.Component {
 			      <iframe 
 			      	width="100%" 
 			      	height="315" 
-			      	src={`https://www.youtube.com/embed/${this.state.link}`} 
+			      	src={`https://www.youtube.com/embed/${this.props.id}`} 
 			      	frameBorder="0" 
 			      	allowFullScreen={true}>
 			      </iframe>
@@ -361,54 +330,27 @@ class Video extends React.Component {
 class Url extends React.Component {
    constructor(props) {
 	   super(props);
-	   this.state = {
-	   	isEditing: false,
-	   	link: null
-	   }
-   }
-
-   componentWillMount() {
-   	if(this.props.link) {
-	   	this.setState({
-	   		link: this.props.link,
-	   		isEditing: this.props.editing
-	   	})
-	   }
-   }
-
-   componentWillReceiveProps(nextProps) {
-   	this.setState({
-   		link: nextProps.link,
-   		isEditing: nextProps.editing
-   	})
-   }
-
-   saveLocally(e) {
-   	var value = e.target.value;
-   	this.props.dispatch(updatePostLink(value)).then(() => {
-   		this.setState({
-   			url: value
-   		})
-   	})
    }
 
    render() {
-   	if(this.state.link) {
-		  	if(this.state.isEditing) {
+   	if(this.props.link) {
+		  	if(this.props.isEditing) {
 		  		return (
 			  		<div className="link">
-			        	<i className="fa fa-link"></i>
+			        	<i className="fa fa-close" onClick={() => {this.props.onRemove('postLink')}}></i>
 			        	<input 
-			        		onChange={(e) => {this.saveLocally(e)}} 
+			        		onChange={(e) => {this.props.onChange(e.target.value, 'postLink')}} 
 			        		type="text" 
-			        		defaultValue={this.state.link} 
+			        		defaultValue={this.props.link} 
 			        	/>
+			        	
 			        	<style jsx>{`
 							.link {
 				          	margin-bottom:15px;
 				          }
-				         .link i {
-				          	margin-right:15px;
+				         .link i.fa-close {
+				         	cursoir:pointer;
+				         	margin-right:15px;
 				          	opacity:.4;
 				         }
 				         .link input {
@@ -416,16 +358,18 @@ class Url extends React.Component {
 				         	font-size:15px;
 				         	outline:none;
 				         	padding:5px;
-				         	width:300px;
+				         	width:80%;
 				         }
 			        	`}</style>
 			      </div> 
 			   )
 		  	} else {
 		  		return (
-		  			<div className="link">
+		  			<div className="link" data-inverted="" 
+			        		data-tooltip="Прикрепленная ссылка" 
+			        		data-position="bottom left">
 			        	<i className="fa fa-link"></i>
-			        	<a href={this.state.link} target="_blank">{this.state.link}</a>
+			        	<a href={this.props.link} target="_blank">{this.props.link}</a>
 			        	<style jsx>{`
 							.link {
 				          	margin-bottom:15px;
@@ -449,45 +393,18 @@ class Url extends React.Component {
 class Content extends React.Component {
    constructor(props) {
 	   super(props);
-	   this.dispatch = this.props.dispatch;
-	   this.state = {
-	    	isEditing: false,
-	    	text: ''
-	   }
-   }
-
-   componentWillMount() {
-	  	this.setState({
-	  		isEditing: this.props.editing,
-	  		text: this.props.text
-	  	})
-	   }
-
-   componentWillReceiveProps(nextProps) {
-	  	this.setState({
-	  		isEditing: nextProps.editing,
-	  		text: nextProps.text
-	  	})
-   }
-
-   updateLocally(e) {
-	  	var value = e.target.value;
-	  	this.dispatch(updatePostContent(value)).then(() => {
-	  		this.setState({
-	  			text:value
-	  		})
-	  	})
    }
 
   	render() {
-  		if(this.state.isEditing) {
+  		if(this.props.isEditing) {
   			return (
   				<div className="editor">
   					<textarea 
-	  					onChange={(e) => {this.updateLocally(e)}} 
+	  					onChange={(e) => {this.props.onChange(e.target.value)}} 
 	  					cols="4" 
-	  					defaultValue={this.state.text} 
-	  					placeholder="Ваш текст..">
+	  					defaultValue={this.props.text} 
+	  					placeholder="Ваш текст.."
+	  					maxLength="140">
   					</textarea>
   					<style jsx>{`
 						.editor textarea {
@@ -503,9 +420,9 @@ class Content extends React.Component {
   			)
   		} else {
 	  		return (
-		    	<div>
+		    	<div className="text">
 			      <p className="primary">
-			      	{this.state.text}
+			      	{this.props.text}
 			      </p>
 		      </div>
 	   	);
@@ -516,42 +433,20 @@ class Content extends React.Component {
 class Image extends React.Component {
    constructor(props) {
 	   super(props);
-	   this.dispatch = this.props.dispatch;
-	   this.state = {
-	    	isEditing: false,
-	    	url: null
-	   }
-   }
-
-   componentWillMount() {
-	  	this.setState({
-	  		isEditing: this.props.editing,
-	  		url: this.props.url
-	  	})
-   }
-
-   componentWillReceiveProps(nextProps) {
-	  	this.setState({
-	  		isEditing: nextProps.editing,
-	  		url: nextProps.url
-  		})
-   }
-
-   updateLocally(url) {
-	  	this.dispatch(updatePostImage(url)).then(() => {
-	  		this.setState({
-	  			url: url
-	  		})
-	  	})
    }
 
   	render() {
-  		if(this.state.url) {
-	  		if(this.state.isEditing) {
+  		if(this.props.url) {
+	  		if(this.props.isEditing) {
 	  			return (
 	  				<div className="editor">
-	  					<img src={this.state.url} width="100%" />
-	  					<i className="fa fa-close" onClick={() => {this.props.onRemove()}}></i>
+	  					<BlurImageLoader src={this.props.url}
+		               fullCover={true}
+		               maxBlurLevel={10}
+		               transitionTime={400}
+		               loader={<Loader />}
+		            />
+	  					<i className="fa fa-close" onClick={() => {this.props.onRemove('postImage')}}></i>
 	  					<style jsx>{`
 	  						.editor {
 	  							position:relative;
@@ -562,10 +457,11 @@ class Image extends React.Component {
 								top:0px;
 								padding:20px;
 								font-size:17px;
-								color:#fff;
+								color:#000;
 								opacity:0.5;
 								transition:0.2s all ease;
 								cursor:pointer;
+								z-index:999;
 							}
 							.editor i:hover {
 								opacity:1.0;
@@ -575,8 +471,13 @@ class Image extends React.Component {
 	  			)
 	  		} else {
 		  		return (
-			    	<div>
-			      	<img src={this.state.url} width="100%" />
+			    	<div className="image">
+			      	<BlurImageLoader src={this.props.url}
+		               fullCover={true}
+		               maxBlurLevel={10}
+		               transitionTime={400}
+		               loader={<Loader />}
+		            />
 			      </div>
 		   	);
 	  		}
@@ -588,49 +489,32 @@ class Image extends React.Component {
 
 
 class ActionBar extends React.Component {
-  constructor(props) {
-    super(props);
-    this.currentUser = this.props.currentUser;
-    this.state = {
-    	isEditing: false
-    }
-  }
-
-  componentWillMount() {
-  	this.setState({
-  		isEditing: this.props.editing,
-  		post: this.props.post,
-  		...this.props.parentState
-  	})
-  }
-
-   componentWillReceiveProps(nextProps) {
-	  	this.setState({
-	  		isEditing: nextProps.editing,
-	  		post: nextProps.post,
-	  		...nextProps.parentState
-	  	})
+   constructor(props) {
+	   super(props);
+	   this.currentUser = this.props.currentUser;
    }
 
-   createPopup() {
-	  	this.video.addEventListener('keydown', (e) => {
-	      if(e.keyCode == 13) {
-	         e.preventDefault();
-	         this.props.onVideo(e.target.value)
-	      }
-	   })
+   componentDidMount() {
+   	UI()
+   }
+
+   onVideo(e, value) {
+      if(e.keyCode == 13) {
+         e.preventDefault();
+         this.props.onVideo(value)
+      }
    }
 
   	render() {
-  		var post = this.state.post;
+  		var post = this.props.post;
   		if (post) {
-		  	if (this.state.isEditing) {
+		  	if (this.props.isEditing) {
 		   	return (
 			      <div>
-		        		<span onClick={() => {this.props.onSave()}} className="ui button small circular primary">Сохранить</span>
+		        		<span onClick={() => {this.props.onSave(post)}} className="ui button small circular primary">Сохранить</span>
 		        		<span onClick={() => {this.props.onCancel()}} className="ui button small circular default">Отмена</span>
-		      	   {(!this.state.post.postImage 
-		      	   	&& !this.state.post.postVideo) 
+		      	   {(!post.postImage 
+		      	   	&& !post.postVideo) 
 		      	   	&&
 			            <span>
 				            <span 
@@ -642,24 +526,23 @@ class ActionBar extends React.Component {
 			  						ref={(e) => {this.image = e}}
 				  					type="file" 
 				  					className="ui hidden" 
-				  					onChange={(e) => {this.props.onUpload(e)}} 
+				  					onChange={(e) => {this.props.onUpload(e.target.files[0])}} 
 			  					/>
 		  					</span>
 			         }
-			         {(!this.state.post.postVideo 
-			         	&& !this.state.post.postImage) 
-			         	&&
+			         {(!post.postVideo 
+			         	&& !post.postImage) &&
 			            <span>
-				            <span
-				            	onClick={(e) => {$('.video.button').popup({popup : $('.video.popup'), on: 'click'});this.createPopup()}} 
-				            	className="ui button video icon circular small basic"
-				            ><i className="fa fa-video-camera"></i></span>
+				            <span 
+				            	onClick={() => {$('.ui.video.button').popup({popup: '.ui.video.popup', on: 'click'})}} 
+				            	className="ui button video icon circular small basic">
+				            	<i className="fa fa-video-camera"></i>
+				            </span>
 				            <div className="popup video ui">
 				               <input 
-				                ref={(e) => {this.video = e}} 
+				                onKeyDown={(e) => {this.onVideo(e, e.target.value)}}
 				                type="text" 
-				                placeholder="Ссылка на видео с YouTube" 
-				               />
+				                placeholder="Ссылка на видео с YouTube" />
 				            </div>
 			            </span>
 			         }
@@ -677,17 +560,13 @@ class ActionBar extends React.Component {
 		   } else {
 		   	return (
 		   		<span>
-		        		<span 
-		        		onClick={() => {this.props.onLike()}} 
-		        		className={(this.state.isLiked) ? 
-		        			`ui button circular small primary` : 
-		        			`ui button circular small default`}
-		        		>
-			        		<i className={(this.state.isLiked) ? 
+			        	<a onClick={() => {this.props.onLike()}}
+		        			className="item">
+			        		<i className={(this.props.isLiked) ? 
 			        			`fa fa-heart icon` : 
 			        			`fa fa-heart-o icon`}>
-			        		</i> {this.state.likeCounter}
-			        	</span>
+			        		</i> {this.props.likeCounter} Мне нравится
+			        	</a>
 			        	<a onClick={() => {this.props.onComment()}} 
 		        			className="item">
 			        		<i className="fa fa-comment-o icon"></i> Оставить комментарий
@@ -703,8 +582,13 @@ class ActionBar extends React.Component {
 				        	 .item {
 				        	 	cursor:pointer;
 				        	 	font-size:15px;
-				        	 	margin-left:15px;
-				        	 	margin-right:0px!important;
+				        	 	margin-right:15px;
+				        	 }
+				        	 .item:last-child {
+				        	 	margin-right:0px;
+				        	 }
+				        	 .fa-heart {
+				        	 	color:#57c1b3!important;
 				        	 }
 		        		`}</style>
 		        	</span>
@@ -718,7 +602,7 @@ class ActionBar extends React.Component {
 
 
 
-var Blank = (props) => {
+var Blank = () => {
 	return (
 		<div>
          <div className="user">

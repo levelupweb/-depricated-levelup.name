@@ -39,26 +39,25 @@ class Component extends React.Component {
     var className = (module.moduleShowSidebar) ? module.moduleClassName + ' main' : module.moduleClassName + ' full main'
     return (
       <div className="module-wrapper">
-        <Sidebar />
+        {module.moduleShowSidebar &&
+          <Sidebar />
+        }
         <div className={className}>
           <div className="inner">
-              <Head header={module.moduleShowHeader} />
-              <div className="after-header">
-                {module.beforeChildren}
-                <Content module={module}>{module.child}</Content>
-                {module.afterChildren}
-              </div>
+            <Header />
+            <div className="after-header">
+              {module.beforeChildren}
+              <Content module={module}>{module.child}</Content>
+              {module.afterChildren}
+            </div>
           </div>
-          <Banner />
+          {/* <Banner /> */}
         </div>
       </div>
     );
   }
 }
 
-var Head = (props) => {
-  return props.header ? <Header /> : <SimpleHeader block={true} />
-}
 
 var Content = (props) => {
   var content;

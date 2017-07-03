@@ -27,28 +27,6 @@ class Sidebar extends React.Component {
     	this.service = new AuthService(this.props.dispatch)
    }
 
-   componentDidMount() {
-	  	this.setFooter()
-	  	UI();
-   }
-
-  	// Упростить
-   setFooter() {
-	  	var footer = document.getElementById('footer');
-	  	var footerHeight = footer.scrollHeight;
-	  	var windowHeight = window.innerHeight;
-	  	var sidebar = document.getElementsByClassName('sidebar')[0];
-	  	sidebar.style.paddingBottom = footerHeight + 10 + 'px';
-	  	footer.style.top = 100 + '%'
-	  	footer.style.marginTop =  footerHeight/2 + 'px'
-   }
-
-  	userBarSwitch() {
-	  	$('.sidebar')
-	  	.dimmer('add content', $('.sidebar .menu.vertical'))
-	  	.dimmer('show');
-  	}
-
    render() {
     	return (
       <div className="sidebar">
@@ -70,82 +48,56 @@ class Sidebar extends React.Component {
       		</div>
       		: // Если залогинен пользователь 
       		<div>
-	      		<div className="profile block">
-		      		<User id={this.currentUser._id} />
-		      		<div className="button userbar">
-			      		<div onClick={() => {this.userBarSwitch()}} className="ui icon top left pointing button">
-						  		<i className="fa fa-angle-down"></i>
+	      		<div className="block">
+						<div>
+							<div className="block-section">
+								<h4 className="ui header">Авторы</h4>
+								<UserList subscriber={this.currentUser._id} />
+							</div>
+							
+							<div className="block-section">
+								<h4 className="ui header">Блоги</h4>
+								<BlogList subscriber={this.currentUser._id} />
+							</div>
+							
+							<div className="block-section">
+								<h4 className="ui header">Темы</h4>
+								<TagsList subscriber={this.currentUser._id} />
 							</div>
 						</div>
-				    	<div className="ui secondary vertical menu block-shadow">
-					      <div className="block profile">
-							  <a className="item"><i className="fa fa-user"></i> Мой профиль</a>
-							  <a className="item"><i className="fa fa-pencil"></i> Написать пост</a>
-							  <a className="item"><i className="fa fa-cog"></i> Редактировать</a>
-							  <a className="item"><i className="fa fa-flash"></i> Статистика</a>
-							  <div className="ui divider"></div>
-							  <a onClick={() => {this.service.getLogout()}} className="item"><i className="fa fa-sign-out"></i> Выход</a>
-						  	</div>
-						</div>
-		      	</div>
-		      	<div className="block-horizontal add">
-						<div className="ui vertical labeled icon buttons small fluid">
-						  <Link href="/editor" prefetch><a className="large labeled icon fluid ui button black">
-						    <i className="fa fa-pencil icon"></i>
-						    Написать пост
-						  </a></Link>
-						  <Link href="/editor" prefetch><a className="large labeled icon fluid ui button black">
-						    <i className="fa fa-camera icon"></i>
-						    Live
-						  </a></Link>
-						</div>
-		      	</div>
-		      	<div className="block sidebar-block" id="subscriptions">
-		      		<div className="title">
-			      		<h3 className="ui header inverted">
-								Подписки <small>исследовать</small>
-							</h3>
-		      		</div>
-		      		<div className="block-content">
-		      			<UserList subscriber={this.currentUser._id} />
-		      			<h4 className="ui header inverted">Блоги</h4>
-		      			<BlogList subscriber={this.currentUser._id} />
-		      			<div className="block-vertical">
-			      			<h4 className="ui header inverted">Темы</h4>
-			      			<TagsList subscriber={this.currentUser._id} />
-		      			</div>
-		      		</div>
+						{/* <div className="footer">
+							<div className="ui dropdown switcher">
+							  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
+							  <div className="menu">
+							   <a href="#" className="item">Levelupmusic</a>
+							   <a href="#" className="item">Levelupworlds</a>
+							   <a href="#" className="item">Levelupplace</a>							   
+							  </div>
+							</div>
+							<div className="divider ui"></div>
+							<p>Свободная платформа для блогеров и их читателей. Все права защищены</p>
+							<div className="divider ui"></div>
+							<div className="tag-list">
+								<a href="#" className="tag">помощь</a>
+				   			<a href="#" className="tag">карьера</a>
+			   				<a href="#" className="tag">блог</a>
+			   				<a href="#" className="tag">публичность</a>
+			   				<a href="#" className="tag">о проекте</a>
+			   			</div>
+						</div> */}
+						
 		      	</div>
 		    </div>
       	}
-      	<div className="block footer" id="footer">
-      		<div className="block-content">
-      			<div className="ui dropdown switcher">
-				  <div className="text"><b>Levelup.name <i className="fa fa-angle-down"></i></b></div>
-				  <div className="menu">
-				    <div className="item">Levelupmusic</div>
-				    <div className="item">Levelupworlds</div>
-				    <div className="item">Levelupplace</div>
-				  </div>
-				</div>
-      			<div className="menu">
-      				<a href="#">помощь</a>
-      				<a href="#">карьера</a>
-      				<a href="#">блог</a>
-      				<a href="#">публичность</a>
-      				<a href="#">о проекте</a>
-      			</div>
-      		</div>
-      	</div>
 		  	<style jsx>{`
-		  		.block.add {
-		  			margin-top:0px;
-		  			padding-top:0px;
-		  		}
 				.sidebar {
-					position:relative;
 					overflow-y:scroll;
-					background:#101010;
+					width:310px;
+					height:100%;
+					position: fixed!important;
+					left:0px;
+					top:68px;
+					border-right:1px solid #eee;
 				}
 				.sidebar::-webkit-scrollbar {
 					display:none;
@@ -153,75 +105,8 @@ class Sidebar extends React.Component {
 				.sidebar::-webkit-scrollbar-thumb {
 					display:none;
 				}
-				.sidebar-block .title .ui.header {
-					color:#fff;
-				}
-				.footer {
-					background:transparent;;
-					position:absolute;
-					left:0px;
-				}
-		  		.footer .menu {
-					display:flex;
-					flex-wrap:wrap;
-					flex-direction:row;
-		  		}
-		  		.footer .switcher .menu {
-					display:none;
-					bottom:100%!important;
-					margin-bottom:10px;
-					top:auto!important;
-		  		}
-		  		.footer .menu a {
-		  			display:inline-block;
-					margin-right:10px;
-					margin-bottom:5px;
-					color:#c0c0c0;
-		  		}
-		  		.footer .switcher {
-		  			margin-bottom:5px;
-		  			color:#fff;
-		  			display:block;
-		  		}
-		  		.profile  {
-		  			position:relative;
-		  			text-align:left;
-		  		}
-		  		.profile.simple {
-		  			 height:85px;
-		  			 display:flex;
-		  			 justify-content:center;
-		  			 align-items:center;
-		  		}
-		  		.profile.simple a {
-					font-size:15px;
-					font-weight:bold;
-					color:#fff;
-		  		}
-		  		.profile .menu .profile .content .description {
-		  			color:#c0c0c0!important;
-		  		}
-		  		.profile .secondary.menu {
-					text-align:left;
-		  		}
-				.profile .button {
-					position: absolute;
-					right:0px;
-					top:0px;
-					bottom:0px;
-					display:flex;
-					justify-content:center;
-					align-items:center;
-					padding:10px;
-					margin-right:18px;
-					cursor:pointer;
-					transition:0.2s all ease;
-					background:none!important;
-					height:auto;
-					color:#fff!important;
-				}
-				.button:focus {
-					background:#c0c0c0!important;
+				.sidebar .blocks {
+					padding-bottom:70px;
 				}
 		    `}</style>  
 		</div>

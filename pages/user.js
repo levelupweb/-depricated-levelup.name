@@ -21,7 +21,7 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <User user={this.props.app.pageData.user} />,
+      child: <User />,
       beforeChildren : null,
       afterChildren : null
     }

@@ -13,12 +13,27 @@ import Feed from '../../../isomorphic/feed/feed.js'
 
 
 class User extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
       userPage: null
     }
+  }
+
+  componentWillMount() {
+    this.getInitialState(
+      this.props.app.pageData.user
+    )
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getInitialState(
+      nextProps.app.pageData.user
+    )
+  }
+
+  componentDidMount() {
+    createTabs('.tabs-menu a')
   }
 
   getInitialState(user) {
@@ -29,99 +44,26 @@ class User extends React.Component {
     }
   }
 
-  componentWillMount() {
-    this.getInitialState(
-      this.props.user
-    )
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.getInitialState(
-      nextProps.user
-    )
-  }
-
-  componentDidMount() {
-    UI()
-    var tabs = document.querySelectorAll('.tabs-menu a');
-    tabs.forEach((item, i) => {
-      item.addEventListener('click', (e) => {
-        document.dispatchEvent(createGrid);
-      })
-    })
-
-  	$(".tabs-menu a").click(function(event) {
-        event.preventDefault();
-        $(this).parent().addClass("current");
-        $(this).parent().siblings().removeClass("current");
-        var tab = $(this).attr("href");
-        $(".tab-content").not(tab).addClass('hidden');
-        $(tab).removeClass('hidden');
-    });
-  }
-
-
   render() {
     var user = this.state.userPage
     if (user) {
       return (
         <div className="profile-feed feed">
         	<UserBar user={user} /> 
-    			<div id="tabs-container" className="block-shadow">
-              <div className="block block-border-bottom">
-                <ul className="tabs-menu">
-                  <li className="current"><a href="#feed">
-                    Лента
-                  </a></li>
-                  <li><a href="#publications">
-                    Публикации
-                  </a></li>
-                  <li><a href="#bookmarks">
-                    Закладки
-                  </a></li>
-                  <li><a href="#comments">
-                    Комментарии
-                  </a></li>
-                </ul>
-              </div>
-    			    <div className="tab">
-                <div id="feed" className="tab-content">
-                  <FlashPost defaultType="user" />
-                  <div className="block">
-                    <Feed options={{ userID : user._id }} />
-                  </div>
-                </div>
-  			        <div id="publications" className="tab-content hidden block">
-  			          {/* <Articles userID={user._id} /> */}
-  			        </div>
-  			        <div id="bookmarks" className="tab-content hidden block">
-  			           
-  			        </div>
-  			        <div id="comments" className="tab-content hidden block">
-  			           <Comments />
-  			        </div>
-    			    </div>
-    			</div>
+          <div className="block content">
+            <Feed 
+              flashPost={true}
+              options={{ 
+                userID : user._id, 
+                status: ['published'] 
+              }} 
+            />
+          </div>
           <style jsx>{`
-            .tabs-menu {
-              display:flex;
-              align-items:center;
-              list-style-type:none;
-              padding:0px;
-              margin:0px;
-            }
-            .tabs-menu li {
-              margin-right:14px;
-              padding:0px;
-            }
-            .tabs-menu li a {
-              font-size:16px;
-              color:#000;
-              padding:0px;
-            }
-            .tabs-menu li.current {
-              color:#4eada0;
-              font-weight:bold;
+            .content {
+              background:#fff;
+              box-shadow:-5px 4px 20px 0px rgba(0, 0, 0, 0.03);
+              border-top:1px solid #eee;
             }
           `}</style>
         </div>
@@ -132,6 +74,18 @@ class User extends React.Component {
       )
     }
   }
+}
+
+function createTabs(selector) {
+  UI()
+  $(selector).click(function(event) {
+      event.preventDefault();
+      $(this).parent().addClass("current");
+      $(this).parent().siblings().removeClass("current");
+      var tab = $(this).attr("href");
+      $(".tab-content").not(tab).addClass('hidden');
+      $(tab).removeClass('hidden');
+  });
 }
 
 export default connect(state => state)(User)

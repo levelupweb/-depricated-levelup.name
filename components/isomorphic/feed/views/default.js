@@ -2,6 +2,7 @@
 import React from 'react';
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
+import dynamic from 'next/dynamic'
 
 // Actions
 import { setLikeById } from '../../../../actions/post.js'
@@ -11,6 +12,10 @@ import User from '../../user.js'
 import Blog from '../../blog.js'
 import TimeAgo from 'timeago-react';
 import Link from 'next/link'
+import Loader from '../../loader.js'
+
+// Dynamics
+var BlurImageLoader = dynamic(import('react-blur-image-loader'))
 
 
 export default class Default extends React.Component {
@@ -54,13 +59,35 @@ export default class Default extends React.Component {
       var comments = post.postCommentsCount;
       var likes = this.state.likeCounter;
       return (
-        <article className={`article preview grid-item w-100`}>
-          {(post.postAuthor.authorType == 'user') ?
-            <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
-          }
-          <div className="image">
-            <img src={post.postImage} className="rounded ui image fluid" />
+        <article className={`article block-item preview grid-item w-100`}>
+          <div className="user">
+            <div className="left">
+              {(post.postAuthor.authorType == 'user') ?
+                <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
+              }
+            </div>
+            <div className="right">
+              <div className="ui dropdown">
+                <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+                <div className="menu">
+                  <Link href={{ pathname: 'editor', query: { slug: post.slug }}}>
+                    <div className="item">Редактировать</div>
+                  </Link>
+                  <div className="item" onClick={() => {console.log('*modal')}}>Пожаловаться</div>
+                </div>
+              </div>
+            </div>
           </div>
+          {post.postImage &&
+            <div className="image">
+              <BlurImageLoader src={post.postImage}
+                fullCover={true}
+                maxBlurLevel={10}
+                transitionTime={400}
+                loader={<Loader />}
+              />
+            </div>
+          }
           <div className="content">
             <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
               <a><h1>{post.postTitle}</h1></a>
@@ -69,16 +96,12 @@ export default class Default extends React.Component {
           </div>
           <div className="meta">
             <div className="left">
-              <span 
-              onClick={() => {this.handleLike(this.token, post._id, this.props.currentUser._id)}} 
-              className={(this.state.isLiked) ? 
-                `ui button circular small primary` : 
-                `ui button circular small default`}
-              >
-                <i className={(this.state.isLiked) ? 
-                  `fa fa-heart icon` : 
-                  `fa fa-heart-o icon`}>
-                </i> {this.state.likeCounter}
+              <span onClick={() => {this.handleLike(this.token, post._id, this.props.currentUser._id)}}
+                  className="item">
+                  <i className={(this.state.isLiked) ? 
+                    `fa fa-heart icon` : 
+                    `fa fa-heart-o icon`}>
+                  </i> {this.state.likeCounter} Мне нравится
               </span>
               <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
                 <a className="item">
@@ -98,15 +121,14 @@ export default class Default extends React.Component {
             </div>
           </div>
           <style jsx>{`
-            .article {
-              margin-top:15px;
-              box-shadow: 0px 3px 18px 0px rgba(34, 36, 38, 0.1);
-              padding:15px 19px;
-              border-radius:4px;
-              background:#fff;
-            }
             .article .user {
-              margin:15px 0px;
+              margin-top:0px;
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+            }
+            .article .image {
+              margin-top:15px;
             }
             .article .meta {
               margin-top:20px;
@@ -115,11 +137,29 @@ export default class Default extends React.Component {
               align-items:center;
               justify-content:space-between;
             }
+            .article .meta .item {
+              cursor:pointer;
+            }
             .article .meta .button {
               margin-right:10px;
             }
             .article .meta .time {
               color:#c0c0c0;
+            }
+            .article .meta .fa.fa-heart {
+              color:#57c1b3;
+            }
+            .article .user .dropdown i {
+              color:#c0c0c0;
+              font-size:16px;
+              transition:0.2s all ease;
+            }
+            .article .user .dropdown i:hover {
+              color:#000;
+            }
+            .article .user .dropdown .menu {
+              left:auto!important;
+              right:-15px!important;
             }
           `}</style>
         </article>

@@ -2,7 +2,7 @@
 import React from 'react';
 
 // Utils
-import getPosts from '../../utils/getPosts.js'
+import { getPosts } from '../../actions/post.js'
 
 // Components
 import Loader from './loader.js'
@@ -11,9 +11,6 @@ import TimeAgo from 'timeago-react';
 import User from './user.js'
 import Link from 'next/link'
 import Avatar from 'react-avatar'
-
-
-
 
 export default class PostList extends React.Component {
    constructor(props) {

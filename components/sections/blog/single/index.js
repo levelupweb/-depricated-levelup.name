@@ -119,10 +119,15 @@ class Blog extends React.Component {
 	      			</div>
 	      		</div>
 	      	</div>
-	      	<div id="feed">
-	      	   <FlashPost defaultType="blog" />
+	      	<div className="feed">
                <div className="block">
-               	<Feed options={{blogID: blog._id}} />
+               	<Feed 
+                     flashPost={true}
+                     options={{ 
+                        blogID: blog._id, 
+                        status: ['published'] 
+                     }} 
+                  />
                </div>
 	      	</div>
 
@@ -130,16 +135,9 @@ class Blog extends React.Component {
 	      .blog .menu a {
 				margin-right:17px;
 	      }
-			.blog .header-wrapper {
-				background: #ffffff; /* Old browsers */
-				background: -moz-linear-gradient(-45deg, #ffffff 36%, #ffffff 44%, #ffffff 58%, #f3f3f3 100%); /* FF3.6-15 */
-				background: -webkit-linear-gradient(-45deg, #ffffff 36%,#ffffff 44%,#ffffff 58%,#f3f3f3 100%); /* Chrome10-25,Safari5.1-6 */
-				background: linear-gradient(135deg, #ffffff 36%,#ffffff 44%,#ffffff 58%,#f3f3f3 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f3f3f3',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-			}
 			.blog .header-wrapper > .main-content {
 				padding:70px 0px;
-				padding-top:30px;
+				padding-top:60px;
 				display:flex;
 				justify-content:center;
 				align-items:center;

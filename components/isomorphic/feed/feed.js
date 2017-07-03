@@ -8,13 +8,14 @@ import Link from 'next/link'
 import React from 'react';
 
 // Actions
-import getPosts from '../../../utils/getPosts'
+import { getPosts } from '../../../actions/post.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';
 import Item from './item.js'
 import Blank from './views/blank.js'
 import Note from './views/note.js'
+import FlashPost from '../flashPost.js'
 
 class Feed extends React.Component {
   constructor(props) {
@@ -23,74 +24,12 @@ class Feed extends React.Component {
     this.currentUser = this.props.currentUser;
     this.state = {
       page: 1,
-    	entries: [],
+    	components: [],
       isLoaded: false,
       isFull: false,
-      isFound: true
+      isFound: true,
+      isHydrating: false
     }
-  }
-
-  componentWillMount() {
-    this.getInitialState(this.props.options)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.getInitialState(nextProps.options)
-  }
-
-  getInitialState(options) {
-    var data = this.props.app.pageData;
-    if (data) {
-      if(data.post) {
-        if(data.post.length > 0) {
-          this.setState({
-            entries: data.post,
-            isLoaded: true
-          })
-        } else {
-          this.setState({
-            isFound: false
-          })
-        }
-      } else {
-      getPosts(1, {...options})
-        .then((res) => {
-          if(res.data.length > 0) {
-            this.setState({
-              entries: res.data
-            })
-          } else {
-            this.setState({
-              isFound: false
-            })
-          }
-        }).then(() => {
-          this.setState({
-            isLoaded: true
-          })
-        })
-      }
-    }
-  }
-
-  loadMore() {
-    getPosts(this.state.page + 1, {...this.props.options})
-      .then((res) => {
-        if(res.data.length > 0) {
-          this.setState({
-            entries: this.state.entries.concat(res.data)
-          })
-        } else {
-          this.setState({
-            isFull: true
-          })
-        }
-      }).then(() => {
-        this.setState({
-          isLoaded: true,
-          page: this.state.page + 1
-        })
-    })
   }
 
   componentDidMount() {
@@ -99,17 +38,59 @@ class Feed extends React.Component {
     })
   }
 
+  // Specific Methods
+
+  pushPost(post) {
+    this.setState({
+      components: [<Item article={post} key={post._id} />, ...this.state.components]
+    })
+  }
+
+  loadMore() {
+    if(!this.state.isHydrating) {
+      this.setState({
+        isHydrating: true
+      }, () => {
+        getPosts(this.state.page, {...this.props.options})
+        .then((res) => {
+          if(res.data.length > 0) {
+            this.setState({
+              components: this.state.components.concat(res.data.map((item, i) => {
+                return (<Item article={item} key={item._id} />)
+              }))
+            })
+          } else {
+            this.setState({
+              isFull: true
+            })
+          }
+        })
+        .then(() => {
+          this.setState({
+            isLoaded: true,
+            page: this.state.page + 1
+          })
+        })
+        .then(() => {
+          this.setState({
+            isHydrating: false
+          })
+        })
+      }
+      )
+    }
+  }
 
   render() {
-    var components = this.state.entries.map((item, i) => {
-      return (<Item article={item} key={i} />)
-    })
     if(this.state.isFound) {
       if(this.state.isLoaded) {
         return (
           <div className="grid">
+            {this.props.flashPost && 
+              <FlashPost onSubmit={(post) => {this.pushPost(post)}} />
+            }
             <InfiniteScroll
-              items={components}
+              items={this.state.components}
               loadMore={() => {this.loadMore()}} 
               hasMore={!this.state.isFull}
               threshold={10}

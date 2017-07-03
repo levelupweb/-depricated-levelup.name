@@ -56,6 +56,7 @@ export function updateImage(token, entryType, entryID, image) {
       data.append('image', image);
       data.append('type', entryType);
       data.append('id', entryID);
+
       return axiosAuth(token, {
         url: 'app/entries/' + entryID + '/upload',
         method: 'POST',

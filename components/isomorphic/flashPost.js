@@ -7,36 +7,29 @@ import cookies from 'js-cookie'
 import getYouTubeId from '../../utils/getYouTube.js' 
 import findURL from '../../utils/findURL.js' 
 import { UI } from '../../utils/initScripts.js'
+import randomString from '../../utils/randomString.js'
 
 // Actions
-import { postAdd } from '../../actions/post.js'
+import { setFace, setUserFaces  } from '../../actions/user.js'
 import { uploadImage } from '../../actions/app.js'
-import { getUserFaces } from '../../actions/user.js'
-import { changePostFace, 
-         savePostLocally, 
-         setPostAuthor, 
-         setPostFaces, 
-         setPost, 
-         flushPost } from '../../actions/post.js'
+import { setPostField, 
+         prepareNewPost, 
+         postAdd,
+         flushPost 
+       } from '../../actions/post.js'
 
 // Components
 import Avatar from 'react-avatar'
 import UserFaces from './userFaces.js'
 import Link from 'next/link'
 import User from './user.js'
+import SwitchFace from './switchFace.js'
 
 const defaultState = {
   isRevealed: false,
   isBlocked: false,
   isDisabled: false,
   placeholder: 'О чём бы вы хотели нам рассказать сегодня?',
-  post: {
-    postImage: null,
-    postVideo: null,
-    postLink: null,
-    postContent: '',
-    postType: 'note'
-  }
 }
 
 
@@ -49,28 +42,21 @@ class FlashPost extends React.Component {
     this.state = defaultState;
   }
 
+  // React Lifecycle
+
   componentWillMount() {
-    var postState = this.props.postState;
-    var post = postState.post;
-
-    if(this.currentUser) { 
-      this.dispatch(changePostFace('user', this.currentUser))
-      if(postState.faces == null) {
-        getUserFaces(this.currentUser._id).then((res) => {
-          this.dispatch(setPostFaces(res.data))
-        })
-      }
-      if(post.postAuthor.authorID != null) {
-        this.setState({
-          post
-        })
-      }
-    } 
-
-    if(  post.postImage 
-      || post.postVideo 
-      || post.postContent 
-      || post.postLink
+    this.dispatch(prepareNewPost(this.currentUser, 'note'))
+    .then(() => {
+      this.dispatch(setUserFaces(this.currentUser))
+      .then(() => {
+        this.dispatch(setFace(this.props.userFaces.faces[this.props.userFaces.faces.length - 1]))
+      })
+    })
+    
+    if ( this.props.postState.post.postImage 
+      || this.props.postState.post.postVideo 
+      || this.props.postState.post.postContent 
+      || this.props.postState.post.postLink
     ) {
       this.setState({
         isRevealed: true
@@ -85,38 +71,37 @@ class FlashPost extends React.Component {
       popup : $('.video.popup'), 
       on: 'click'
     })
-    $('.video.popup input').on('keydown', (e) => {
-      if(e.keyCode == 13) {
-        e.preventDefault();
-        this.setVideo(e.target.value)
-      }
+  }
+
+  // Specific Methods
+
+  publishPost(token) {
+    this.dispatch(
+      setPostField('postStatus', 'published')
+    ).then(() => {
+      this.dispatch(
+        postAdd(token, this.props.postState.post)
+      ).then((res) => {
+        if(res.data.success) {
+          this.props.onSubmit(res.data.post)
+        } else {
+          console.log('error: ', res.data)
+        }
+      })
+    }).then(() => {
+      this.dispatch(
+        flushPost()
+      )
     })
   }
 
-  componentWillUnmount() {
-    this.dispatch(
-      savePostLocally(this.state.post)
-    );
+  savePost(token, post) {
+    this.props.dispatch(
+      savePost(token, post)
+    )
   }
 
-  makePost() {
-    this.dispatch(savePostLocally(this.state.post))
-    .then(() => {
-      postAdd(this.token, this.props.postState.post)
-      .then((res) => {
-        if(res.data.success) {
-          flushPost();
-          this.setState({
-            post: defaultState.post,
-            isRevealed: false
-          })
-        } 
-      })
-    });
-  }
-
-  handleTyping(e) {
-    var value = e.target.value
+  handleTyping(value) {
     if(value.length >= 140) {
       this.setState({ isBlocked: true })
       $('.ui.form').popup({
@@ -126,109 +111,51 @@ class FlashPost extends React.Component {
     } else {
       if(findURL(value).length == 0) {
         this.setState({ 
-          isBlocked: false,
-          post: {
-            ...this.state.post,
-            postContent: value
-          }
+          isBlocked: false
         })
+        this.handleChange('postContent', value)
       } else {
-        this.setState({
-          post: {
-            ...this.state.post,
-            postLink: findURL(value)[0],
-            postContent: value
-          }
-        })
+        this.handleChange('postLink', findURL(value)[0])
+        this.handleChange('postContent', value)
       }
     }
   }
 
-  uploadImage(e) {
-    var image = e.target.files[0];
-    uploadImage(this.token, image).then((res) => {
-      this.setState({
-        placeholder: 'Добавьте подпись к загруженному изображению',
-        post: {
-          ...this.state.post,
-          postImage: res.path,
-        }
-      })
+  handleImage(token, file) {
+    uploadImage(token, file)
+    .then((image) => {
+      this.dispatch(
+        setPostField('postImage', image.path)
+      )
     })
   }
 
-  handleImage(e) {
-    this.setState({
-      isDisabled:true
-    })
-  }
-
-  setVideo(value) {
-    var id = getYouTubeId(value)
-    if (id) {
-      this.setState({
-        placeholder: 'Подпись к видеоролику',
-        post: {
-          ...this.state.post,
-          postVideo: id
-        }
-      })
-    } else {
-      this.setState({
-        errors: this.state.errors.concat(
-          ['Некорретная ссылка']
-        ),
-      })
+  setVideo(e, value) {
+    if(e.which == 13) {
+      var id = getYouTubeId(value)
+      if (id) {
+        this.handleChange('postVideo', id)
+      }
     }
   }
 
-  deleteImage() {
-    this.setState({
-      placeholder: 'О чем бы вы хотели сейчас рассказать?',
-      post: {
-        ...this.state.post,
-        postImage: null
-      }
-    })
-  }
+  // Isomorphic Methods
 
-  deleteVideo() {
-    this.setState({
-      placeholder: 'О чем бы вы хотели сейчас рассказать?',
-      post: {
-        ...this.state.post,
-        postVideo: null
-      }
-    })
+  handleChange(field, value) {
+    this.dispatch(
+      setPostField(field, value)
+    )
   }
-
-  deleteLink() {
-    this.setState({
-      placeholder: 'О чем бы вы хотели сейчас рассказать?',
-      post: {
-        ...this.state.post,
-        postLink: null
-      }
-    })
-  }
-
-  setType(type, item) {
-    this.props.dispatch(
-      changePostFace(type, item)
-    );
-  }
-
 
   render() {
     var postState = this.props.postState;
-    var post = this.state.post;    
-    var user = this.currentUser;
+    var post = this.props.postState.post;    
     if (this.currentUser.isLogged && post) {
       // Кнопка
       var button = (
         <span>
           {(!this.state.isBlocked) ? 
-          <a onClick={() => {this.makePost()}} className="medium circular ui button primary">
+          <a onClick={() => {this.publishPost(this.token, post)}} className="medium circular ui button primary">
             Опубликовать
           </a>
            : 
@@ -243,10 +170,10 @@ class FlashPost extends React.Component {
 
       // Изображение
       var image = (
-        <div>{(this.state.post.postImage) ? 
+        <div>{(post.postImage) ? 
           <div className="uploaded-image">
-            <img src={this.state.post.postImage} width="100%" />
-            <i onClick={() => {this.deleteImage()}} className="fa fa-close"></i>
+            <img src={post.postImage} width="100%" />
+            <i onClick={() => {this.handleChange('postImage', null)}} className="fa fa-close"></i>
           </div>
           :
           <div></div>
@@ -277,11 +204,11 @@ class FlashPost extends React.Component {
 
       // Ссылка
       var link = (<div>
-        {this.state.post.postLink != null &&
+        {post.postLink != null &&
           <div className="link">
             <i className="fa fa-link"></i>
-            <span><a href={this.state.post.postLink}>{this.state.post.postLink}</a></span>
-            <i className="fa fa-close" onClick={() => {this.deleteLink()}}></i>
+            <span><a href={post.postLink}>{post.postLink}</a></span>
+            <i className="fa fa-close" onClick={() => {this.handleChange('postLink', null)}}></i>
           </div>
         }
         <style jsx>{`
@@ -312,10 +239,10 @@ class FlashPost extends React.Component {
 
       var video = (
         <div>
-          {(this.state.post.postVideo) &&
+          {(post.postVideo) &&
             <div className="video">
-              <iframe width="500" height="315" src={`https://www.youtube.com/embed/${this.state.post.postVideo}`} frameBorder="0" allowFullScreen={true}></iframe>
-              <i className="fa fa-close" onClick={() => {this.deleteVideo()}}></i>
+              <iframe width="500" height="315" src={`https://www.youtube.com/embed/${post.postVideo}`} frameBorder="0" allowFullScreen={true}></iframe>
+              <i className="fa fa-close" onClick={() => {this.handleChange('postVideo', null)}}></i>
               <style jsx>{`
                 .video {
                   position:relative;
@@ -339,38 +266,17 @@ class FlashPost extends React.Component {
         </div>
       )
 
-      var symbols = 140 - this.state.post.postContent.length;
+      var symbols = 140 - post.postContent.length;
 
       return (
-        <div className={(this.state.isRevealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.setState({isRevealed: true})}}>
+        <div className={(this.state.isRevealed) ? `revealed flashpost block-item` : `flashpost block-item`} onClick={() => {this.setState({isRevealed: true})}}>
     			<form className="ui form">
     				<div className="field">
     					<div className="image user">
-                <div className="ui inline dropdown right face">                  
-                  <Avatar 
-                    color={`#46978c`} 
-                    round={true} 
-                    size={32} 
-                    src={(postState.postFace.faceImage) ? postState.postFace.faceImage : user.userImage} 
-                    name={postState.postFace.faceTitle} 
-                  />
-                  {(this.state.isRevealed) && <i className="fa fa-angle-down icon"></i> }
-                  <div className="menu left">
-                    <div className="item" onClick={() => {this.setType('user', user)}}>
-                      <Avatar color={`#46978c`} round={true} size={20} src={user.userImage} name={user.userName} />
-                      <span>{user.userName}</span>
-                    </div>
-                    {(postState.faces) &&
-                      postState.faces.map((item, i) => {
-                        return (
-                          <div onClick={() => {this.setType('blog', item)}} className="item" key={i}>
-                            <Avatar color={`#46978c`} round={true} size={20} src={item.blogImage} name={item.blogTitle} />
-                            <span>{item.blogTitle}</span>
-                          </div>
-                        )})
-                      }
-                  </div>
-                </div>
+                <SwitchFace 
+                  size="tiny"
+                  imageSize={40}
+                />
     			    </div>
               <div className="note">
                 <div>{image}</div>
@@ -379,24 +285,29 @@ class FlashPost extends React.Component {
                   <textarea 
                     disabled={this.state.isDisabled} 
                     maxLength="140" ref={(e) => {this.textarea = e}} 
-                    onChange={(e) => {this.handleTyping(e)}} 
-                    defaultValue={postState.post.postContent} 
+                    onChange={(e) => {this.handleTyping(e.target.value)}} 
                     rows="2" 
                     placeholder={this.state.placeholder} 
-                  />
+                  >{this.props.postState.post.postContent}</textarea>
     			        <div className="bar">
                     {button}
-                    {(!this.state.post.postImage && !this.state.post.postVideo) &&
-                      <span onClick={() => {this.image.click()}} className="ui button icon circular small basic"><i className="fa fa-image"></i></span>
+                    {(!post.postImage && !post.postVideo) &&
+                      <span 
+                        onClick={() => {this.image.click()}} 
+                        className="ui button icon circular small basic">
+                          <i className="fa fa-image"></i>
+                      </span>
                     }
-                    {(!this.state.post.postVideo && !this.state.post.postImage) &&
+                    {(!post.postVideo && !post.postImage) &&
                       <span>
-                        <span onClick={() => {$('.video.button').popup({popup : $('.video.popup'), on: 'click'})}} className="ui button video icon circular small basic"><i className="fa fa-video-camera"></i></span>
+                        <span className="ui button video icon circular small basic">
+                            <i className="fa fa-video-camera"></i>
+                        </span>
                         <div className="popup video ui">
                           <input 
-                            ref={(e) => {this.video = e}} 
                             type="text" 
                             placeholder="Ссылка на видео с YouTube" 
+                            onKeyDown={(e) => {this.setVideo(e, e.target.value)}}
                           />
                         </div>
                       </span>
@@ -411,7 +322,7 @@ class FlashPost extends React.Component {
                 <div>{link}</div>
               </div>
               <input 
-                onChange={(e) => {this.uploadImage(e)}} 
+                onChange={(e) => {this.handleImage(this.token, e.target.files[0])}} 
                 type="file" 
                 className="ui hidden" 
                 ref={(e) => {this.image = e}} 
@@ -428,16 +339,11 @@ class FlashPost extends React.Component {
             .textarea {
               position:relative;
             }
-            .flashpost {
-              background:#fff;
-              border-bottom:1px solid rgba(0,0,0,0.07);
-              box-shadow:0px 11px 20px 0px rgba(0, 0, 0, 0.03)
-            }
             .flashpost .image {
               position: absolute;
               left:0px;
               top:50%;
-              margin-top:-20px;
+              margin-top:-16px;
               display:flex;
               justify-content:center;
               align-items:center;
@@ -449,7 +355,7 @@ class FlashPost extends React.Component {
               height:36px;
               font-size:16px;
               overflow:hidden;
-              padding-left:48px;
+              padding-left:52px;
               transition: 0.2s all ease;
               resize: none;
             }
@@ -500,7 +406,7 @@ class FlashPost extends React.Component {
               z-index:999;
             }
             .flashpost {
-              padding:6px 30px;
+              padding:6px 17px;
             }
             .flashpost textarea:focus {
               background:transparent;

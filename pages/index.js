@@ -7,9 +7,9 @@ import Router from 'next/router'
 import NProgress from 'nprogress'
 import config from '../app.config.js'
 import HOC from '../components/HOC.js'
+import cookies from 'js-cookie'
 
 // For Page
-import FlashPost from '../components/isomorphic/flashPost.js'
 import Feed from '../components/isomorphic/feed/feed.js'
 
 // Router with Progress Bar
@@ -17,13 +17,14 @@ Router.onRouteChangeStart = (url) => NProgress.start()
 Router.onRouteChangeComplete = () => NProgress.done()
 Router.onRouteChangeError = () => NProgress.done()
 
+
 class Page extends React.Component {
   constructor(props) {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <Feed options={{perPage: 10}} />,
-      beforeChildren : <FlashPost />,
+      child: <Feed flashPost={true} options={{status: ['published']}} />,
+      beforeChildren : null,
       afterChildren : null
     }
   }
@@ -35,14 +36,5 @@ class Page extends React.Component {
   }
 }
 
-const query = {
-  posts: {
-    type: 'post',
-    single: false,
-    url: config.API + 'post/entries/personal',
-    custom: true
-  }
-}
-
-const Component = HOC(Page, 'index', query);
+const Component = HOC(Page, 'index');
 export default withRedux(initStore, (state) => state)(Component)

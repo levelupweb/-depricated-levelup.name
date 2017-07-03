@@ -105,16 +105,12 @@ class Blog extends React.Component {
 								<div className="sub header">{(blog.blogDescription) ? blog.blogDescription : `Подписчиков: ${blog.blogSubscribersCount}`}</div>
 							</h4>
 						</div>
-						<div className="updates">
-							+1
-						</div>
 						<style jsx>{`
 							.item {
 								border-bottom:1px solid rgba(255,255,255,0.2);
 								display:flex;
 								align-items:center;
 								flex-direction:row;
-
 								overflow:hidden;
 								max-width:100%;
 							}

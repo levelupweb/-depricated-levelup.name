@@ -66,13 +66,13 @@ class UserBar extends React.Component {
       var currentUser = this.props.user.profile || {};
       return (
         <div>
-          <div className="userbar block block-shadow">
+          <div className="userbar block">
             <div className="user block-vertical">
               <div className="image">
                 <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
                   <Avatar color={`#eee`} fgColor={`#eee`} round={true} size={95} src={user.userImage} name={user.userName} />
                 </a></Link>
-                <div onClick={() => {this.fileUploader.click()}} data-position="bottom left" data-tooltip="Загрузить изображение" data-inverted="" className={(user.userImage) ? 'edit' : 'edit visible'}>
+                <div onClick={() => {this.fileUploader.click()}} data-position="left center" data-tooltip="Загрузить изображение" data-inverted="" className={(user.userImage) ? 'edit' : 'edit visible'}>
                   <i className="fa fa-user" aria-hidden="true"></i>
                   <input onChange={(e) => {this.handleUpload(e)}} type="file" ref={(file) => {this.fileUploader = file}} className="ui hidden" />
                 </div>
@@ -85,7 +85,7 @@ class UserBar extends React.Component {
                   field="userDescription"
                   title="Должность/профессия"
                   size="normal"
-                  align="left"
+                  align="center"
                 />
                 <EditableInput 
                   value={user.userName} 
@@ -94,7 +94,7 @@ class UserBar extends React.Component {
                   field="userName"
                   title="Полное имя пользователя"
                   size="large"
-                  align="left"
+                  align="center"
                 />
                 <div className="actions">
                   {this.currentUser &&
@@ -126,6 +126,9 @@ class UserBar extends React.Component {
           </div>
           <Statistic userID={this.state.user._id} />
         	<style jsx>{`
+            .userbar.block-shadow {
+              border:0px;
+            }
             .form-blog .form {
               width:100%;
             }
@@ -134,10 +137,16 @@ class UserBar extends React.Component {
               padding-top:0px;
             }
             .userbar {
-              box-shadow:0px 11px 20px 0px rgba(0, 0, 0, 0.03)
+              border-bottom:1px solid #eee;
+              padding:50px 30px;
+              text-align:center;
             }
             .userbar .user {
               padding:0px;
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              justify-content:center;
             }
             .header {
               display:flex;

@@ -22,7 +22,7 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <Editor post={this.props.app.pageData.post} />,
+      child: <Editor defaultPost={this.props.app.pageData.post} />,
       beforeChildren : null,
       afterChildren : null
     }

@@ -12,7 +12,7 @@ a {
 }
 
 body {
-	background:#fafafa;
+	background:#fff;
 }
 
 .hidden,
@@ -108,10 +108,11 @@ form .field input:focus {
 .main {
 	position:absolute;
 	left:310px;
-	top:0px;
-	-webkit-box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34);
+	top:68px;
+	/* -webkit-box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34);
 	-moz-box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34);
-	box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34);
+	box-shadow: 0px 0px 44px -16px rgba(0,0,0,0.34); */
+	border-right:1px solid #eee;
 	width:668px;
 	min-height:100%;
 	background:#fff;
@@ -126,6 +127,7 @@ form .field input:focus {
 .main .inner {
 	min-height:100vh;
 }
+
 
 .main .inner {
 	position: relative;
@@ -147,8 +149,8 @@ form .field input:focus {
 	padding:15px;
 }
 
-#feed .block {
-	padding:23px 15px;
+.feed > .block {
+	padding:15px
 }
 
 .main h1.header {
@@ -166,6 +168,10 @@ form .field input:focus {
 	padding:23px 30px;
 }
 
+.blocks {
+	padding:15px;
+}
+
 .block-border-bottom {
 	border-bottom:1px solid rgba(0,0,0,0.07);
 }
@@ -173,6 +179,11 @@ form .field input:focus {
 .block-vertical {
 	padding:18px 0px;
 }
+
+.block .block-vertical:first-child {
+	padding-top:0px;
+}
+
 
 .block-horizontal {
 	padding:0px 30px;
@@ -182,6 +193,30 @@ form .field input:focus {
 	-webkit-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.9);
 	-moz-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.9);
 	box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.9);
+	border:1px solid #eee;
+}
+.block-item {
+	padding: 15px 19px;
+   background: #fff;
+   margin-bottom:15px;
+   border: 1px solid rgba(34, 36, 38, 0.1);
+ 	box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.1);
+ 	border-radius: 0.28571429rem;
+}
+.block-section {
+	border-bottom:1px solid #eee;
+	padding-bottom:10px;
+	margin-bottom:10px;
+}
+.block-section h4.ui.header {
+	margin-top:5px!important;
+	margin-bottom:5px!important;
+}
+
+.block-section:last-child {
+	margin-bottom:0px;
+	padding-bottom:0px;
+	border-bottom:0px;
 }
 
 .header-wrapper .menu.left {
@@ -231,91 +266,10 @@ form .field input:focus {
 	align-items:center;
 }
 
-.sidebar-block .header {
-margin-top:0px;
+.sidebar > .user > .sb-avatar > img {
+	min-width:40px;
 }
 
-.sidebar-block {
-	margin-top:0px;
-}
-
-.sidebar-block .title {
-	border-bottom:1px solid rgba(0,0,0,0.1);
-	padding-bottom:10px;
-	margin-bottom:10px;
-}
-
-.sidebar-block .title small {
-	font-weight:300;
-}
-
-.sidebar {
-	width:310px;
-	height:100%;
-	position: fixed!important;
-	left:0px;
-	top:0px;
-}
-
-.sidebar a {
-	color:#fff!important;
-}
-
-.sidebar .sub.header {
-	color:#c0c0c0!important;
-}
-
-
-.sidebar .profile .menu {
-	display:none;
-	position: absolute;
-	top:100%;
-	left:0px;
-	width:100%;
-	background:#fff;
-	-webkit-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.75);
-	-moz-box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.75);
-	box-shadow: 0px 0px 32px -16px rgba(0,0,0,0.75);
-	margin:0px!important;
-	z-index:10;
-}
-
-.sidebar .profile .name {
-	color:#fff
-}
-
-.sidebar .profile .description {
-	color:#c0c0c0!important;
-}
-
-.sidebar .dimmer .menu {
-	width:100%;
-}
-
-.sidebar .dimmer .profile {
-	background:transparent;
-	margin-left:5px;
-}
-
-.sidebar .dimmer .menu a {
-	color:#fff;
-	text-align:left;
-	background: rgba(255,255,255,0.1)!important;
-}
-
-.sidebar .dimmer .menu a i {
-	margin-right:6px;
-	opacity:0.4;
-}
-
-.sidebar .dimmer .menu a:hover {
-	color:#fafafa!important;
-	background: rgba(255,255,255,0.02)!important;
-}
-
-.tag-list {
-
-}
 
 .tag-list .tag {
 	display:inline-block;
@@ -332,21 +286,6 @@ margin-top:0px;
 .grid-sizer {
 	width:50%;
 }
-
-
-.article {
-	margin-bottom:15px;
-	border-bottom:1px solid rgba(0,0,0,0.1);
-	padding-bottom:15px;
-	text-align:left;
-}
-
-.article:last-child {
-	margin-bottom:0px;
-	padding-bottom:0px;
-	border-bottom:0px;
-}
-
 .article.hided {
 	opacity:0px;
 	display:none;
@@ -399,11 +338,6 @@ margin-top:0px;
 	width:90%;
 }
 
-.article > .content {
-	margin:15px 0px;
-	text-align:left;
-}
-
 .article .content h1 {
 	margin-bottom:5px;
 }
@@ -447,13 +381,6 @@ margin-top:0px;
 	padding:0px 20px;
 }
 
-
-/* Full Article Page Single */
-.article .bar .tags a {
-    margin-right:10px;
-    color:#fff;
-}
-
 .header-background-img img {
     width:100%;
     opacity:0.2;
@@ -470,11 +397,10 @@ margin-top:0px;
 }
 
 .dot.divider {
-	margin-top: 52px;
-    margin-bottom: 42px;
-    display: block;
-    border: 0;
-    text-align: center;
+	height:50px;
+   display: block;
+   text-align: center;
+   border:0px!important;
 }
 
 .dot.divider:before {
@@ -496,19 +422,7 @@ margin-top:0px;
 /* EDITOR CUSTOM QUILL STYLES */
 
 .ql-toolbar.ql-snow {
-	position: absolute;
-    right: 20px;
-    padding:0px!important;
-    top: 20px;
-    display: flex;
-    flex-direction: column;
-    z-index:999;
-}
-
-.ql-toolbar.ql-snow .ql-formats {
-	display:flex;
-	flex-direction:column;
-	border-bottom:1px solid rgba(0,0,0,0.2);
+	padding:0px!important;
 }
 
 .ql-toolbar.ql-snow button {
@@ -516,6 +430,10 @@ margin-top:0px;
 	padding:8px!important;
 	width:auto!important;
 	height:auto!important;
+}
+.ql-toolbar.ql-snow button:first-child {
+	margin-left:0px!important;
+	padding-left:0px!important;
 }
 
 .ql-toolbar.ql-snow button svg {
@@ -536,6 +454,11 @@ margin-top:0px;
 }
 
 .ql-editor::-webkit-scrollbar { width: 0 !important }
+
+.ql-container.ql-snow {
+	margin:15px 0px;
+	height:50vh;
+}
 
 .advert {
 	position: fixed;
@@ -559,42 +482,43 @@ margin-top:0px;
     margin-left:15px!important;
 }
 
-  .blank {
-    background:#f3f3f3;
-    border-radius: 4px;
-  }
 
-  .blank.avatar {
-    width:40px;
-    height:40px;
-    border-radius:100%;
-  }
+.blank {
+ background:#f3f3f3;
+ border-radius: 4px;
+}
 
-  .blank.string {
-    width:200px;
-    height:15px;
-    background:#eee;
-    margin:3px 0px;
-  }
+.blank.avatar {
+ width:40px;
+ height:40px;
+ border-radius:100%;
+}
 
-  .blank.image {
-    width:100%;
-    height:220px;
-    margin:20px 0px;
-  }
+.blank.string {
+ width:200px;
+ height:15px;
+ background:#eee;
+ margin:3px 0px;
+}
 
-  .blank.header {
-    width:80%;
-    height:35px;
-    margin:10px 0px;
-    background:#eee;
-  }
+.blank.image {
+ width:100%;
+ height:220px;
+ margin:20px 0px;
+}
 
-  .blank.description {
-    width:100%;
-    height:10px;
-    margin-top:10px;
-  }
+.blank.header {
+ width:80%;
+ height:35px;
+ margin:10px 0px;
+ background:#eee;
+}
+
+.blank.description {
+ width:100%;
+ height:10px;
+ margin-top:10px;
+}
 
 
 .serach .results > div:first-child {
@@ -612,3 +536,8 @@ margin-top:0px;
 	top:0px;
 	height:100%;
 }
+
+.bil-svg-container {
+	min-height:300px;
+}
+
