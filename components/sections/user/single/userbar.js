@@ -363,6 +363,7 @@ class UserBlog extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+   
     this.getBlog(nextProps.userID).then(() => {
       this.setState({ isLoaded: true })
     })
@@ -550,5 +551,8 @@ class Blank extends React.Component {
   }
 }
 
+function mapStateToProps(state) {
+  return { currentUser: state.currentUser }
+}
 
-export default connect(state => state)(UserBar)
+export default connect(mapStateToProps)(UserBar)

@@ -51,3 +51,13 @@ export async function removeTagById(id) {
 }
 
 
+
+export function findTag(query) {   
+    return axiosNoAuth({
+      url: 'search/entries/tags',
+      method: 'GET',
+      params: {
+        query: query
+      }
+    })
+}

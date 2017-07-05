@@ -15,7 +15,6 @@ import declOfNum from '../../../utils/declarationOfNum.js'
 
 // Components
 import TagsList from '../../isomorphic/tagsList.js'
-import Avatar from 'react-avatar'
 import TimeAgo from 'timeago-react';
 import User from '../../isomorphic/user'
 import Blog from '../../isomorphic/blog'
@@ -76,71 +75,77 @@ class Post extends React.Component {
     var blog = this.state.blog;
     if(post && (user || blog)) {
       return (
-        <article className="article single">
-          <div className="user block">
-            {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
-          </div>
-        	<div className="image block-horizontal">
-              <BlurImageLoader src={post.postImage}
-                preview={"http://localhost:3001/storage/tiny.jpg"} 
-                fullCover={true}
-                maxBlurLevel={10}
-                transitionTime={400}
-              />
-          </div>
-          <div className="title block">
-            <h1 className="ui header">
-              {post.postTitle}
-            </h1>
-            <p className="primary">
-              {post.postDescription}
-            </p>
-            <div className="tags">
-              {post.postTags.map((item, i) => {
-                return <Link key={i} href={{ pathname: 'search', query: { query: item }}}><a className="ui label">
-                  {item}
-                </a></Link>
-              })}
+        <div className="wrapper">
+          <article className="article single">
+            <div className="user block">
+              {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
             </div>
-          </div>
-          <div className="ui divider dot"></div>
-          <div className="content block-horizontal" 
-            dangerouslySetInnerHTML={{__html: post.postContent}}>
-          </div>
-          <div className="block-border-bottom">
+          	<div className="image block-horizontal">
+                <BlurImageLoader src={post.postImage}
+                  preview={"http://localhost:3001/storage/tiny.jpg"} 
+                  fullCover={true}
+                  maxBlurLevel={10}
+                  transitionTime={400}
+                />
+            </div>
+            <div className="title block">
+              <h1 className="ui header">
+                {post.postTitle}
+              </h1>
+              <p className="primary">
+                {post.postDescription}
+              </p>
+              <div className="tags">
+                {post.postTags.map((item, i) => {
+                  return <Link key={i} href={{ pathname: 'search', query: { query: item }}}><a className="ui label">
+                    {item}
+                  </a></Link>
+                })}
+              </div>
+            </div>
             <div className="ui divider dot"></div>
-          </div>
-          <div className="user block block-border-bottom">
-            {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
-            <SubscribeButton 
-              additionalClasses="small" 
-              entryType="user"
-              entryID={user ? user._id : blog._id} 
-              subscribeText="Подписаться" 
-              unsubscribeText="Отписаться" 
-            />
-          </div>
-          <div className="comments-wrapper block block-border-bottom">
-            <Comments 
-              postID={post._id}
-              isRevealed={true}
-              isSingle={true}
-            />
-          </div>
-          <div className="related block">
-            <p className="primary">
-              Возможно вам это будет интересно
-            </p>
-          </div>
+            <div className="content block-horizontal" 
+              dangerouslySetInnerHTML={{__html: post.postContent}}>
+            </div>
+            <div className="block-border-bottom">
+              <div className="ui divider dot"></div>
+            </div>
+            <div className="user block block-border-bottom">
+              {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
+              <SubscribeButton 
+                additionalClasses="small" 
+                entryType="user"
+                entryID={user ? user._id : blog._id} 
+                subscribeText="Подписаться" 
+                unsubscribeText="Отписаться" 
+              />
+            </div>
+            <div className="comments-wrapper block block-border-bottom">
+              <Comments 
+                postID={post._id}
+                isRevealed={true}
+                isSingle={true}
+              />
+            </div>
+            <div className="related block">
+              <p className="primary">
+                Возможно вам это будет интересно
+              </p>
+            </div>
 
-          <Actions 
-            likeCount={post.postLikes.length}
-            commentCount={post.postCommentsCount}
-            isLiked={post.liked}
-            currentUser={this.currentUser}
-            post={post}
-          />
+            <Actions 
+              likeCount={post.postLikes.length}
+              commentCount={post.postCommentsCount}
+              isLiked={post.liked}
+              currentUser={this.currentUser}
+              post={post}
+            />
+          </article>
           <style jsx>{`
+            .wrapper {
+              background:#fff;
+              border-right:1px solid #eee;
+            }
             .article {
               margin:0px!important;
               border:0px!important;
@@ -186,7 +191,7 @@ class Post extends React.Component {
               justify-content:space-between;
             }            
           `}</style>
-        </article>
+        </div>
       );
     } else {
       return <div></div>

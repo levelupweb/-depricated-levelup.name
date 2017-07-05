@@ -339,6 +339,9 @@ class FlashPost extends React.Component {
             .textarea {
               position:relative;
             }
+            .flashpost {
+              margin-bottom:15px;
+            }
             .flashpost .image {
               position: absolute;
               left:0px;

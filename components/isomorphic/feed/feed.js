@@ -38,6 +38,10 @@ class Feed extends React.Component {
     })
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log(this.state)
+  }
+
   // Specific Methods
 
   pushPost(post) {
@@ -113,4 +117,10 @@ class Feed extends React.Component {
   }
 }
 
-export default connect((store) => store)(Feed)
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(Feed)

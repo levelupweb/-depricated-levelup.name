@@ -141,5 +141,13 @@ class Faces extends React.Component {
    }
 }
 
+function mapStateToProps(state) {
+  return { 
+  	currentUser: state.currentUser,
+  	userFaces: state.userFaces
+  }
+}
 
-export default connect((store) => store)(SwitchFace)
+
+
+export default connect(mapStateToProps)(SwitchFace)

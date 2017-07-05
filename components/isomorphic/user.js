@@ -12,7 +12,7 @@ import Loader from './loader'
 import Link from 'next/link'
 
 
-export class User extends React.Component {
+class User extends React.Component {
 
   constructor(props) {
     super(props);
@@ -25,7 +25,6 @@ export class User extends React.Component {
   componentWillMount() {
     this.getUser(this.props.id)
   }
-
 
   componentWillReceiveProps(nextProps) {
     this.getUser(nextProps.id)
@@ -182,6 +181,9 @@ export class Blank extends React.Component {
 }
 
 
+function mapStateToProps(state) {
+  return { user: state.currentUser }
+}
 
 
-export default connect((store) => store)(User)
+export default connect(mapStateToProps)(User)

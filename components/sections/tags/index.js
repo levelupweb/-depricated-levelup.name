@@ -4,18 +4,20 @@ import { connect } from 'react-redux'
 import cookies from 'js-cookie'
 
 // Actions
-import { getTags, subscribeToTag, getTagSubscribers } from '../../../actions/tag.js'
+import { getTags, subscribeToTag, getTagSubscribers, findTag } from '../../../actions/tag.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';
 import SubscribeButton from '../../isomorphic/subscribeButton.js'
 import Loader from '../../isomorphic/loader.js'
 import TimeAgo from 'timeago-react';
+import Link from 'next/link'
 
 class Tags extends React.Component {
   constructor(props) {
     super(props);    
     this.state = {
+      isHydrating: false,
     	entries: [],
     	loaded: false,
       isFull: false,
@@ -65,6 +67,27 @@ class Tags extends React.Component {
     })
   }
 
+  search(query) {
+    return findTag(query).then((res) => {
+      this.setState({
+        entries: res.data.tags
+      })
+    })
+    .then(() => {
+      this.setState({
+        isHydrating: false
+      })
+    })
+  }
+
+  handleTyping(query) {
+    this.setState({
+      isHydrating: true
+    }, () => {
+      this.search(query)
+    })
+  }
+
   render() {
     var tags = this.state.entries.map((item, i) => {
       return <Tag tag={item} key={i} />
@@ -72,15 +95,33 @@ class Tags extends React.Component {
 
   	if(this.state.loaded) {
 	    return (
-	      <div>
-          <InfiniteScroll
-            items={tags}
-            loadMore={() => {this.loadMore()}} 
-            hasMore={!this.state.isFull}
-            threshold={10}
-            elementIsScrollable={false}
-            className="tags grid ui"
-          />
+	      <div className="blocks">
+          <div className="block-item">
+            <h2 className="ui header">Темы <small>все темы сайта</small></h2>
+          </div>
+          <div className="block-item">
+            <div className="search">
+              <div className="ui form">
+                <div className="field">
+                  <input 
+                    onChange={(e) => {this.handleTyping(e.target.value)}}
+                    type="text" 
+                    placeholder="Введите запрос для поиска.."
+                  />
+                </div>
+             </div>
+            </div>
+          </div>
+          <div className="block-item">
+            <InfiniteScroll
+              items={tags}
+              loadMore={() => {this.loadMore()}} 
+              hasMore={!this.state.isFull}
+              threshold={10}
+              elementIsScrollable={false}
+              className="tags grid ui"
+            />
+          </div>
         </div>
 	    )
 	} else {
@@ -99,7 +140,7 @@ class Tag extends React.Component {
     var tag = this.props.tag;
     var subscribersCount = tag.tagSubscribersCount;
     return (
-      <div className={(subscribersCount > 1) ? `sixteen wide column` : `eight wide column`}>
+      <div className={(subscribersCount > 10 && tag.tagDescription) ? `sixteen wide column` : `eight wide column`}>
         <div className="tag">
           <div className="info">
             <span>{subscribersCount} подписчиков</span>
@@ -108,9 +149,11 @@ class Tag extends React.Component {
             <img src={tag.tagImage} />
           </div>
           <div className="content">
-            <a className="header">{tag.tagTitle}</a>
+            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
+              <a className="header">{tag.tagTitle}</a>
+            </Link>
             <div className="meta">
-              <p>{(tag.tagDescription) ? tag.tagDescription : `У этого тега пока нет описания`}</p>
+              <p>{(tag.tagDescription) && tag.tagDescription}</p>
             </div>
           </div>
           <div className="action">
@@ -119,6 +162,7 @@ class Tag extends React.Component {
             unsubscribeText="Отписаться"
             entryType="tag"
             entryID={tag._id}
+            additionalClasses="small"
           />
           </div>
         </div>

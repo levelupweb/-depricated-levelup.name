@@ -47,7 +47,7 @@ class Component extends React.Component {
             <Header />
             <div className="after-header">
               {module.beforeChildren}
-              <Content module={module}>{module.child}</Content>
+              {module.child}
               {module.afterChildren}
             </div>
           </div>
@@ -58,42 +58,6 @@ class Component extends React.Component {
   }
 }
 
-
-var Content = (props) => {
-  var content;
-  switch(props.module.slug) {
-    case 'user': case 'post': case 'blog':
-    content = (
-      <div>
-        <Title title={props.module.moduleShowTitle} />
-        {props.children}
-      </div>
-    )
-    break;
-    default: 
-    content = (
-      <div className="block">
-        <Title title={props.module.moduleShowTitle} />
-        {props.children}
-      </div>
-    )
-    break;
-  }
-  return content
-}
-
-var Title = (props) => {
-  if(props.title) {
-    return (
-      <h1 className="ui header">
-        {module.moduleTitle}
-        <div className="sub header">{module.moduleDescription}</div>
-      </h1>
-    )
-  } else {
-    return null
-  }
-}
 
 
 var Banner = (props) => {

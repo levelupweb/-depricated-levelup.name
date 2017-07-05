@@ -632,4 +632,10 @@ var Blank = () => {
 	)
 }
 
-export default connect((store) => store)(Note)
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(Note)

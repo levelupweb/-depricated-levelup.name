@@ -38,5 +38,10 @@ class Item extends React.Component {
   }
 }
 
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
 
-export default connect((store) => store)(Item)
+export default connect(mapStateToProps)(Item)

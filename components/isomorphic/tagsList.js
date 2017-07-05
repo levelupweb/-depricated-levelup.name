@@ -61,7 +61,7 @@ export default class TagsList extends React.Component {
       if(this.state.tags.length == 0) {
         return (
           <div className="no-content">
-            <p>Список пуст</p>
+            <p><i className="fa fa-ellipsis-h"></i></p>
           </div>
         )
       } else {
@@ -147,14 +147,40 @@ class Tag extends React.Component {
         </div>
       );
     } else {
-      return (
-        <div className="tag">
-          <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
-            <a>{tag.tagTitle}</a>
-          </Link>
-          
-        </div>
-      );
+      if(this.props.size == 'menu') {
+        return (
+          <div className="tag">
+            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
+              <a className="header">{tag.tagTitle}</a>
+            </Link>
+            <style jsx>{`
+              .tag {
+                width: 100%;
+                position:relative;
+                background:#fafafa;
+                margin-top:5px;
+                display:inline-block;
+                width:auto!important;
+                padding:3px 6px;
+                font-size:13px;
+                border-radius:5px;
+              }
+              .tag a {
+                color:#000;
+              }
+            `}</style>
+          </div>
+        );
+      } else {
+        return (
+          <div className="tag">
+            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
+              <a>{tag.tagTitle}</a>
+            </Link>
+            
+          </div>
+        );
+      }
     }
   }
 }

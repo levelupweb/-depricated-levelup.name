@@ -22,18 +22,14 @@ class User extends React.Component {
 
   componentWillMount() {
     this.getInitialState(
-      this.props.app.pageData.user
+      this.props.pageData.user
     )
   }
 
   componentWillReceiveProps(nextProps) {
     this.getInitialState(
-      nextProps.app.pageData.user
+      nextProps.pageData.user
     )
-  }
-
-  componentDidMount() {
-    createTabs('.tabs-menu a')
   }
 
   getInitialState(user) {
@@ -76,16 +72,8 @@ class User extends React.Component {
   }
 }
 
-function createTabs(selector) {
-  UI()
-  $(selector).click(function(event) {
-      event.preventDefault();
-      $(this).parent().addClass("current");
-      $(this).parent().siblings().removeClass("current");
-      var tab = $(this).attr("href");
-      $(".tab-content").not(tab).addClass('hidden');
-      $(tab).removeClass('hidden');
-  });
+function mapStateToProps(state) {
+  return { pageData: state.app.pageData }
 }
 
-export default connect(state => state)(User)
+export default connect(mapStateToProps)(User)

@@ -188,3 +188,14 @@ export function removePostById(id) {
 		method: 'GET'
     })
 }
+
+
+export function findPost(query) {   
+    return axiosNoAuth({
+      url: 'search/entries/posts',
+      method: 'GET',
+      params: {
+        query: query
+      }
+    })
+}

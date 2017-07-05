@@ -104,14 +104,15 @@ class Post extends React.Component {
 		                <Avatar color={`#46978c`} round={true} size={32} src={post.postImage} name={post.postTitle} />
 		            </a></Link>
 		            <div className="content">
-						<h4 className="ui header">
-							<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-								<a>{post.postTitle}</a>
-							</Link>
-							<div className="sub header">{(post.postDescription) ? post.postDescription : `Подписчиков: ${post.postSubscribersCount}`}</div>
-						</h4>
+							<h4 className="ui header">
+								<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+									<a>{post.postTitle}</a>
+								</Link>
+								<div className="sub header">
+									<TimeAgo datetime={post.updated} locale='ru' />
+								</div>
+							</h4>
 						</div>
-						<div className="updates">+1</div>
 						<style jsx>{`
 							.item {
 								margin:10px 0px;
@@ -132,6 +133,12 @@ class Post extends React.Component {
 								max-width:100%;
 								overflow:hidden;
 								position:relative;
+							}
+							.item .header .sub span {
+								margin-right:10px;
+							}
+							.item .header .sub span i {
+								color:#c0c0c0;
 							}
 							.item:before {
 								background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6-15 */
@@ -164,26 +171,15 @@ class Post extends React.Component {
 			} else {
 				return (
 	      	<article className="article">
-		      	<div className="ui grid">
-		      		<div className="four wide column">
-		      			<div className="image">
-							<img src={post.postImage} className="rounded ui image fluid" />
+	  				<div className="content">
+		 				<div className="meta">
+		 					<span><TimeAgo datetime={post.updated} locale='ru' /></span>
 						</div>
-		      		</div>
-		  				<div className="twelve wide column">
-			  				<div className="content">
-				 				<div className="meta">
-				 					<span><TimeAgo datetime={post.updated} locale='ru' /></span>
-									<span><a><i className="fa fa-comment-o"></i> 23</a></span>
-								   <span><a><i className="fa fa-heart-o"></i> 15</a></span>
-								</div>
-				 				<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-									<a><h3>{post.postTitle}</h3></a>
-								</Link>
-								<p className="primary">{post.postDescription}</p>
-							</div>
-		  				</div>
-		      	</div>
+		 				<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+							<a><h3>{post.postTitle}</h3></a>
+						</Link>
+						<p className="primary">{post.postDescription}</p>
+					</div>
 					<style jsx>{`
 						.article p.primary {
 							font-size:15px;

@@ -22,6 +22,7 @@ exports.uploadImage = uploadImage;
 exports.getUserStats = getUserStats;
 exports.setFace = setFace;
 exports.setUserFaces = setUserFaces;
+exports.findUser = findUser;
 
 var _promise = require('babel-runtime/core-js/promise');
 
@@ -188,4 +189,14 @@ function setUserFaces(user) {
 			dispatch(setFaces(res.data.concat(user)));
 		});
 	};
+}
+
+function findUser(query) {
+	return (0, _axiosAuth.axiosNoAuth)({
+		url: 'search/entries/users',
+		method: 'GET',
+		params: {
+			query: query
+		}
+	});
 }

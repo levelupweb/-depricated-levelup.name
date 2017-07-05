@@ -65,7 +65,7 @@ class SubscribeButton extends React.Component {
       	)
   	} else {
 	    return (
-			<a onClick={() => {this.handleSubscription(this.token, this.props.entryType, this.props.entryID)}} className={`button circular ui ${this.props.additionalClasses}`}>
+			<a onClick={() => {this.handleSubscription(this.token, this.props.entryType, this.props.entryID)}} className={`button default circular ui ${this.props.additionalClasses}`}>
 				    {(this.props.unsubscribeText) ? this.props.unsubscribeText : 'Отписаться от автора'}
 			</a>	
 	    )

@@ -18,7 +18,7 @@ import Loader from '../../loader.js'
 var BlurImageLoader = dynamic(import('react-blur-image-loader'))
 
 
-export default class Default extends React.Component {
+class Default extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token')
@@ -169,3 +169,11 @@ export default class Default extends React.Component {
     }
   }
 }
+
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(Default)

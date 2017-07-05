@@ -24,6 +24,14 @@ class SearchContainer extends React.Component {
   		return this.state.results
   	}
 
+  	componentWillMount() {
+  		this.setState({
+  			isHydrating: true
+  		}, () => {
+  			this.search(this.props.app.query.query)
+  		})
+  	}
+
   	componentWillReceiveProps(nextProps) {
   		this.setState({
   			isHydrating: true
@@ -59,33 +67,25 @@ class SearchContainer extends React.Component {
 
   	render() {
     	return (
-	    <div className="search-wrapper">
-	    	<div className="search">
+	    <div className="search-wrapper blocks">
+	    	<div className="search block-item">
 	    		<div className="ui form">
 		    		<div className="field">
-			    		<input className="block-shadow" ref={(e) => {this.searcher = e}} defaultValue={this.state.query} onChange={e => this.handleTyping(e)} type="text" name="searchQuery" placeholder="Что ищем?" />
+			    		<input 
+			    			ref={(e) => {this.searcher = e}} 
+			    			defaultValue={this.state.query}
+			    			onChange={e => this.handleTyping(e)} 
+			    			type="text" 
+			    			placeholder="Введите запрос для поиска.."
+			    		/>
 			    	</div>
 			   </div>
 	    	</div>
-    		<div className="block-vertical">
+    		<div>
     			{!this.state.isHydrating ? 
     				<Results results={this.state.results} /> : <Loader />
     			}
 		   </div>
-		   <style jsx>{`
-				.search .form input {
-					border-radius:999em!important;
-					background:#333!important;
-					color:#fff!important;
-					transition:0.2s all ease;
-					font-size:20px!important;
-				}
-				.search .form input:focus {
-					background:#fff!important;
-					color:#000!important;
-					border-color:#46978c!important;
-				}
-		   `}</style>
 	    </div>
     	);
   	}
@@ -97,10 +97,21 @@ var Results = (props) => {
 		|| props.results.blogs.length > 0
 		|| props.results.posts.length > 0) {
 			return (
-				<div>
+				<div className="">
+					{props.results.posts.length > 0 && 
+						<div className="posts block-item">
+						   <div className="results">
+						    	<h2 className="ui header">
+						    		Посты
+						    		<div className="sub header">Все посты по вашему запросу</div>
+						    	</h2>
+						    	<PostList size="block" posts={props.results.posts} /> 
+						   </div>
+						</div>
+					}
+					
 					{props.results.users.length > 0 && 
-						<div className="users">
-						   <div className="ui divider"></div>
+						<div className="users block-item">
 						   <div className="results">
 						    	<h2 className="ui header">
 						    		Юзеры
@@ -111,8 +122,7 @@ var Results = (props) => {
 						</div>
 					}
 					{props.results.blogs.length > 0 && 
-						<div className="blogs">
-						   <div className="ui divider"></div>
+						<div className="blogs block-item">
 						   <div className="results">
 						    	<h2 className="ui header">
 						    		Блоги
@@ -122,28 +132,17 @@ var Results = (props) => {
 						   </div>
 						</div>
 					}
-					{props.results.posts.length > 0 && 
-						<div className="posts">
-						   <div className="ui divider"></div>
-						   <div className="results">
-						    	<h2 className="ui header">
-						    		Посты
-						    		<div className="sub header">Все посты по вашему запросу</div>
-						    	</h2>
-						    	<PostList size="block" posts={props.results.posts} /> 
-						   </div>
-						</div>
-					}
+					
 				</div>
 			)
 		} else {
 			return (
-				<div>К сожалению, ничего не нашлось. Попробуйте ещё!</div>
+				<div className="block-item">К сожалению, ничего не нашлось. Попробуйте ещё!</div>
 			)	
 		}
 	} else {
 		return (
-			<div>Начните вводить ключевое слово</div>
+			<div className="block-item">Начните вводить ключевое слово</div>
 		)
 	}
 }

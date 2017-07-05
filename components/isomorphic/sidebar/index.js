@@ -3,6 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 import cookies from 'js-cookie'
 import router from 'next/router'
+import config from '../../../app.config.js'
 
 // Utils 
 import { UI } from '../../../utils/initScripts.js'
@@ -32,37 +33,125 @@ class Sidebar extends React.Component {
       <div className="sidebar">
       	{!this.currentUser.isLogged ? 
       		<div>
-      			<div className="block profile simple">
-      				<Link href="/auth"><a><i className="fa fa-lock"></i> Авторизация</a></Link>
-      			</div>
-      			<div className="block sidebar-block">
-	      			<div className="title">
-	      				<h3 className="ui header">
-							Темы <small>популярные</small>
-						</h3>
-					</div>
-					<div className="block-content">
-		      			<TagsList />
-		      		</div>
-      			</div>
-      		</div>
+      			<div className="blocks">
+      				<div className="block-item full">
+	      				<div className="promo inverted">
+	      					<img className="ui image rounded" src={config.frontend + 'background-white.png'} width="100%" />
+	      					<div className="content">
+	      						<h2>Будь частью чего-то бо́льшего</h2>
+	      						<p>Зарегиструйся и получи возможность делиться с миром своими публикациями, постами и прочим контентом</p>
+	      						<a href="#" className="button ui basic">Узнать больше</a>
+	      					</div>
+	      				</div>
+	      			</div>
+	      			<div className="block-item">
+      					<h4 className="ui header">
+								Меню
+								<small>навигация</small>
+							</h4>
+							<div className="ui vertical text menu">
+								<Link href="/authors"><a className="item">
+							   	Авторы
+							  	</a></Link>
+							  	<Link href="/blogs"><a className="item">
+							    	Блоги
+							  	</a></Link>
+							  	<Link href="/tags"><a className="item">
+							    	Темы
+							  	</a></Link>
+							</div>
+	      			</div>
+      				<div className="block-item">
+      					<h4 className="ui header">
+								Вопросы?
+								<small>у нас есть ответ!</small>
+							</h4>
+							<div className="ui vertical text menu">
+								<a className="item">
+							   	О проекте
+							  	</a>
+							  	<a className="item">
+							    	Регистрация
+							  	</a>
+							  	<a className="item">
+							    	Рекламодателям
+							  	</a>
+							</div>
+	      			</div>
+      				<div className="block-item">
+		      			<h4 className="ui header">
+								Темы <small>популярные</small>
+							</h4>
+							<TagsList size="menu" />
+						</div>
+		      	</div>
+		      </div>
       		: // Если залогинен пользователь 
       		<div>
-	      		<div className="block">
-						<div>
+	      		<div className="blocks">
+	      			<div className="block-item">
+      					<h4 className="ui header">
+								Меню
+								<small>навигация</small>
+							</h4>
+							<div className="ui vertical text menu">
+								<Link href="/authors"><a className="item">
+							   	<i className="fa fa-user-o" aria-hidden="true"></i> Искать авторов
+							  	</a></Link>
+							  	<Link href="/blogs"><a className="item">
+							    	<i className="fa fa-bookmark-o" aria-hidden="true"></i> Искать блоги
+							  	</a></Link>
+							  	<Link href="/tags"><a className="item">
+							    	<i className="fa fa-bolt" aria-hidden="true"></i> Искать темы
+							  	</a></Link>
+							</div>
+	      			</div>
+	      			<div className="block-item">
+							<div className="ui vertical text menu">
+							  <a className="item">
+							    Как писать статьи
+							  </a>
+							  <a className="item">
+							    Как разместить рекламу
+							  </a>
+							  <a className="item">
+							    Что тут надо делать?
+							  </a>
+							</div>
+	      			</div>
+	      			<div className="block-item full">
+	      				<div className="promo">
+	      					<img className="ui image rounded" src={config.frontend + 'background-orange.png'} width="100%" />
+	      					<div className="content">
+	      						<h2>Исследуй!</h2>
+	      						<p>Начни искать интересное для себя. Подпишись на тематические блоги и интересных авторов</p>
+	      						<a href="#" className="button ui basic default inverted">Начать</a>
+	      					</div>
+	      				</div>
+	      			</div>
+						<div className="block-item">
 							<div className="block-section">
-								<h4 className="ui header">Авторы</h4>
+								<h4 className="ui header">
+									Авторы
+									<small>, на которые вы подписаны</small>
+								</h4>
 								<UserList subscriber={this.currentUser._id} />
 							</div>
 							
 							<div className="block-section">
-								<h4 className="ui header">Блоги</h4>
+								<h4 className="ui header">
+									Блоги
+									<small>, на которые вы подписаны</small>
+								</h4>
 								<BlogList subscriber={this.currentUser._id} />
 							</div>
 							
 							<div className="block-section">
-								<h4 className="ui header">Темы</h4>
-								<TagsList subscriber={this.currentUser._id} />
+								<h4 className="ui header">
+									Темы
+									<small>, на которые вы подписаны</small>
+								</h4>
+								<TagsList size="menu" subscriber={this.currentUser._id} />
 							</div>
 						</div>
 						{/* <div className="footer">
@@ -98,6 +187,34 @@ class Sidebar extends React.Component {
 					left:0px;
 					top:68px;
 					border-right:1px solid #eee;
+					background:#fff;
+					padding-bottom:60px;
+				}
+				.sidebar .block {
+					padding:15px;
+				}
+				.sidebar .promo {
+					border-radius:4px;
+					position: relative;
+				}
+				.sidebar .promo .content {
+					position: absolute;
+					left:0px;
+					top:0px;
+					width:100%;
+					height:100%;
+					display:flex;
+					justify-content:center;
+					align-items:center;
+					flex-direction:column;
+					text-align:center;
+					padding:15px;
+				}
+				.sidebar .promo .content > * {
+					color:#fff;
+				}
+				.sidebar .promo.inverted .content > * {
+					color:#333;
 				}
 				.sidebar::-webkit-scrollbar {
 					display:none;
@@ -107,6 +224,9 @@ class Sidebar extends React.Component {
 				}
 				.sidebar .blocks {
 					padding-bottom:70px;
+				}
+				.sidebar .block-section {
+					position:relative;
 				}
 		    `}</style>  
 		</div>

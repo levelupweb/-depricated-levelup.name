@@ -156,3 +156,13 @@ export function setUserFaces(user) {
 	   })
 	}
 }
+
+export function findUser(query) {   
+    return axiosNoAuth({
+      url: 'search/entries/users',
+      method: 'GET',
+      params: {
+        query: query
+      }
+    })
+}

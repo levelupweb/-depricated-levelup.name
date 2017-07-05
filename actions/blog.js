@@ -48,3 +48,13 @@ export function getBlogById(blogID) {
 		method: 'GET'
     })
 }
+
+export function findBlog(query) {   
+    return axiosNoAuth({
+      url: 'search/entries/blogs',
+      method: 'GET',
+      params: {
+        query: query
+      }
+    })
+}

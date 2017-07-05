@@ -23,7 +23,7 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <Feed flashPost={true} options={{status: ['published']}} />,
+      child: <div className="blocks"><Feed flashPost={true} options={{status: ['published']}} /></div>,
       beforeChildren : null,
       afterChildren : null
     }

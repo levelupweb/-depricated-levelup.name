@@ -105,4 +105,10 @@ class Comments extends React.Component {
 	}
 }
 
-export default connect((store) => store)(Comments)
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(Comments)

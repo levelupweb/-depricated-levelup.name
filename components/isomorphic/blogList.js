@@ -60,7 +60,7 @@ export default class BlogList extends React.Component {
   	  if(this.state.blogs.length == 0) {
 	      return (
 	        <div className="no-content">
-	          <p>Список пуст</p>
+	          <p><i className="fa fa-ellipsis-h"></i></p>
 	        </div>
 	      )
 	   } else {
@@ -169,7 +169,7 @@ class Blog extends React.Component {
 				          <SubscribeButton 
 					          subscribeText="Подписаться" 
 					          unsubscribeText="Отписаться" 
-					          additionalClasses="basic small" 
+					          additionalClasses="small" 
 					          entryType="blog"
 					          entryID={blog._id}
 					          />
@@ -183,7 +183,7 @@ class Blog extends React.Component {
 			          align-items:center;
 			          width:100%;
 			          border-bottom:1px solid #eee;
-			          padding:0px!important;
+			          padding-bottom:8px;
 						 margin:0px!important;
 						 margin-bottom:8px!important;
 			        }
@@ -201,7 +201,7 @@ class Blog extends React.Component {
 			          font-weight:bold;
 			        }
 			        .item .content .subscribers {
-			          font-size:15px;
+			          font-size:13px;
 			          font-weight:100;
 			          color:#c0c0c0;
 			          margin-left:10px;
