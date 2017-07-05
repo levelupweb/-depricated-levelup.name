@@ -113,14 +113,16 @@ export function createPost(token, post) {
 		if(post.postTitle == null) {
 			post.postTitle = 'Безымянный';
 		}
-		axiosAuth(token, {
+		return axiosAuth(token, {
 			url: 'post/add',
 			method: 'POST',
 			data: post
 	   }).then((res) => {
 	   	dispatch(setPost(res.data.post))
-	   }).then(() => {
+	   	return res.data.post._id
+	   }).then((id) => {
 	   	dispatch(displayStatus('Сохранено в черновиках'))
+	   	return id
 	   })
 	}
 }

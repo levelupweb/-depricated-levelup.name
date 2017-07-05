@@ -37,14 +37,17 @@ class Component extends React.Component {
   render() {
     var module = this.state;
     var className = (module.moduleShowSidebar) ? module.moduleClassName + ' main' : module.moduleClassName + ' full main'
+
     return (
       <div className="module-wrapper">
         {module.moduleShowSidebar &&
           <Sidebar />
         }
-        <div className={className}>
+        <div className={(module.moduleShowHeader) ? `${className}` : `${className} no-header`}>
           <div className="inner">
-            <Header />
+            {module.moduleShowHeader && 
+              <Header />
+            }
             <div className="after-header">
               {module.beforeChildren}
               {module.child}

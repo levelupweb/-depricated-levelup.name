@@ -46,13 +46,6 @@ class FlashPost extends React.Component {
 
   componentWillMount() {
     this.dispatch(prepareNewPost(this.currentUser, 'note'))
-    .then(() => {
-      this.dispatch(setUserFaces(this.currentUser))
-      .then(() => {
-        this.dispatch(setFace(this.props.userFaces.faces[this.props.userFaces.faces.length - 1]))
-      })
-    })
-    
     if ( this.props.postState.post.postImage 
       || this.props.postState.post.postVideo 
       || this.props.postState.post.postContent 
@@ -66,7 +59,6 @@ class FlashPost extends React.Component {
 
   componentDidMount() {
     UI()
-    $('.ui.dropdown').dropdown();
     $('.video.button').popup({
       popup : $('.video.popup'), 
       on: 'click'

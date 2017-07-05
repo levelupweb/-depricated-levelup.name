@@ -9,31 +9,16 @@ import { UI } from '../../../utils/initScripts.js'
 // Components
 import Avatar from 'react-avatar'
 import SwitchFace from '../../isomorphic/switchFace.js'
+import Link from 'next/link'
 
 // Actions
 import { setPostField, displayStatus, savePost, pushTag, pullTag } from '../../../actions/post.js'
 import { updateImage } from '../../../actions/app.js'
-import { setUserFaces, setFace } from '../../../actions/user.js'
 
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token');
-  }
-
-  // React Lifecycle
-
-  componentWillMount() {
-    this.props.dispatch(setUserFaces(this.props.user))
-    .then(() => {
-      this.props.dispatch(setFace(this.props.userFaces.faces[0]))
-    })
-  }
-
-  componentDidMount() {
-    UI()
-    $('.ui.dropdown')
-    .dropdown();
   }
 
   // Isomorphic Methods
@@ -65,42 +50,36 @@ class Sidebar extends React.Component {
   render() {
     var user = this.props.user;
     var post = this.props.post;
-    var face = this.props.userFaces.current;
-    var faces = this.props.userFaces.faces;
     return (
-      <div className="sidebar block">
-   		  <div className="profile block-vertical ui inverted dropdown ui">
-          <SwitchFace
-            imageSize={55}
-          />
+      <div className="sidebar blocks">
+   		  <div className="block-item switch">
+          <SwitchFace imageSize={55} defaultFace={this.props.postState.post.postAuthor.authorID} />
         </div>
-        <div className="block-vertical">
-          <div className="ui vertical labeled icon buttons fluid">
-            <a onClick={() => {this.publishPost(this.token)}} className="small labeled icon fluid ui button black">
-              <i className="fa fa-plane icon"></i>
-              Опубликовать
+        <div className="block-item">
+          <h4 className="ui header">
+            Меню
+            <small>навигация</small>
+          </h4>
+          <div className="ui vertical text menu">
+            <a className="item" onClick={() => {this.publishPost(this.token)}}>
+              <i className="fa fa-plane" aria-hidden="true"></i> Опубликовать
             </a>
-          </div>
-          <div className="divider ui"></div>
-          <div className="ui vertical labeled icon buttons fluid">
-            <a onClick={() => {this.savePost(this.token)}} className="small labeled icon fluid ui button black">
-              <i className="fa fa-save icon"></i>
-              Сохранить
+            <a className="item" onClick={() => {this.savePost(this.token)}}>
+              <i className="fa fa-save" aria-hidden="true"></i> Сохранить
             </a>
-            <a onClick={() => {this.savePost(this.token)}} className="small labeled icon fluid ui button black">
-              <i className="fa fa-eye icon"></i>
-              Предпросмотр
-            </a>
+            <Link href={{ pathname: 'post', query: { slug: this.props.postState.post.slug }}}><a className="item">
+              <i className="fa fa-eye" aria-hidden="true"></i> Предпросмотр
+            </a></Link>
           </div>
         </div>
-        <div className="block-vertical">
+        <div className="block-item">
           <Image 
             url={post.postImage}
             post={this.props.postState.post}
             dispatch={this.props.dispatch}
           />
         </div>
-        <div className="block-vertical">
+        <div className="block-item">
           <Tags 
             tags={this.props.postState.post.postTags}
             dispatch={this.props.dispatch}
@@ -109,8 +88,25 @@ class Sidebar extends React.Component {
 
      	<style jsx>{`
   			.sidebar {
-  				background:#222;
-  			}
+          overflow-y:scroll;
+          width:310px;
+          height:100%;
+          position: fixed!important;
+          left:0px;
+          top:68px;
+          border-right:1px solid #eee;
+          background:#fff;
+          padding-bottom:60px;
+        }
+        .sidebar::-webkit-scrollbar {
+          display:none;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+          display:none;
+        }
+        .switch {
+          padding-top:0px;
+        }
         .sidebar .block-vertical {
           border-bottom:1px solid rgba(255,255,255,0.1)
         }
@@ -140,7 +136,8 @@ class Tags extends React.Component {
     super(props);
     this.state = {
       temp: '',
-      isRevealed: false
+      isRevealed: false,
+      isBlocked: false
     }
   }
 
@@ -163,11 +160,12 @@ class Tags extends React.Component {
     }
   }
 
-
   pushTag(tag) {
-    this.props.dispatch(
-      pushTag(tag)
-    )
+    if(this.props.tags.length <= 5) {
+      this.props.dispatch(
+        pushTag(tag)
+      )
+    } 
   }
 
   pullTag(tag) {
@@ -180,7 +178,7 @@ class Tags extends React.Component {
     if(this.state.isRevealed) {
       return (
         <div>
-          <h3 className="ui header inverted">
+          <h3 className="ui header">
             Теги 
             {this.props.tags.length == 0 ?
              <small>Список пуст</small> 
@@ -188,7 +186,7 @@ class Tags extends React.Component {
              <small>Осталось {5 - this.props.tags.length}</small>
            }
           </h3>
-          <div className="ui form inverted">
+          <div className="ui form">
             <div className="field">
               <input 
                 ref={(e) => {this.input = e}}
@@ -196,6 +194,7 @@ class Tags extends React.Component {
                 onKeyPress={(e) => {this.handleTyping(e)}}
                 placeholder="Введите тэг" 
                 id="inputTag"
+                disabled={(this.props.tags.length >= 5) ? true : false}
               />
             </div>
           </div>
@@ -209,8 +208,13 @@ class Tags extends React.Component {
           </div>
           <style jsx>{`
             .tags .tag i {
-              color:#fff;
+              cursor:pointer;
+              opacity:0.2;
               margin-left:5px;
+              transition:0.2s all ease;
+            }
+            .tags .tag i:hover {
+              opacity:1;
             }
             .tags h3 {
               display:block;
@@ -224,14 +228,20 @@ class Tags extends React.Component {
               margin-top:15px;
             }
             .tags .tag {
-              margin-right:7px;
-              color:#fff;
-              font-size:14px;
-              line-height:30px;
+              background:#fafafa;
+              margin-top:5px;
+              display:inline-block;
+              width:auto!important;
+              padding:3px 6px;
+              font-size:13px;
+              border-radius:5px;
             }
             .form .field input {
-              background:#333!important;
-              color:#fff!important;
+              border:0px;
+              padding-left:0px;
+              padding-right:0px;
+              outline:none;
+              border-bottom:1px solid #eee;
             }
           `}</style>
         </div>
@@ -239,10 +249,10 @@ class Tags extends React.Component {
     } else {
       return (
         <div className="tags">
-          <h3 className="ui header inverted">
+          <h4 className="ui header">
             Теги <small>добавьте до 5 тегов, чтобы люди могли найти ваш пост</small>
-          </h3>
-          <a onClick={() => {this.setState({isRevealed: true})}} className="large icon ui button black small add">
+          </h4>
+          <a onClick={() => {this.setState({isRevealed: true})}} className="large icon ui button default small">
             <i className="fa fa-plus icon"></i>
           </a>
         </div>
@@ -315,10 +325,10 @@ class Image extends React.Component {
     } else {
       return (
         <div className="image">
-          <h3 className="ui header inverted">
+          <h4 className="ui header">
             Изображение <small>добавьте изображение, чтобы получить больше внимания к посту</small>
-          </h3>
-          <a className="large icon ui button black small" onClick={() => {this.image.click()}}>
+          </h4>
+          <a className="large icon ui button default small" onClick={() => {this.image.click()}}>
             <i className="fa fa-plus icon"></i>
           </a>
           <input ref={(e) => {this.image = e}} onChange={(e) => {this.handleImage(e.target.files[0])}} type="file" className="ui hidden" />

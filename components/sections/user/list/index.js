@@ -35,7 +35,7 @@ class Blogs extends React.Component {
   search(query) {
     return findUser(query).then((res) => {
       this.setState({
-        entries: res.data.blogs
+        entries: res.data.users
       })
     })
     .then(() => {
@@ -76,7 +76,7 @@ class Blogs extends React.Component {
           <div className="block-item">
             {!this.state.isHydrating ? 
               (this.state.entries.length > 0) ?
-                <UserList blogs={this.state.entries} size="block" />
+                <UserList users={this.state.entries} size="block" />
                 : 
                 <p>Ничего не найдено..</p>
               :

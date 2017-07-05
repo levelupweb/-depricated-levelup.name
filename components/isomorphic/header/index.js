@@ -66,6 +66,10 @@ class Header extends React.Component {
 					box-shadow:0px 1px 2px 0 rgba(34, 36, 38, 0.15);
 					border-bottom:1px solid #eee;
 					padding: 10px 20px;
+					min-height:65px;
+					display:flex;
+					flex-direction:row;
+					align-items:center;
 			 	}
 			 	.header .menu {
 			 		display:flex;

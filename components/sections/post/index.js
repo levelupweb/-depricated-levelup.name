@@ -76,19 +76,21 @@ class Post extends React.Component {
     if(post && (user || blog)) {
       return (
         <div className="wrapper">
-          <article className="article single">
-            <div className="user block">
+          <article className="article single blocks">
+            <div className="user block-item">
               {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
             </div>
-          	<div className="image block-horizontal">
+            {post.postImage && 
+            	<div className="image block-item">
                 <BlurImageLoader src={post.postImage}
                   preview={"http://localhost:3001/storage/tiny.jpg"} 
                   fullCover={true}
                   maxBlurLevel={10}
                   transitionTime={400}
                 />
-            </div>
-            <div className="title block">
+              </div>
+            }
+            <div className="title block-item">
               <h1 className="ui header">
                 {post.postTitle}
               </h1>
@@ -104,13 +106,13 @@ class Post extends React.Component {
               </div>
             </div>
             <div className="ui divider dot"></div>
-            <div className="content block-horizontal" 
+            <div className="content block-item" 
               dangerouslySetInnerHTML={{__html: post.postContent}}>
             </div>
             <div className="block-border-bottom">
               <div className="ui divider dot"></div>
             </div>
-            <div className="user block block-border-bottom">
+            <div className="user block-item">
               {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
               <SubscribeButton 
                 additionalClasses="small" 
@@ -120,14 +122,14 @@ class Post extends React.Component {
                 unsubscribeText="Отписаться" 
               />
             </div>
-            <div className="comments-wrapper block block-border-bottom">
+            <div className="comments-wrapper block-item">
               <Comments 
                 postID={post._id}
                 isRevealed={true}
                 isSingle={true}
               />
             </div>
-            <div className="related block">
+            <div className="related block-item">
               <p className="primary">
                 Возможно вам это будет интересно
               </p>

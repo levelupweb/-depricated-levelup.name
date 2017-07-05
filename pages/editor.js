@@ -38,7 +38,8 @@ class Page extends React.Component {
 const query = {
   editor: {
     type: 'post',
-    single: true
+    single: true,
+    by: 'id'
   }
 }
 

@@ -70,7 +70,7 @@ class Default extends React.Component {
               <div className="ui dropdown">
                 <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
                 <div className="menu">
-                  <Link href={{ pathname: 'editor', query: { slug: post.slug }}}>
+                  <Link href={{ pathname: 'editor', query: { id: post._id }}}>
                     <div className="item">Редактировать</div>
                   </Link>
                   <div className="item" onClick={() => {console.log('*modal')}}>Пожаловаться</div>

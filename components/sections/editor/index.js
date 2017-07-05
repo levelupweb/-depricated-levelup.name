@@ -2,6 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import cookies from 'js-cookie'
+import router from 'next/router'
 
 // Actions
 import { 
@@ -30,12 +31,16 @@ class Editor extends React.Component {
   // React Lifecycle
 
   componentWillMount() {
-   	if(this.props.defaultPost) {
+   	if(this.props.defaultPost._id) {
    		this.dispatch(setPost(this.props.defaultPost))
    	} else {
    		this.dispatch(prepareNewPost(this.currentUser, 'post'))
       .then(() => {
-        this.dispatch(createPost(this.token, this.props.postState.post))
+        this.dispatch(createPost(this.token, this.props.postState.post)).then((id) => {
+          router.replace('/editor?id=' + id, 
+            '/editor?id=' + id, 
+            { shallow: true })
+        })
       })
    	}
   }
@@ -55,14 +60,16 @@ class Editor extends React.Component {
    // Specific Methods
 
   handleSlug(value) {
-   	if(value.length < 35) { 
-	   	this.dispatch(
-	   		setPostField('slug', createSlug(value))
-	   	) 
-	  }
+   	this.dispatch(
+   		setPostField('slug', createSlug(value.slice(0, 35)))
+   	) 
+    this.dispatch(
+      setPostField('postTitle', value)
+    )
   }
 
   render() {
+    console.log(this.props.postState.post.slug)
     var postState = this.props.postState;
 	  return (
       <div className="module-wrapper">
@@ -75,7 +82,6 @@ class Editor extends React.Component {
           		<div className="header block-vertical block-border-bottom">
              		<Header
              			onChange={(field, value) => {
-             				this.handleChange(field, value);
              				this.handleSlug(value);
              			}}
                   value={this.props.postState.post.postTitle}
@@ -120,10 +126,9 @@ class Header extends React.Component {
       <div className="header">
       	<div className="title"> 
         		<input 
-        			onChange={(e) => {this.props.onChange('postTitle', e.target.value)}} 
+        			onInput={(e) => {this.props.onChange('postTitle', e.target.value)}} 
         			type="text" 
         			placeholder="Заголовок вашего поста" 
-              defaultValue={this.props.value || ''}
               value={this.props.value || ''}
         		/>
       	</div>
@@ -179,9 +184,8 @@ class Description extends React.Component {
       <div className="description">
 	      <textarea 
 	      	maxLength="140" 
-	      	onChange={(e) => {this.props.onChange(e.target.value)}} 
+	      	onInput={(e) => {this.props.onChange(e.target.value)}} 
 	      	placeholder="Описание к вашему посту"
-          defaultValue={this.props.value || ''}
           value={this.props.value || ''}
         ></textarea>
 	      <style jsx>{`
@@ -200,6 +204,13 @@ class Description extends React.Component {
 }
 
 
+function mapStateToProps(state) {
+  return { 
+    postState: state.postState,
+    currentUser: state.currentUser
+  }
+}
 
-export default connect((state) => state)(Editor)
+
+export default connect(mapStateToProps)(Editor)
 

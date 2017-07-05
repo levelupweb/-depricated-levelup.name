@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { UI } from '../../utils/initScripts.js'
 
 // Actions
-import { setFace } from '../../actions/user.js'
+import { setFace, setUserFaces } from '../../actions/user.js'
 import Avatar from 'react-avatar'
 
 class SwitchFace extends React.Component {
@@ -17,8 +17,24 @@ class SwitchFace extends React.Component {
 	   this.imageSize = 32;
    }
 
-   render() {
+   componentWillMount() {
+    	this.dispatch(setUserFaces(this.props.currentUser))
+    	.then(() => {
+    		var id = this.props.defaultFace ? this.props.defaultFace : this.props.currentUser._id
+ 			var face = this.props.userFaces.faces.filter((obj) => {
+			  return obj._id == id;
+			});
+    		this.dispatch(setFace(face[0]))
+    	})
+  	}
 
+  	componentDidMount() {
+	   UI()
+	   $('.ui.dropdown')
+	   .dropdown();
+	}
+
+   render() {
    	var face = this.props.userFaces.current, 
 	   	 faces = this.props.userFaces.faces;
 	  	if (face) {

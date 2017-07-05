@@ -112,6 +112,7 @@ class User extends React.Component {
 								display:flex;
 								align-items:center;
 								flex-direction:row;
+								margin:5px 0px;
 							}
 							.item:last-child {
 								border-bottom:0px;

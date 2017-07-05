@@ -29,12 +29,20 @@ async function prepareData(builder, query) {
     var data = {}
     var queries = await Object.values(builder)
     await Promise.all(queries.map(async (item) => {
-      var slug = (item.single) ? query.slug : ``;
+      var value = item.single ? query[item.by] || query.slug : ``;
       if(item.custom) {
         var url = item.type + '/' + item.url
       } else {
         if(!item.options) {
-          var url = item.type + `/entries/` + encodeURI(slug)
+          if(value) {
+            if(item.by) {
+              var url = item.type + `/entries/` + encodeURI(value) + `/by` + item.by
+            } else {
+              var url = item.type + `/entries/` + encodeURI(value)
+            }
+          } else {
+            var url = item.type + `/entries/`
+          }
         } else {
           var url = item.type + `/entries?` + queryString.stringify(item.options)
         }

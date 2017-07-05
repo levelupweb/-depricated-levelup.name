@@ -51,13 +51,13 @@ class Sidebar extends React.Component {
 							</h4>
 							<div className="ui vertical text menu">
 								<Link href="/authors"><a className="item">
-							   	Авторы
+							   	<i className="fa fa-user-o" aria-hidden="true"></i> Искать авторов
 							  	</a></Link>
 							  	<Link href="/blogs"><a className="item">
-							    	Блоги
+							    	<i className="fa fa-bookmark-o" aria-hidden="true"></i> Искать блоги
 							  	</a></Link>
 							  	<Link href="/tags"><a className="item">
-							    	Темы
+							    	<i className="fa fa-bolt" aria-hidden="true"></i> Искать темы
 							  	</a></Link>
 							</div>
 	      			</div>
