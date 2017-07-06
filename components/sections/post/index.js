@@ -73,7 +73,6 @@ class Post extends React.Component {
     var user = this.state.user;
     var post = this.state.post;
     var blog = this.state.blog;
-    console.log(post)
     if(post && (user || blog)) {
       return (
         <div className="wrapper">
