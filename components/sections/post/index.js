@@ -73,6 +73,7 @@ class Post extends React.Component {
     var user = this.state.user;
     var post = this.state.post;
     var blog = this.state.blog;
+    console.log(post)
     if(post && (user || blog)) {
       return (
         <div className="wrapper">
@@ -124,6 +125,7 @@ class Post extends React.Component {
             </div>
             <div className="comments-wrapper block-item">
               <Comments 
+                comments={post.postComments}
                 postID={post._id}
                 isRevealed={true}
                 isSingle={true}

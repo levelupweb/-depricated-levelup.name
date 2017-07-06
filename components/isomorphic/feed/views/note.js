@@ -217,6 +217,7 @@ class Note extends React.Component {
 			      </div>
 			      <div className="comments">
 			      	<Comments 
+			      		comments={post.postComments}
 			      		postID={post._id}
 			      		isRevealed={this.state.isCommentsRevealed}
 			      	/>

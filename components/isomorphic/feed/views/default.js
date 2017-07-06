@@ -105,7 +105,7 @@ class Default extends React.Component {
               </span>
               <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
                 <a className="item">
-                  <i className="fa fa-comment-o icon"></i> {comments} Комментариев
+                  <i className="fa fa-comment-o icon"></i> {post.postComments.length} Комментариев
                 </a>
               </Link>
               <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
