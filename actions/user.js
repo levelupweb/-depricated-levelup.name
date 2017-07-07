@@ -1,6 +1,7 @@
 import axios from 'axios'
 import config from '../app.config.js'
 import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
+import cookies from 'js-cookie'
 
 export function authenticateUser(token) {
 	return (dispatch) => {
@@ -21,6 +22,68 @@ export function authenticateUser(token) {
 		}
 	}
 }
+
+export function signIn(data) {
+	return (dispatch) => {
+	   return axiosNoAuth({
+		   url: config.API + 'user/signin',
+		   method: 'POST',
+		   data: data
+		}).then((res) => {
+			if(res.data.success) {
+				// Записываем пользователя
+				dispatch(setUser(res.data.user))
+			} 
+			return res
+		}).then((res) => {
+			if(res.data.token && res.data.success) {
+				// Записываем токен
+				cookies.set(
+					'x-access-token', 
+					res.data.token, 
+					{ expires: 7, path: '' }
+				);
+				// Возвращаем пользователя и сообщение
+				return {
+					success: true,
+					message: res.data.message,
+					user: res.data.user
+				}
+			} else {
+				// Возвращаем ошибку
+				return {
+					success: false,
+					message: res.data.message
+				}
+			}
+		})
+	}
+}
+
+export function signUp(data) {
+	return (dispatch) => {
+	   return axiosNoAuth({
+		   url: config.API + 'user/signup',
+		   method: 'POST',
+		   data: data
+		}).then((res) => {
+			if(res.data.success) {
+				return {
+					success: true,
+					message: res.data.message
+				}
+			} else {
+				// Возвращаем ошибку
+				return {
+					success: false,
+					message: res.data.message,
+					errors: res.data.errors
+				}
+			}
+		})
+	}
+}
+
 
 export function setUser(user) {
 	return (dispatch) => {

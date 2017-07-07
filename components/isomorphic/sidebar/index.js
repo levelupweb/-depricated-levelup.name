@@ -24,14 +24,13 @@ class Sidebar extends React.Component {
    constructor(props) {
     	super(props);
     	this.dispatch = this.props.dispatch;
-    	this.currentUser = this.props.currentUser
-    	this.service = new AuthService(this.props.dispatch)
    }
 
    render() {
+   	var currentUser = this.props.currentUser;
     	return (
       <div className="sidebar">
-      	{!this.currentUser.isLogged ? 
+      	{!currentUser.isLogged ? 
       		<div>
       			<div className="blocks">
       				<div className="block-item full">
@@ -135,7 +134,7 @@ class Sidebar extends React.Component {
 									Авторы
 									<small>, на которые вы подписаны</small>
 								</h4>
-								<UserList subscriber={this.currentUser._id} />
+								<UserList subscriber={currentUser._id} />
 							</div>
 							
 							<div className="block-section">
@@ -143,7 +142,7 @@ class Sidebar extends React.Component {
 									Блоги
 									<small>, на которые вы подписаны</small>
 								</h4>
-								<BlogList subscriber={this.currentUser._id} />
+								<BlogList subscriber={currentUser._id} />
 							</div>
 							
 							<div className="block-section">
@@ -151,7 +150,7 @@ class Sidebar extends React.Component {
 									Темы
 									<small>, на которые вы подписаны</small>
 								</h4>
-								<TagsList size="menu" subscriber={this.currentUser._id} />
+								<TagsList size="menu" subscriber={currentUser._id} />
 							</div>
 						</div>
 						{/* <div className="footer">
@@ -234,4 +233,9 @@ class Sidebar extends React.Component {
   }
 }
 
-export default connect((store) => store)(Sidebar)
+function mapStateToProps(state) {
+  return { currentUser: state.currentUser }
+}
+
+
+export default connect(mapStateToProps)(Sidebar)

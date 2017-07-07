@@ -22,24 +22,37 @@ class Default extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token')
-    this.post = this.props.post;
-    this.currentUser = this.props.currentUser
     this.state = {
       isLiked: false,
       likeCounter: 0
     }
   }
 
+  // React LifeCycle
+
   componentWillMount() {
-    if(this.currentUser) {
-      if(this.post.postLikes.indexOf(this.currentUser._id) != -1) {
-       this.setState({
-         isLiked: true,
-         likeCounter: this.post.postLikes.length
-       })
-     }
+    if(this.props.currentUser) {
+      if(this.props.post.postLikes.indexOf(this.props.currentUser._id) != -1) {
+        this.setState({
+          isLiked: true,
+          likeCounter: this.props.post.postLikes.length
+        })
+      }
     }
   }
+
+  componentWillReceiveProps(nextProps) {  
+    if(nextProps.currentUser) {
+      if(nextProps.post.postLikes.indexOf(nextProps.currentUser._id) != -1) {
+        this.setState({
+          isLiked: true,
+          likeCounter: nextProps.post.postLikes.length
+        })
+      }
+    }
+  }
+
+  // Specific Methods
 
   handleLike(token, postID, userID) {
     setLikeById(token, postID).then((res) => {
@@ -54,7 +67,7 @@ class Default extends React.Component {
   }
 
   render() {
-    var post = this.post
+    var post = this.props.post
     if (post) {
       var comments = post.postCommentsCount;
       var likes = this.state.likeCounter;

@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.authenticateUser = authenticateUser;
+exports.signIn = signIn;
+exports.signUp = signUp;
 exports.setUser = setUser;
 exports.getLogout = getLogout;
 exports.getAllUsers = getAllUsers;
@@ -38,6 +40,10 @@ var _appConfig2 = _interopRequireDefault(_appConfig);
 
 var _axiosAuth = require('../utils/axiosAuth.js');
 
+var _jsCookie = require('js-cookie');
+
+var _jsCookie2 = _interopRequireDefault(_jsCookie);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function authenticateUser(token) {
@@ -57,6 +63,63 @@ function authenticateUser(token) {
 			dispatch({ type: 'LOGIN_FAILURE' });
 			return false;
 		}
+	};
+}
+
+function signIn(data) {
+	return function (dispatch) {
+		return (0, _axiosAuth.axiosNoAuth)({
+			url: _appConfig2.default.API + 'user/signin',
+			method: 'POST',
+			data: data
+		}).then(function (res) {
+			if (res.data.success) {
+				// Записываем пользователя
+				dispatch(setUser(res.data.user));
+			}
+			return res;
+		}).then(function (res) {
+			if (res.data.token && res.data.success) {
+				// Записываем токен
+				_jsCookie2.default.set('x-access-token', res.data.token, { expires: 7, path: '' });
+				// Возвращаем пользователя и сообщение
+				return {
+					success: true,
+					message: res.data.message,
+					user: res.data.user
+				};
+			} else {
+				// Возвращаем ошибку
+				return {
+					success: false,
+					message: res.data.message
+				};
+			}
+		});
+	};
+}
+
+function signUp(data) {
+	return function (dispatch) {
+		return (0, _axiosAuth.axiosNoAuth)({
+			url: _appConfig2.default.API + 'user/signup',
+			method: 'POST',
+			data: data
+		}).then(function (res) {
+			if (res.data.success) {
+				return {
+					success: true,
+					message: res.data.message
+				};
+			} else {
+				// Возвращаем ошибку
+				return {
+					success: false,
+					message: res.data.message,
+					errors: res.data.errors
+				};
+			}
+		});
 	};
 }
 

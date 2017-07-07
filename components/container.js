@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 
 // Components
 import Header from './isomorphic/header/index.js'
-import SimpleHeader from './isomorphic/header/simple.js'
 import Sidebar from './isomorphic/sidebar/index.js'
 
 class Container extends React.Component {

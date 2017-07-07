@@ -21,7 +21,6 @@ class Feed extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token')
-    this.currentUser = this.props.currentUser;
     this.state = {
       page: 1,
     	components: [],
@@ -36,10 +35,6 @@ class Feed extends React.Component {
     this.setState({
       isLoaded: true
     })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log(this.state)
   }
 
   // Specific Methods
@@ -107,12 +102,12 @@ class Feed extends React.Component {
       }
     } else {
       return (
-          <h2 className="ui icon header">
-            <div className="content">
-              <div className="sub header">Записей не найдено</div>
-            </div>
-          </h2>
-        )
+        <h2 className="ui icon header">
+          <div className="content">
+            <div className="sub header">Записей не найдено</div>
+          </div>
+        </h2>
+      )
     }
   }
 }

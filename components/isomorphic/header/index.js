@@ -7,6 +7,7 @@ import config from '../../../app.config.js'
 import { makeSearch } from '../../../actions/app.js'
 
 // Components
+import Auth from '../authentication/index.js'
 import Link from 'next/link'
 import User from '../user.js'
 import Avatar from 'react-avatar'
@@ -17,27 +18,27 @@ import BlogList from '../blogList.js'
 class Header extends React.Component {
    constructor(props) {
 		super(props);
-		this.currentUser = this.props.currentUser;
    }
 
    render() {
+   	var currentUser = this.props.currentUser
     	return (
       <div className="wrapper">
 			<div className="header">
 	   		<div className="menu">
    				<div className="item">
-   					{this.currentUser.isLogged ?
-   						<User id={this.currentUser._id} size="dropdown" imageSize={36} />
+   					{currentUser.isLogged ?
+   						<User id={currentUser._id} size="dropdown" imageSize={36} />
    							:
-   						<Link href="/auth"><a className="ui button primary circular basic">
-						    	Войти
-						  	</a></Link>
+   						<Auth><div className="ui button basic circular">
+								Войти
+							</div></Auth>
    					}
    				</div>
    				<Link href="/"><a className="item ui button primary circular">
 				    	Лента
 				  	</a></Link>
-				  	{this.currentUser.isLogged && 
+				  	{currentUser.isLogged && 
 				  		<span>
 					  		<Link href="/editor"><a className="item ui button basic circular icon">
 						    	<i className="fa fa-pencil"></i>
@@ -204,6 +205,9 @@ class Search extends React.Component {
 }
 
 
+function mapStateToProps(state) {
+  return { currentUser: state.currentUser }
+}
 
 
-export default connect((state) => state)(Header)
+export default connect(mapStateToProps)(Header)

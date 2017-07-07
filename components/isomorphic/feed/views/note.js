@@ -36,16 +36,14 @@ class Note extends React.Component {
    constructor(props) {
 	   super(props);
 	   this.token = cookies.get('x-access-token')
-	   this.currentUser = this.props.currentUser;
 	   this.dispatch = this.props.dispatch;
 	   this.state = defaultState;
    }
 
    // React Lifecycle
-
   	componentWillMount() {
-	  	if(this.currentUser) {
-		  	if(this.props.post.postLikes.indexOf(this.currentUser._id) != -1) {
+	  	if(this.props.currentUser) {
+		  	if(this.props.post.postLikes.indexOf(this.props.currentUser._id) != -1) {
 		      this.setState({
 			      isLiked: true
 		      })
@@ -57,13 +55,27 @@ class Note extends React.Component {
 		})
    }
 
+   componentWillReceiveProps(nextProps) {
+   	if(nextProps.currentUser) {
+		  	if(nextProps.post.postLikes.indexOf(nextProps.currentUser._id) != -1) {
+		      this.setState({
+			      isLiked: true
+		      })
+		   }
+		}		
+		this.setState({
+			likeCounter: nextProps.post.postLikes.length,
+			post: nextProps.post
+		})
+   }
+
    componentDidMount() {
    	UI();
-   	$('.ui.dropdown').dropdown();
+   	$('.ui.dropdown')
+   	.dropdown();
    }
 
    // Specific Methods
-
    handleTyping(value) {
       if(findURL(value).length == 0) {
         this.changeField(value, 'postContent')
@@ -202,7 +214,7 @@ class Note extends React.Component {
 				        		likeCounter={this.state.likeCounter}
 				        		isEditing={this.state.isEditing}
 				        		onCancel={() => {this.setState({isEditing: false, post: this.props.post})}}
-				        		onLike={() => {this.handleLike(post._id, this.currentUser._id)}}
+				        		onLike={() => {this.handleLike(post._id, this.props.currentUser._id)}}
 				        		onSave={() => {this.handleSave(this.token, post._id, this.state.post)}}
 				        		onUpload={(file) => {this.handleImage(this.token, file)}}
 				        		onVideo={(url) => {this.handleVideo(url)}}
@@ -492,7 +504,6 @@ class Image extends React.Component {
 class ActionBar extends React.Component {
    constructor(props) {
 	   super(props);
-	   this.currentUser = this.props.currentUser;
    }
 
    componentDidMount() {

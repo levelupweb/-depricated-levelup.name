@@ -20,17 +20,17 @@ import Blank from './views/blank.js'
 class Item extends React.Component {
   constructor(props) {
     super(props);
-    this.currentUser = this.props.currentUser;
   }
 
   render() {
+    var currentUser = this.props.currentUser;
     var post = this.props.article;
     if (post) { 
       switch(post.postType) {
         case 'note':
         return <Note post={post} />
         default:
-        return <Default currentUser={this.currentUser} post={post} />
+        return <Default currentUser={currentUser} post={post} />
       }
     } else {
       return (<Blank />)
