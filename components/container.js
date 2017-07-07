@@ -38,11 +38,11 @@ class Component extends React.Component {
     var className = (module.moduleShowSidebar) ? module.moduleClassName + ' main' : module.moduleClassName + ' full main'
 
     return (
-      <div className="module-wrapper">
+      <div className={(module.moduleShowHeader) ? 'module-wrapper' : 'module-wrapper no-header'}>
         {module.moduleShowSidebar &&
           <Sidebar />
         }
-        <div className={(module.moduleShowHeader) ? `${className}` : `${className} no-header`}>
+        <div className={className}>
           <div className="inner">
             {module.moduleShowHeader && 
               <Header />

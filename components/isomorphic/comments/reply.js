@@ -18,21 +18,23 @@ const defaultState = {
 	}
 }
 
-export default class ReplyForm extends React.Component {
+class ReplyForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.token = cookies.get('x-access-token')
 		this.state = defaultState
 	}
 
+	// React lifecycle
 	componentWillMount() {
-		this.settingUp(this.props.user._id, this.props.postID)
+		this.settingUp(this.props.currentUser._id, this.props.postID)
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.settingUp(nextProps.user._id, nextProps.postID)
+		this.settingUp(nextProps.currentUser._id, nextProps.postID)
 	}
 
+	// Specific Methods
 	settingUp(userID, postID) {
 		this.setState({
 			comment: {
@@ -46,26 +48,15 @@ export default class ReplyForm extends React.Component {
 	submitComment(token, comment) {
 		addComment(token, comment).then((res) => {
 			if(res.data.success) {
-				this.flushForm()
 				this.props.onSubmit(res.data.comment)
-				console.log(res.data)
 			} else {
 				console.log(res.data)
 			}
 		})
 	}
 
-	flushForm() {
-		this.setState({
-			comment: {
-				...this.state.comment,
-				commentContent: ''
-			}
-		})
-	}
-
 	render() {
-		var user = this.props.user
+		var user = this.props.currentUser
 		if (this.props.isRevealed) {
 			return (
 				<form className="ui reply form">
@@ -82,7 +73,7 @@ export default class ReplyForm extends React.Component {
 				      		ref={(e) => {this.textarea = e}}>
 				      	</textarea>
 				      	<div 
-					    		onClick={() => {this.submitComment(this.token, this.state.comment)}}
+					    		onClick={() => {this.submitComment(this.token, this.state.comment, this.props.currentUser)}}
 					    		className="ui button primary small circular">
 					      	Отправить
 					    	</div>
@@ -128,3 +119,11 @@ export default class ReplyForm extends React.Component {
 		}
 	}
 }
+
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(ReplyForm)

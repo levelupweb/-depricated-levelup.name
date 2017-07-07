@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cookies from 'js-cookie'
 
 // Actions
-import { removeComment, updateComment } from '../../../actions/comment.js'
+import { updateComment } from '../../../actions/comment.js'
 
 // Components
 import TimeAgo from 'timeago-react';
@@ -87,11 +87,10 @@ class Comment extends React.Component {
 			        	{comment.commentContent}
 			      </div>
 			      <div className="actions">
-			        	<a className="reply">Ответить</a>
-			        	{user._id == this.currentUser._id && 
+			        	{user._id == this.currentUser._id &&
 			        		<span>
-				        		<a className="reply" onClick={() => {this.removeComment(comment._id)}}>Удалить</a>
-				        		<a className="reply" onClick={() => {this.editComment(comment)}}>Редактировать</a>
+				        		<a onClick={() => {this.props.onRemove(this.token, comment._id, this.props.num)}}>Удалить</a>
+				        		<a onClick={() => {this.editComment(comment)}}>Редактировать</a>
 			        		</span>
 			        	}
 			      </div>

@@ -2,9 +2,10 @@
 import React from 'react';
 import cookies from 'js-cookie'
 import { connect } from 'react-redux'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 // Actions
-import { getPostComments } from '../../../actions/comment.js'
+import { removeComment, getPostComments } from '../../../actions/comment.js'
 
 // Components
 import TimeAgo from 'timeago-react';
@@ -13,60 +14,68 @@ import ReplyForm from './reply.js'
 import Link from 'next/link'
 import Comment from './comment.js'
 
-
-// clever component
 class Comments extends React.Component {
 	constructor(props) {
 		super(props);
 		this.token = cookies.get('x-access-token')
-	   this.currentUser = this.props.currentUser;
 		this.state = {
 			comments: [],
-			isFull: false
+			isHided: true
 		}
 	}
 
 	componentWillMount() {
-		this.getComments()
+		if(this.state.comments.length == 0) {
+			this.setComments()
+		}
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.getComments()
-	}
-
-	getComments() {
-		this.setState({
-			comments: this.props.comments.map((comment, i) => {
-				if(!this.props.isSingle) {
-					if(i >= this.props.comments.length - 3) {
-						return <Comment comment={comment} key={comment._id} />
-					} 
-				} else {
-					return <Comment comment={comment} key={comment._id} />
-				}
-			}),
-			isFull: false
-		})
-	}
-
-	loadMore() {
-		this.setState({
-			comments: this.props.comments.map((comment, i) => {
-				return <Comment comment={comment} key={comment._id} />
-			}), 
-			isFull: true
-		})
-	}
-
-	pushComment(comment, user) {
-		var comm = {
-			...comment,
-			commentAuthor: user
+		if(this.state.comments.length == 0) {
+			this.setComments()
 		}
+	}
+
+	setComments() {
 		this.setState({
-	      comments: [<Comment comment={comm} key={comm._id}  />, ...this.state.comments]
+			comments: this.props.comments.map((comment, i) => {
+				return <Comment 
+					onRemove={(token, id) => {this.removeComment(token, id)}} 
+					comment={comment} 
+					key={comment._id} />
+			})
+		})
+	}
+
+	pushComment(comment) {
+		var comm = { ...comment }
+		comm.commentAuthor = this.props.currentUser;
+		this.setState({
+	      comments: [...this.state.comments, <Comment 
+	      	onRemove={(token, id) => {this.removeComment(token, id)}} 
+	      	comment={comm} 
+	      	key={comm._id}  
+	      />]
 	   })
 	}
+
+	removeComment(token, id) {
+    	removeComment(token, id).then((res) => {
+  			if(res.data.success) {
+  				this.state.comments.map((item, i) => {
+  					if(item.key == id) {
+  						var array = this.state.comments.slice();
+		    			array.splice(i, 1);
+		    			this.setState({
+				    		comments: array
+				    	});
+  					}
+  				})
+  			} else {
+  				console.log(res.data)
+  			}
+  		})
+  	}
 
 	render() {
 		if(this.state.comments.length > 0) {
@@ -79,29 +88,42 @@ class Comments extends React.Component {
 					   <div className="comments">
 					   	{(this.state.comments.length > 3) &&
 					   		<div>
-						   		{!this.state.isFull ? 
+						   		{this.state.isHided ? 
 							   		<div 
 							   			className="ui button fluid default small"
-							   			onClick={() => {this.loadMore()}}>
-							   			Загрузить комментарии ({this.props.comments.length})
+							   			onClick={() => {this.setState({isHided: false})}}>
+							   			Загрузить комментарии ({this.state.comments.length - 3})
 							   		</div>
 							   		:
 							   		<div 
 							   			className="ui button fluid default small"
-							   			onClick={() => {this.getComments()}}>
+							   			onClick={() => {this.setState({isHided: true})}}>
 							   			Скрыть комментарии
 							   		</div>
 							   	}
+							   	<br />
 					   		</div>
 					   	}
-					   	{this.state.comments}
+					   	<ReactCSSTransitionGroup
+				         	transitionName="fadeInOut"
+				         	transitionEnterTimeout={500}
+				         	transitionLeaveTimeout={300}>
+				          	{this.state.comments.map((comment, i) => {
+				          		if(this.state.isHided) {
+					          		if(i >= this.state.comments.length - 3) {
+					          			return comment
+					          		}
+					          	} else {
+					          		return comment
+					          	}
+				          	})}
+				         </ReactCSSTransitionGroup>
 					   </div>
-					   {(this.currentUser) && 
+					   {(this.props.currentUser) && 
 						   <ReplyForm
-						   	user={this.currentUser}
 						   	postID={this.props.postID} 
 						   	isRevealed={this.props.isRevealed} 
-						   	onSubmit={(comment) => {this.pushComment(comment, this.currentUser)}}
+						   	onSubmit={(comment, user) => {this.pushComment(comment, user)}}
 						   />
 						}
 					</div>
@@ -112,18 +134,18 @@ class Comments extends React.Component {
 			          	padding-top:15px;
 			          	border-top:1px solid #eee;
 						}
+						
 				   `}</style>
 				</div>
 			)
 		} else {
-			if(this.currentUser) {
+			if(this.props.currentUser) {
 				return (
 					<div>
 						{this.props.isSingle &&
 							<p>Будьте первым, кто оставит комментарий!</p>
 						}
-						<ReplyForm 
-							user={this.currentUser}
+						<ReplyForm
 							isRevealed={this.props.isRevealed} 
 							postID={this.props.postID} 
 							onSubmit={(comment) => {this.pushComment(comment)}}

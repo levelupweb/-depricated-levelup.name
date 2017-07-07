@@ -11,37 +11,40 @@ import Comments from '../../../isomorphic/comments/index.js'
 import UserBar from './userbar.js'
 import Feed from '../../../isomorphic/feed/feed.js'
 
-
 class User extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userPage: null
+      user: null
     }
   }
 
   componentWillMount() {
-    this.getInitialState(
-      this.props.pageData.user
-    )
+    if(this.props.user != null) {
+      this.getInitialState(
+        this.props.user
+      )
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getInitialState(
-      nextProps.pageData.user
-    )
+    if(nextProps.user != null) {
+      this.getInitialState(
+        nextProps.user
+      )
+    }
   }
 
   getInitialState(user) {
     if (user) {
       this.setState({
-        userPage: user
+        user: user
       })
     }
   }
 
   render() {
-    var user = this.state.userPage
+    var user = this.state.user
     if (user) {
       return (
         <div className="profile-feed feed">
@@ -73,7 +76,7 @@ class User extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return { pageData: state.app.pageData }
+  return { user: state.app.pageData.user }
 }
 
 export default connect(mapStateToProps)(User)
