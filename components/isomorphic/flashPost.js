@@ -66,17 +66,17 @@ class FlashPost extends React.Component {
 
   // Specific Methods
 
-  publishPost(token) {
+  /* publishPost(token, post, key) {
     this.dispatch(
       setPostField('postStatus', 'published')
     ).then(() => {
       this.dispatch(
-        postAdd(token, this.props.postState.post)
+        postAdd(token, post)
       ).then((res) => {
         if(res.data.success) {
-          this.props.onSubmit(res.data.post)
+          this.props.onSubmit(key, res.data.post)
         } else {
-          console.log('error: ', res.data)
+          console.warn('Ошибка при добавлении поста: ', res.data)
         }
       })
     }).then(() => {
@@ -84,7 +84,7 @@ class FlashPost extends React.Component {
         flushPost()
       )
     })
-  }
+  } DEPR */ 
 
   savePost(token, post) {
     this.props.dispatch(
@@ -146,7 +146,7 @@ class FlashPost extends React.Component {
       var button = (
         <span>
           {(!this.state.isBlocked) ? 
-          <a onClick={() => {this.publishPost(this.token, post)}} className="medium circular ui button primary">
+          <a onClick={() => {this.props.onSubmit(this.props.hashKey)}} className="medium circular ui button primary">
             Опубликовать
           </a>
            : 

@@ -83,7 +83,7 @@ class Note extends React.Component {
       }
   	}
 
-   handleRemove(id) {
+   /* handleRemove(id) {
       var result = confirm('Вы действительно хотите удалить запись?');
       if (result) {
 	      removePostById(id).then((res) => {
@@ -92,7 +92,7 @@ class Note extends React.Component {
 	      	}
 	      })
       }
-   }
+   } DEPR */ 
 
   	handleLike(postID, userID) {
     	setLikeById(this.token, postID).then((res) => {
@@ -171,7 +171,7 @@ class Note extends React.Component {
 								  <div className="menu">
 								  	 <div className="item" onClick={() => {this.setState({isEditing: true})}}>Редактировать</div>
 								  	 <div className="item" onClick={() => {console.log('*modal')}}>Пожаловаться</div>
-								    <div className="item" onClick={() => {this.handleRemove(post._id)}}>Удалить</div>
+								    <div className="item" onClick={() => {this.props.onRemove(post._id)}}>Удалить</div>
 								</div>
 							</div>
 			         </div>

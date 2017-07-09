@@ -5,6 +5,30 @@ import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 import randomString from '../utils/randomString.js'
 import hash from 'object-hash'
 
+// models
+import * as MODEL from '../models/post.js'
+
+// Common actions
+export function findPost(query) {   
+   return MODEL.findPost(query)
+}
+
+// TODO: rewrite name -> getUserPosts
+export function getPostsByUserId(id) {
+	return MODEL.getUserPosts(id)
+}
+
+// TODO: rewrite name -> setLike
+export function setLikeById(token, id) {
+   return MODEL.setLike(token, id)
+}
+
+// TODO: rewrite name -> updatePost
+export function postUpdate(token, id, post) {
+   return MODEL.updatePost(token, id, post)
+}
+
+// TODO: rewrite
 export function getPosts(page, options, token) {
 	var params = options;
 	if(!params.perPage) { params.perPage = 10 }
@@ -25,62 +49,13 @@ export function getPosts(page, options, token) {
 	}
 }
 
-export function getPostsByUserId(id) {
-	return axios.get(config.API + 'user/' + id + '/posts')	
-}
-
-export function getUsersWhoLikes(postID) {
-	return axiosNoAuth({
-		url: 'post/entries/' + postID + '/wholikes',
-		method: 'GET'
-    })
-}
-
-export function setLikeById(token, id) {
-    return axiosAuth(token, {
-		url: 'post/entries/' + id + '/like',
-		method: 'GET'
-    })
-}
-
-// Rename to addPost
-export function postAdd(token, data) {
-   return (dispatch) => {
-   	return axiosAuth(token, {
-			url: 'post/add',
-			method: 'POST',
-			data: data
-	    })
-   }
-}
-
-// Rename to updatePost
-export function postUpdate(token, postID, postData) {
-    return axiosAuth(token, {
-		url: 'post/entries/' + postID + '/update',
-		method: 'POST',
-		data: postData
-    })
-}
-
-export function setPostFaces(faces) {
-	return (dispatch) => {
-		dispatch({type: 'SET_NOTE_FACES', payload: faces});
-	}
-}
-
-export function flushPost() {
-	return (dispatch) => {
-		dispatch({type: 'FLUSH_POST'})
-	}
-}
-
-// PostState Reducer
-
 export function setPostField(field, value) {
 	return (dispatch) => {
 		return new Promise((resolve) => {
-			dispatch({type: 'SET_POST_FIELD', payload: {field, value}})
+			dispatch({
+				type: 'SET_POST_FIELD', 
+				payload: { field, value }
+			})
 			resolve()
 		})
 	}
@@ -88,7 +63,10 @@ export function setPostField(field, value) {
 
 export function setPost(post) {
 	return (dispatch) => {
-		dispatch({type: 'SET_POST', payload: post})
+		dispatch({
+			type: 'SET_POST', 
+			payload: post
+		})
 	}
 }
 
@@ -101,16 +79,14 @@ export function prepareNewPost(user, type) {
 	}
 }
 
-export function createPost(token, post) {
+// TODO: return data
+export function createPost(token, defaultPost) {
 	return (dispatch) => {
-		if(post.postTitle == null) {
-			post.postTitle = 'Безымянный';
+		var post = {
+			...defaultPost,
+			postTitle: defaultPost.postTitle || 'Безымянный' 
 		}
-		return axiosAuth(token, {
-			url: 'post/add',
-			method: 'POST',
-			data: post
-	   }).then((res) => {
+		return MODEL.addPost(token, post).then((res) => {
 	   	dispatch(setPost(res.data.post))
 	   	return res.data.post._id
 	   }).then((id) => {
@@ -120,23 +96,19 @@ export function createPost(token, post) {
 	}
 }
 
+// TODO: return data / dispatch setPost from post to res.data.post
 export function savePost(token, post, message) {
-	var status = message ? message : 'Сохранено';
 	return (dispatch) => {
-		return axiosAuth(token, {
-			url: 'post/entries/' + post._id + '/update',
-			method: 'POST',
-			data: post
-	   }).then((res) => {
+		console.log(post)
+		return MODEL.updatePost(token, post._id, post).then((res) => {
 	   	if(res.data.success) {
 	   		dispatch(setPost(post))
 	   	} else {
-	   		// Handle Error
-	   		console.log(res.data)
+	   		console.warn('Ошибка при обновлении поста', res.data)
 	   	}
 	   	return res.data
 	   }).then(() => {
-	   	dispatch(displayStatus(status))
+	   	dispatch(displayStatus(message || 'Сохранено'))
 	   })
 	}
 }
@@ -144,18 +116,22 @@ export function savePost(token, post, message) {
 export function pushTag(tag) {
 	return (dispatch) => {
 		if(tag.length > 0) {
-			dispatch({type: 'POST_PUSH_TAG', payload: tag})
+			dispatch({
+				type: 'POST_PUSH_TAG', 
+				payload: tag
+			})
 		}
 	}
 }
 
 export function pullTag(tag) {
 	return (dispatch) => {
-		dispatch({type: 'POST_PULL_TAG', payload: tag})
+		dispatch({
+			type: 'POST_PULL_TAG', 
+			payload: tag
+		})
 	}
 }
-
-// Status lifecycle 
 
 export function displayStatus(value) {
 	return async (dispatch) => {
@@ -173,29 +149,8 @@ function setStatus(value) {
    }
 }
 
-
-
-// Добавить токен!!
-export function removePostById(id) {
-	return axiosNoAuth({
-		url: 'post/entries/' + id + '/remove',
-		method: 'GET'
-    })
-}
-
-
-export function findPost(query) {   
-    return axiosNoAuth({
-      url: 'search/entries/posts',
-      method: 'GET',
-      params: {
-        query: query
-      }
-    })
-}
-
 // PostsStorage Actions
-export function fetchPosts(defaultOptions, skip, key) {
+export function fetchPosts(key, defaultOptions, skip) {
 	const options = {
 		...defaultOptions,
 		perPage: defaultOptions.perPage || 10
@@ -203,22 +158,14 @@ export function fetchPosts(defaultOptions, skip, key) {
 	return (dispatch, getState) => {
 		var state = getState()
 		if (state.postsStorage[key]) {
-			if (!state.postsStorage[key].isFetching && !state.postsStorage[key].isFull) {
+			if (!state.postsStorage[key].isHydrating && !state.postsStorage[key].isFull) {
 				dispatch(fetchPostsStart(key, options))
-				return axiosNoAuth({
-					url: 'post/entries',
-					method: 'GET',
-					params: {
-						skip: skip,
-						limit: options.perPage,
-						...options
-					}
-			   }).then((res) => {
+				return MODEL.fetchPosts(options, skip).then((res) => {
 			   	dispatch(fetchPostsEnd(key, res.data))
 			   })
 			}
 		} else {
-			console.log('Инстанция не найдена')
+			console.warn('Инстанция не найдена')
 		}
 	}
 }
@@ -227,26 +174,110 @@ export function createPostsInstance(key, options) {
 	return {
 		type: 'CREATE_POSTS_INSTANCE',
 		payload: {
-			hash: key, 
-			options: options
+			key, 
+			options
 		}
 	}
 }
 
-function fetchPostsStart(hash, options) {
+export function pushPost(token, key, post) {
+	var postFinal = {
+		...post,
+		postStatus: 'published'
+	}
+	return (dispatch) => {
+		dispatch(pushPostStart(key))
+		return MODEL.addPost(token, postFinal).then((response) => {
+			if(response.data.success) {
+				dispatch(pushPostEnd(key, response.data.post))
+				return {
+					success: true,
+					message: 'Пост успешно добавлен'
+				}
+			} else {
+				return {
+					success: false,
+					message: 'Ошибка при публикации нового поста..'
+				}
+				console.warn('Ошибка при публикации нового поста..')
+			}
+			return response;
+		})
+	}
+}
+
+function pushPostStart(key) {
+	return {
+		type: 'PUSH_POST_START',
+		payload: {
+			key
+		}
+	}
+}
+
+function pushPostEnd(key, post) {
+	return {
+		type: 'PUSH_POST_END',
+		payload: {
+			key, post
+		}
+	}
+}
+
+// add remove model to dispatch
+export function removePost(token, key, id) {
+	return (dispatch) => {
+		dispatch(removePostStart(key, id))
+		return MODEL.removePost(token, id).then((res) => {
+			if(res.data.success) {
+				dispatch(removePostEnd(key, id))
+				return {
+					success: true,
+					message: 'Пост успешно удалён'
+				}
+			} else {
+				return {
+					success: false,
+					message: 'Ошибка при удалении'
+				}
+			}
+		})
+	}
+}
+
+function removePostStart(id) {
+	return { 
+		type: 'REMOVE_POST_START',
+		payload: {
+			isRemoving: true,
+			id: id
+		}
+	}
+}
+
+function removePostEnd(key, id) {
+	return { 
+		type: 'REMOVE_POST_END',
+		payload: {
+			key, id
+		}
+	}
+}
+
+function fetchPostsStart(key, options) {
 	return {
 		type: 'FETCH_POSTS_START',
 		payload: {
-			hash, options
+			key, options
 		}
 	}
 }
 
-function fetchPostsEnd(hash, posts) {
+function fetchPostsEnd(key, posts) {
 	return {
 		type: 'FETCH_POSTS_END',
 		payload: {
-			hash, posts
+			key, posts
 		}
 	}
 }

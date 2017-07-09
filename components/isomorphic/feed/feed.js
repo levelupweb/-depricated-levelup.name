@@ -7,9 +7,10 @@ import Loader from '../loader'
 import Link from 'next/link'
 import React from 'react'
 import hash from 'object-hash'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 // Actions
-import { getPosts, fetchPosts, createPostsInstance } from '../../../actions/post.js'
+import { getPosts, fetchPosts, createPostsInstance, pushPost, removePost } from '../../../actions/post.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';
@@ -54,9 +55,9 @@ class Feed extends React.Component {
         )
       )
       this.loadMore(
+        key,
         options,
-        this.state.defaultSkip,
-        key
+        this.state.defaultSkip
       )
     }
     this.setState({
@@ -68,29 +69,48 @@ class Feed extends React.Component {
   // Specific Methods
   loadMore(options, skip, key) {
     this.dispatch(
-      fetchPosts(
-        options, 
-        skip,
-        key
-      )
+      fetchPosts(...arguments)
     )
+  }
+
+  pushItem(token, key, post) {
+    this.dispatch(
+      pushPost(...arguments)
+    )
+  }
+
+  removeItem(token, key, id) {
+    this.dispatch(
+      removePost(...arguments)
+    ).then((res) => {
+      if(res.success) {
+
+      }
+    })
   }
 
   render() {
     var instance = this.props.postsStorage[this.state.key];
     if(instance) {
-      var components = instance.posts.map((entry, i) => {
-        return <Item article={entry} key={entry._id} />
+      var components = instance.posts.map((post, i) => {
+        return <Item 
+          article={post} 
+          key={post._id} 
+          onRemove={(postID) => {this.removeItem(this.token, this.state.key, postID)}}
+        />
       })
       return (
         <div className="grid">
           {this.props.flashPost && 
-            <FlashPost onSubmit={(post) => {this.pushPost(post)}} />
+            <FlashPost 
+              onSubmit={(key) => {this.pushItem(this.token, key, this.props.postState.post)}}
+              hashKey={this.state.key}
+            />
           }
           <InfiniteScroll
-            items={components}
-            loadMore={() => {this.loadMore(this.state.options, instance.posts.length, this.state.key)}} 
-            hasMore={!instance.isFull}
+            children={components}
+            loadMore={() => {this.loadMore(this.state.key, this.state.options, instance.posts.length)}} 
+            hasMore={!instance.uisFll}
             threshold={10}
             elementIsScrollable={false}
           />
@@ -105,7 +125,8 @@ class Feed extends React.Component {
 function mapStateToProps(state) {
   return { 
     currentUser: state.currentUser,
-    postsStorage: state.postsStorage
+    postsStorage: state.postsStorage,
+    postState: state.postState
   }
 }
 

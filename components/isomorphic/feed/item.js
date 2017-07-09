@@ -28,9 +28,16 @@ class Item extends React.Component {
     if (post) { 
       switch(post.postType) {
         case 'note':
-        return <Note post={post} />
+        return <Note 
+          post={post} 
+          onRemove={(postID) => {this.props.onRemove(postID)}}
+        />
         default:
-        return <Default currentUser={currentUser} post={post} />
+        return <Default 
+          currentUser={currentUser}
+          post={post}
+          onRemove={(postID) => {this.props.onRemove(postID)}}
+        />
       }
     } else {
       return (<Blank />)
