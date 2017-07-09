@@ -20,6 +20,10 @@ var _userFaces = require('./userFaces.js');
 
 var _userFaces2 = _interopRequireDefault(_userFaces);
 
+var _postsStorage = require('./postsStorage.js');
+
+var _postsStorage2 = _interopRequireDefault(_postsStorage);
+
 var _redux = require('redux');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -28,7 +32,8 @@ var reducers = {
 	app: _app2.default,
 	currentUser: _currentUser2.default,
 	postState: _postState2.default,
-	userFaces: _userFaces2.default
+	userFaces: _userFaces2.default,
+	postsStorage: _postsStorage2.default
 };
 
 exports.default = (0, _redux.combineReducers)(reducers);

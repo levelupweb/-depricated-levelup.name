@@ -23,7 +23,9 @@ class Page extends React.Component {
     super(props);
     this.options = {
       ...this.props.app.pageSettings,
-      child: <div className="blocks"><Feed flashPost={true} options={{status: ['published']}} /></div>,
+      child: <div className="blocks"><div className="block-item">
+        <Feed flashPost={true} options={{perPage: 3, status: ['published']}} />
+      </div></div>,
       beforeChildren : null,
       afterChildren : null
     }

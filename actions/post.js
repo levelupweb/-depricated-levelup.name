@@ -3,6 +3,7 @@ import config from '../app.config.js'
 import cookies from 'js-cookie'
 import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 import randomString from '../utils/randomString.js'
+import hash from 'object-hash'
 
 export function getPosts(page, options, token) {
 	var params = options;
@@ -10,19 +11,11 @@ export function getPosts(page, options, token) {
 	params.skip = (page - 1) * params.perPage
 
 	if(!params.personal) {
-		if(!token) {
-			return axiosNoAuth({
-				url: 'post/entries',
-				method: 'GET',
-				params: params
-		   })
-		} else {
-			return axiosAuth(token, {
-				url: 'post/entries',
-				method: 'GET',
-				params: params
-		   })
-		}
+		return axiosNoAuth({
+			url: 'post/entries',
+			method: 'GET',
+			params: params
+	   })
 	} else {
 		return axiosAuth(token, {
 			url: 'post/entries/personal',
@@ -130,7 +123,6 @@ export function createPost(token, post) {
 export function savePost(token, post, message) {
 	var status = message ? message : 'Сохранено';
 	return (dispatch) => {
-		console.log(post)
 		return axiosAuth(token, {
 			url: 'post/entries/' + post._id + '/update',
 			method: 'POST',
@@ -200,4 +192,61 @@ export function findPost(query) {
         query: query
       }
     })
+}
+
+// PostsStorage Actions
+export function fetchPosts(defaultOptions, skip, key) {
+	const options = {
+		...defaultOptions,
+		perPage: defaultOptions.perPage || 10
+	}
+	return (dispatch, getState) => {
+		var state = getState()
+		if (state.postsStorage[key]) {
+			if (!state.postsStorage[key].isFetching && !state.postsStorage[key].isFull) {
+				dispatch(fetchPostsStart(key, options))
+				return axiosNoAuth({
+					url: 'post/entries',
+					method: 'GET',
+					params: {
+						skip: skip,
+						limit: options.perPage,
+						...options
+					}
+			   }).then((res) => {
+			   	dispatch(fetchPostsEnd(key, res.data))
+			   })
+			}
+		} else {
+			console.log('Инстанция не найдена')
+		}
+	}
+}
+
+export function createPostsInstance(key, options) {
+	return {
+		type: 'CREATE_POSTS_INSTANCE',
+		payload: {
+			hash: key, 
+			options: options
+		}
+	}
+}
+
+function fetchPostsStart(hash, options) {
+	return {
+		type: 'FETCH_POSTS_START',
+		payload: {
+			hash, options
+		}
+	}
+}
+
+function fetchPostsEnd(hash, posts) {
+	return {
+		type: 'FETCH_POSTS_END',
+		payload: {
+			hash, posts
+		}
+	}
 }

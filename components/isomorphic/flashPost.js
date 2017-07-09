@@ -36,7 +36,6 @@ const defaultState = {
 class FlashPost extends React.Component {
   constructor(props) {
     super(props);
-    this.currentUser = this.props.currentUser;
     this.token = cookies.get('x-access-token');
     this.dispatch = this.props.dispatch;
     this.state = defaultState;
@@ -45,7 +44,7 @@ class FlashPost extends React.Component {
   // React Lifecycle
 
   componentWillMount() {
-    this.dispatch(prepareNewPost(this.currentUser, 'note'))
+    this.dispatch(prepareNewPost(this.props.currentUser, 'note'))
     if ( this.props.postState.post.postImage 
       || this.props.postState.post.postVideo 
       || this.props.postState.post.postContent 
@@ -141,8 +140,8 @@ class FlashPost extends React.Component {
 
   render() {
     var postState = this.props.postState;
-    var post = this.props.postState.post;    
-    if (this.currentUser.isLogged && post) {
+    var post = postState.post;    
+    if (this.props.currentUser.isLogged && post) {
       // Кнопка
       var button = (
         <span>
@@ -261,7 +260,7 @@ class FlashPost extends React.Component {
       var symbols = 140 - post.postContent.length;
 
       return (
-        <div className={(this.state.isRevealed) ? `revealed flashpost block-item` : `flashpost block-item`} onClick={() => {this.setState({isRevealed: true})}}>
+        <div className={(this.state.isRevealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.setState({isRevealed: true})}}>
     			<form className="ui form">
     				<div className="field">
     					<div className="image user">
@@ -279,8 +278,9 @@ class FlashPost extends React.Component {
                     maxLength="140" ref={(e) => {this.textarea = e}} 
                     onChange={(e) => {this.handleTyping(e.target.value)}} 
                     rows="2" 
-                    placeholder={this.state.placeholder} 
-                  >{this.props.postState.post.postContent}</textarea>
+                    placeholder={this.state.placeholder}
+                    defaultValue={post.postContent}
+                  />
     			        <div className="bar">
                     {button}
                     {(!post.postImage && !post.postVideo) &&
@@ -326,13 +326,15 @@ class FlashPost extends React.Component {
               margin-left:5px;
             }
             .note {
-              padding:15px 0px;
+              padding:5px 0px;
             }
             .textarea {
               position:relative;
             }
             .flashpost {
               margin-bottom:15px;
+              padding-bottom:15px;
+              border-bottom:1px solid #eee;
             }
             .flashpost .image {
               position: absolute;
@@ -397,11 +399,8 @@ class FlashPost extends React.Component {
               left: auto;
               opacity: 1;
               top: 0px;
-              margin-top: 20px;
+              margin-top: 15px;
               z-index:999;
-            }
-            .flashpost {
-              padding:6px 17px;
             }
             .flashpost textarea:focus {
               background:transparent;
@@ -424,6 +423,13 @@ class FlashPost extends React.Component {
     } else {
       return (<div></div>)
     }
+  }
+}
+
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser,
+    postState: state.postState
   }
 }
 

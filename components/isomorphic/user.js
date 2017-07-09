@@ -13,7 +13,6 @@ import Link from 'next/link'
 
 
 class User extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -27,34 +26,27 @@ class User extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getUser(nextProps.id)
+    if(this.props.id != nextProps.id) {
+      this.getUser(nextProps.id)
+    }
   }
 
-  componentWillUnmount() {
-    this.setState({
-      user: null
-    })
-  }
-
-  async getUser(id) {
+  getUser(id) {
     if(id) {
-      var user = await getUserById(id)
-      await this.setState({
-        user: {
-          ...this.state.user,
-          ...user.data
-        }
-      })
-      await this.setState({
-        isLoaded: true
+      getUserById(id).then((res) => {
+        this.setState({
+          user: {
+            ...this.state.user,
+            ...res.data
+          },
+          isLoaded: true
+        })
       })
     } else {
       if(this.props.user.isLogged) {
-        await this.setState({
+        this.setState({
           ...this.state,
-          user: this.props.user.profile
-        })
-        await this.setState({
+          user: this.props.user.profile,
           isLoaded: true
         })
       } 

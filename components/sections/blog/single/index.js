@@ -61,9 +61,9 @@ class Blog extends React.Component {
   	var blog = this.state.blog;
   	if (blog) { 
 	    return (
-	      <div className="blog">
-	      	<div className="header-wrapper">
-		         <div className="main-content block">
+	      <div className="blog blocks">
+	      	<div className="header-wrapper block-item">
+		         <div className="main-content">
 		        	<div className="image" onClick={() => {this.imageUploader.click()}} data-inverted="" data-tooltip="Загрузить изображение" data-position="top center">
 		      			<Avatar 
 		      				color={`#57c1b3`} 
@@ -119,16 +119,13 @@ class Blog extends React.Component {
 	      			</div>
 	      		</div>
 	      	</div>
-	      	<div className="feed">
-               <div className="block">
-               	<Feed 
-                     flashPost={true}
-                     options={{ 
-                        blogID: blog._id, 
-                        status: ['published'] 
-                     }} 
-                  />
-               </div>
+	      	<div className="feed block-item">
+            	<Feed 
+                  flashPost={true}
+                  options={{ 
+                     blogID: blog._id, 
+                     status: ['published'] 
+                  }} />
 	      	</div>
 
 	      <style jsx>{`

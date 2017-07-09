@@ -14,9 +14,6 @@ import TimeAgo from 'timeago-react';
 import Link from 'next/link'
 import Loader from '../../loader.js'
 
-// Dynamics
-var BlurImageLoader = dynamic(import('react-blur-image-loader'))
-
 
 class Default extends React.Component {
   constructor(props) {
@@ -41,7 +38,7 @@ class Default extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {  
+  componentWillReceiveProps(nextProps) {
     if(nextProps.currentUser) {
       if(nextProps.post.postLikes.indexOf(nextProps.currentUser._id) != -1) {
         this.setState({
@@ -72,7 +69,7 @@ class Default extends React.Component {
       var comments = post.postCommentsCount;
       var likes = this.state.likeCounter;
       return (
-        <article className={`article block-item preview grid-item w-100`}>
+        <article className={`article preview grid-item w-100`}>
           <div className="user">
             <div className="left">
               {(post.postAuthor.authorType == 'user') ?
@@ -93,17 +90,12 @@ class Default extends React.Component {
           </div>
           {post.postImage &&
             <div className="image">
-              <BlurImageLoader src={post.postImage}
-                fullCover={true}
-                maxBlurLevel={10}
-                transitionTime={400}
-                loader={<Loader />}
-              />
+              <img src={post.postImage} width="100%" />
             </div>
           }
           <div className="content">
             <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-              <a><h1>{post.postTitle}</h1></a>
+              <a className="header"><h2>{post.postTitle}</h2></a>
             </Link>
             <p className="primary">{(post.postDescription) ? post.postDescription : ''}</p>
           </div>
@@ -134,6 +126,11 @@ class Default extends React.Component {
             </div>
           </div>
           <style jsx>{`
+            article {
+                margin-bottom:20px;
+                padding-bottom:20px;
+                border-bottom:1px solid #eee;
+            }
             .article .user {
               margin-top:0px;
               display:flex;
@@ -149,6 +146,9 @@ class Default extends React.Component {
               display:flex;
               align-items:center;
               justify-content:space-between;
+            }
+            .article .content .header h2 {
+              margin:10px 0px;
             }
             .article .meta .item {
               cursor:pointer;

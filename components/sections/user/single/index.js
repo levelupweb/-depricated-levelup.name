@@ -20,17 +20,17 @@ class User extends React.Component {
   }
 
   componentWillMount() {
-    if(this.props.user != null) {
+    if(this.props.pageData != null) {
       this.getInitialState(
-        this.props.user
+        this.props.pageData.user
       )
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.user != null) {
+    if(nextProps.pageData != null) {
       this.getInitialState(
-        nextProps.user
+        nextProps.pageData.user
       )
     }
   }
@@ -47,9 +47,11 @@ class User extends React.Component {
     var user = this.state.user
     if (user) {
       return (
-        <div className="profile-feed feed">
-        	<UserBar user={user} /> 
-          <div className="block content">
+        <div className="profile-feed blocks">
+        	<div className="block-item">
+            <UserBar user={user} /> 
+          </div>
+          <div className="block-item">
             <Feed 
               flashPost={true}
               options={{ 
@@ -76,7 +78,7 @@ class User extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return { user: state.app.pageData.user }
+  return { pageData: state.app.pageData }
 }
 
 export default connect(mapStateToProps)(User)

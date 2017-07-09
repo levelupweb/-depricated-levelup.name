@@ -16,7 +16,6 @@ import Link from 'next/link'
 export class Blog extends React.Component {
   constructor(props) {
     super(props);
-    this.currentUser = this.props.currentUser;
     this.state = {
       isLoaded: false,
       blog: null
@@ -27,46 +26,32 @@ export class Blog extends React.Component {
     this.getBlog(this.props.id)
   }
 
-
   componentWillReceiveProps(nextProps) {
-    this.getBlog(nextProps.id)
-  }
-
-  componentWillUnmount() {
-    this.setState({
-      blog: null
-    })
+    if(this.props.id != nextProps.id) {
+      this.getBlog(nextProps.id)
+    }
   }
 
   getBlog(id) {
     if(id) {
       getBlogById(id).then((res) => {
         this.setState({
-          blog: res.data
-        })
-      }).then(() => {
-        this.setState({
+          blog: res.data,
           isLoaded: true
         })
       })
     } else {
-      if(this.currentUser.isLogged) {
-        new Promise(() => {
-          this.setState({
-            ...this.state,
-            blog: this.currentUser
-          })
-        }).then(() =>{
-          this.setState({
-            isLoaded: true
-          })
+      if(this.props.currentUser.isLogged) {
+        this.setState({
+          ...this.state,
+          blog: this.props.currentUser,
+          isLoaded: true
         })
       } 
     }
   }
 
   render() {
-
     var blog = this.state.blog;
     if (this.state.isLoaded && this.state.blog != null) {
         return (
@@ -84,7 +69,6 @@ export class Blog extends React.Component {
                 {(blog.blogDescription) ? blog.blogDescription : `Подписчиков: ${blog.blogSubscribersCount}`}
               </div>
             </div>
-          
         		<style jsx>{`
       			.blog {
       				display: flex;

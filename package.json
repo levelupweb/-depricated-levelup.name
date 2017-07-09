@@ -15,12 +15,12 @@
     "next-redux-wrapper": "1.1.1",
     "next-style-loader": "^0.3.1",
     "nprogress": "^0.2.0",
+    "object-hash": "^1.1.8",
     "query-string": "^4.3.4",
     "quill": "^1.2.6",
     "react": "^15.5.3",
     "react-addons-css-transition-group": "^15.6.0",
     "react-avatar": "^2.3.0",
-    "react-blur-image-loader": "^0.2.2",
     "react-dom": "^15.5.3",
     "react-quill": "^1.0.0-rc.2",
     "react-redux": "latest",
@@ -39,5 +39,13 @@
     "start": "next start"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-clean-css": "^3.5.0",
+    "gulp-jshint": "^2.0.4",
+    "gulp-util": "^3.0.8",
+    "gulp-watch": "^4.3.11",
+    "jshint-stylish": "^2.2.1"
+  }
 }

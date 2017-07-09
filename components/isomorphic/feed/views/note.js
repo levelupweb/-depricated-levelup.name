@@ -21,9 +21,6 @@ import TimeAgo from 'timeago-react';
 import Link from 'next/link'
 import Loader from '../../loader.js'
 
-// Dynamics
-var BlurImageLoader = dynamic(import('react-blur-image-loader'))
-
 const defaultState = {
 	isLiked: false,
  	likeCounter: 0,
@@ -161,7 +158,7 @@ class Note extends React.Component {
     	var post = this.state.post;
 		if (post) {
 			return (
-				<article className={`article block-item note preview post-${post._id}`}>
+				<article className={`article note preview post-${post._id}`}>
 					<div className="user"> 
 						<div className="left">
 							{(post.postAuthor.authorType == 'user') ?
@@ -235,6 +232,11 @@ class Note extends React.Component {
 			      	/>
 			      </div>
 			      <style jsx>{`
+			      	article {
+			      		margin-bottom:20px;
+			      		padding-bottom:20px;
+			      		border-bottom:1px solid #eee;
+			      	}
 			         .note .user,
 			         .note .meta {
 			          	display:flex;
@@ -453,12 +455,7 @@ class Image extends React.Component {
 	  		if(this.props.isEditing) {
 	  			return (
 	  				<div className="editor">
-	  					<BlurImageLoader src={this.props.url}
-		               fullCover={true}
-		               maxBlurLevel={10}
-		               transitionTime={400}
-		               loader={<Loader />}
-		            />
+	  					<img src={this.props.url} width="100%" />
 	  					<i className="fa fa-close" onClick={() => {this.props.onRemove('postImage')}}></i>
 	  					<style jsx>{`
 	  						.editor {
@@ -485,12 +482,7 @@ class Image extends React.Component {
 	  		} else {
 		  		return (
 			    	<div className="image">
-			      	<BlurImageLoader src={this.props.url}
-		               fullCover={true}
-		               maxBlurLevel={10}
-		               transitionTime={400}
-		               loader={<Loader />}
-		            />
+			      	<img src={this.props.url} width="100%" />
 			      </div>
 		   	);
 	  		}

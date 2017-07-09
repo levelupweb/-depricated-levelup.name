@@ -5,10 +5,11 @@ import Router from 'next/router'
 import cookies from 'js-cookie'
 import Loader from '../loader'
 import Link from 'next/link'
-import React from 'react';
+import React from 'react'
+import hash from 'object-hash'
 
 // Actions
-import { getPosts } from '../../../actions/post.js'
+import { getPosts, fetchPosts, createPostsInstance } from '../../../actions/post.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';
@@ -20,101 +21,91 @@ import FlashPost from '../flashPost.js'
 class Feed extends React.Component {
   constructor(props) {
     super(props);
-    this.token = cookies.get('x-access-token')
+    this.token = cookies.get('x-access-token');
+    this.dispatch = this.props.dispatch;
     this.state = {
-      page: 1,
-    	components: [],
-      isLoaded: false,
-      isFull: false,
-      isFound: true,
-      isHydrating: false
+      defaultSkip: 0,
+      key: null
     }
   }
 
-  componentDidMount() {
+  // React Lifecycle
+  componentWillMount() {
+    const key = hash(this.props.options)
+    if (key != this.state.key) {
+      this.createInstance(this.props.options)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const key = hash(nextProps.options)
+    if (key != this.state.key) {
+      this.createInstance(nextProps.options)
+    } 
+  }
+
+  createInstance(options) {
+    const key = hash(options)
+    if(!this.props.postsStorage[key]) {
+      this.dispatch(
+        createPostsInstance(
+          key, 
+          options
+        )
+      )
+      this.loadMore(
+        options,
+        this.state.defaultSkip,
+        key
+      )
+    }
     this.setState({
-      isLoaded: true
+      key,
+      options
     })
   }
 
   // Specific Methods
-
-  pushPost(post) {
-    this.setState({
-      components: [<Item article={post} key={post._id} />, ...this.state.components]
-    })
-  }
-
-  loadMore() {
-    if(!this.state.isHydrating) {
-      this.setState({
-        isHydrating: true
-      }, () => {
-        getPosts(this.state.page, {...this.props.options})
-        .then((res) => {
-          if(res.data.length > 0) {
-            this.setState({
-              components: this.state.components.concat(res.data.map((item, i) => {
-                return (<Item article={item} key={item._id} />)
-              }))
-            })
-          } else {
-            this.setState({
-              isFull: true
-            })
-          }
-        })
-        .then(() => {
-          this.setState({
-            isLoaded: true,
-            page: this.state.page + 1
-          })
-        })
-        .then(() => {
-          this.setState({
-            isHydrating: false
-          })
-        })
-      }
+  loadMore(options, skip, key) {
+    this.dispatch(
+      fetchPosts(
+        options, 
+        skip,
+        key
       )
-    }
+    )
   }
 
   render() {
-    if(this.state.isFound) {
-      if(this.state.isLoaded) {
-        return (
-          <div className="grid">
-            {this.props.flashPost && 
-              <FlashPost onSubmit={(post) => {this.pushPost(post)}} />
-            }
-            <InfiniteScroll
-              items={this.state.components}
-              loadMore={() => {this.loadMore()}} 
-              hasMore={!this.state.isFull}
-              threshold={10}
-              elementIsScrollable={false}
-            />
-          </div>
-        )
-      } else {
-        return <Blank />
-      }
-    } else {
+    var instance = this.props.postsStorage[this.state.key];
+    if(instance) {
+      var components = instance.posts.map((entry, i) => {
+        return <Item article={entry} key={entry._id} />
+      })
       return (
-        <h2 className="ui icon header">
-          <div className="content">
-            <div className="sub header">Записей не найдено</div>
-          </div>
-        </h2>
+        <div className="grid">
+          {this.props.flashPost && 
+            <FlashPost onSubmit={(post) => {this.pushPost(post)}} />
+          }
+          <InfiniteScroll
+            items={components}
+            loadMore={() => {this.loadMore(this.state.options, instance.posts.length, this.state.key)}} 
+            hasMore={!instance.isFull}
+            threshold={10}
+            elementIsScrollable={false}
+          />
+        </div>
       )
+    } else {
+      return null
     }
   }
 }
 
 function mapStateToProps(state) {
   return { 
-    currentUser: state.currentUser
+    currentUser: state.currentUser,
+    postsStorage: state.postsStorage
   }
 }
 

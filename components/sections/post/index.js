@@ -23,9 +23,6 @@ import SubscribeButton from '../../isomorphic/subscribeButton.js'
 import Link from 'next/link'
 import { ShareButtons, ShareCounts, generateShareIcon } from 'react-share'
 
-// Dynamics
-var BlurImageLoader = dynamic(import('react-blur-image-loader'))
-
 
 class Post extends React.Component {
   constructor(props) {
@@ -82,12 +79,7 @@ class Post extends React.Component {
             </div>
             {post.postImage && 
             	<div className="image block-item">
-                <BlurImageLoader src={post.postImage}
-                  preview={"http://localhost:3001/storage/tiny.jpg"} 
-                  fullCover={true}
-                  maxBlurLevel={10}
-                  transitionTime={400}
-                />
+                <img src={post.postImage} width="100%" />
               </div>
             }
             <div className="title block-item">
@@ -160,7 +152,6 @@ class Post extends React.Component {
               justify-content:space-between;
             }
             .article .image {
-              margin:0px;
               position:relative;
             }
             .article .title h1 {

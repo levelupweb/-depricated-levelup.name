@@ -78,8 +78,8 @@ class Editor extends React.Component {
          	post={this.props.postState.post}
          />
          <div className="main">
-          	<div className="inner block">
-          		<div className="header block-vertical block-border-bottom">
+          	<div className="inner blocks">
+          		<div className="header block-item">
              		<Header
              			onChange={(field, value) => {
              				this.handleSlug(value);
@@ -88,7 +88,7 @@ class Editor extends React.Component {
                   status={postState.status}
              		/>
              	</div>
-             	<div className="description block-vertical block-border-bottom">
+             	<div className="description block-item">
              		<Description 
              			onChange={(value) => {
              				this.handleChange('postDescription', value)
@@ -96,7 +96,7 @@ class Editor extends React.Component {
                   value={this.props.postState.post.postDescription}
              		/>
           		</div>
-            		<div className="textarea block-vertical">
+            		<div className="textarea block-item">
             			<Textarea 
             				value={this.getField('postContent')}
             				onChange={(value) => {

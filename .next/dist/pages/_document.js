@@ -83,48 +83,32 @@ var MyDocument = function (_Document) {
           fileName: _jsxFileName,
           lineNumber: 20
         }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/components/dropdown.min.css', __source: {
+      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/frontend/global.css', __source: {
           fileName: _jsxFileName,
           lineNumber: 21
         }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/global.css', __source: {
+      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/frontend/loader.css', __source: {
           fileName: _jsxFileName,
           lineNumber: 22
         }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/normalize.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 23
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/loader.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 24
-        }
       }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/libs/quill/quill.snow.css', __source: {
           fileName: _jsxFileName,
-          lineNumber: 25
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/libs/quill/quill.bubble.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 26
-        }
-      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/libs/quill/quill.core.css', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 27
+          lineNumber: 23
         }
       })), _react2.default.createElement('body', {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 29
+          lineNumber: 25
         }
       }, this.props.customValue, _react2.default.createElement(_document.Main, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 31
+          lineNumber: 27
         }
       }), _react2.default.createElement(_document.NextScript, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 32
+          lineNumber: 28
         }
       })));
     }

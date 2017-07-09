@@ -66,8 +66,8 @@ class UserBar extends React.Component {
       var currentUser = this.props.user.profile || {};
       return (
         <div>
-          <div className="userbar block">
-            <div className="user block-vertical">
+          <div className="userbar">
+            <div className="user">
               <div className="image">
                 <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
                   <Avatar color={`#eee`} fgColor={`#eee`} round={true} size={95} src={user.userImage} name={user.userName} />
@@ -124,7 +124,9 @@ class UserBar extends React.Component {
               </div>
             </div>
           </div>
-          <Statistic userID={this.state.user._id} />
+          <div>
+            <Statistic userID={this.state.user._id} />
+          </div>
         	<style jsx>{`
             .userbar.block-shadow {
               border:0px;
@@ -138,7 +140,7 @@ class UserBar extends React.Component {
             }
             .userbar {
               border-bottom:1px solid #eee;
-              padding:50px 30px;
+              padding:50px 15px;
               text-align:center;
             }
             .userbar .user {
@@ -243,72 +245,87 @@ class Statistic extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     var id = nextProps.userID;
-    getUserStats(id).then((res) => {
-      this.setState({ ...res.data })
-    }).then(() => {
-      this.setState({isLoaded: true})
-    })
+    if(id != this.props.userID) {
+      console.log('Update state...')
+      getUserStats(id).then((res) => {
+        this.setState({ 
+          ...res.data,
+          isLoaded: true 
+        })
+      })
+    }
   }
 
   render() {
     if(this.state.isLoaded) {
       return (
-          <div className="block stats">
-            <div className="summary statistics mini">
-              <div className="statistic">
-                <div className="value">
-                  {this.state.score}
+          <div className="stats">
+            <div className="left">
+              <div className="summary statistics mini">
+                <div className="statistic">
+                  <div className="value">
+                    {this.state.score}
+                  </div>
+                  <div className="label">
+                    балл.
+                  </div>
                 </div>
-                <div className="label">
-                  балл.
+              </div>
+              <div className="common">
+                <div className="statistic">
+                  <div className="value">
+                    {this.state.subscribers}
+                  </div>
+                  <div className="label">
+                    подп.
+                  </div>
+                </div>
+                <div className="statistic">
+                  <div className="value">
+                    {this.state.likes}
+                  </div>
+                  <div className="label">
+                    лайк.
+                  </div>
+                </div>
+                <div className="statistic">
+                  <div className="value">
+                    {this.state.posts}
+                  </div>
+                  <div className="label">
+                    публ.
+                  </div>
+                </div>
+                <div className="statistic">
+                  <div className="value">
+                    {this.state.comments}
+                  </div>
+                  <div className="label">
+                    комм.
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="common">
-              <div className="statistic">
-                <div className="value">
-                  {this.state.subscribers}
-                </div>
-                <div className="label">
-                  подп.
-                </div>
-              </div>
-              <div className="statistic">
-                <div className="value">
-                  {this.state.likes}
-                </div>
-                <div className="label">
-                  лайк.
-                </div>
-              </div>
-              <div className="statistic">
-                <div className="value">
-                  {this.state.posts}
-                </div>
-                <div className="label">
-                  публ.
-                </div>
-              </div>
-              <div className="statistic">
-                <div className="value">
-                  {this.state.comments}
-                </div>
-                <div className="label">
-                  комм.
-                </div>
-              </div>
+            <div className="right">
+              <UserBlog userID={this.props.userID} />
             </div>
-            <UserBlog userID={this.props.userID} />
             <style jsx>{`
             .stats {
               display:flex;
               align-items:center;
+              justify-content:space-between;
               position:relative;
+              padding:25px 0px;
+              padding-bottom:10px;
+            }
+            .stats .left {
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
             }
             .stats .summary {
               min-width:90px;
               position:relative;
-              padding-left:15px;
             }
             .stats .summary::after {
               position:absolute;
@@ -324,7 +341,6 @@ class Statistic extends React.Component {
               align-items:center;
               margin-left:40px;
             }
-
             .stats .statistic {
               text-align:center;
               margin-right:20px;
@@ -336,7 +352,7 @@ class Statistic extends React.Component {
           </div>        
       )
     } else {
-      return <Blank />
+      return null
     }
   }
 }
@@ -363,10 +379,11 @@ class UserBlog extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-   
-    this.getBlog(nextProps.userID).then(() => {
-      this.setState({ isLoaded: true })
-    })
+    if(nextProps.userID != this.props.userID) {
+      this.getBlog(nextProps.userID).then(() => {
+        this.setState({ isLoaded: true })
+      })
+    }
   }
 
   getBlog(id) {
@@ -397,8 +414,8 @@ class UserBlog extends React.Component {
     var blog = this.state.blog;
     if (blog == null) { 
       return (
-        <div className="blog" data-position="bottom right" data-tooltip="Создать блог" data-inverted="">
-          <div className="ui modal small form-blog">
+        <div className="blog">
+          <div className="ui modal small form-blog" >
             <div className="header">Создание блога</div>
             <div className="image content">
               <div className="ui form">
@@ -416,12 +433,6 @@ class UserBlog extends React.Component {
             <i className="fa fa-plus"></i>
           </div>
           <style jsx>{`
-            .blog {
-              position:absolute;
-              right:0px;
-              top:0px;
-              padding:17px 30px;
-            }
             .blog .image {
               width:40px;
               height:40px;
@@ -458,10 +469,8 @@ class UserBlog extends React.Component {
             </div>
             <style jsx>{`
               .blog {
-                position:absolute;
                 right:0px;
                 top:0px;
-                padding:17px 30px;
               }
             `}</style>
           </div>
