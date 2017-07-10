@@ -14,8 +14,7 @@ const defaultState = {
     postTags: [],
     postImage: null,
     postStatus: null
-  },
-  status: ''
+  }
 }
 
 
@@ -36,11 +35,6 @@ export default (state = defaultState, action) => {
           ...state.post,
           ...action.payload
         }
-      }
-    case 'SET_POST_STATUS': 
-      return {
-        ...state,
-        status: action.payload
       }
     case 'POST_PUSH_TAG':
       return {

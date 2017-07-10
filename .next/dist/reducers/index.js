@@ -24,6 +24,10 @@ var _postsStorage = require('./postsStorage.js');
 
 var _postsStorage2 = _interopRequireDefault(_postsStorage);
 
+var _message = require('./message.js');
+
+var _message2 = _interopRequireDefault(_message);
+
 var _redux = require('redux');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -33,7 +37,8 @@ var reducers = {
 	currentUser: _currentUser2.default,
 	postState: _postState2.default,
 	userFaces: _userFaces2.default,
-	postsStorage: _postsStorage2.default
+	postsStorage: _postsStorage2.default,
+	message: _message2.default
 };
 
 exports.default = (0, _redux.combineReducers)(reducers);

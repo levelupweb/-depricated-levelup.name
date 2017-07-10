@@ -30,13 +30,6 @@ export default class PostList extends React.Component {
 						isLoaded: true
 					})
 				})
-			} else {
-				getPosts(1).then((res) => {
-					this.setState({
-						posts: res.data,
-						isLoaded: true
-					})
-				})
 			}
 		} else {
 			this.setState({

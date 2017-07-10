@@ -82,11 +82,7 @@ class Feed extends React.Component {
   removeItem(token, key, id) {
     this.dispatch(
       removePost(...arguments)
-    ).then((res) => {
-      if(res.success) {
-
-      }
-    })
+    )
   }
 
   render() {

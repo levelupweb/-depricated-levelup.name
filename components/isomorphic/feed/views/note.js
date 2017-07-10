@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic'
 
 // Actions
 import { uploadImage } from '../../../../actions/app.js'
-import { setLikeById, removePostById, postUpdate } from '../../../../actions/post.js'
+import { setLike, removePostById, updatePost } from '../../../../actions/post.js'
 
 // Utils 
 import getYouTubeId from '../../../../utils/getYouTube.js' 
@@ -95,7 +95,7 @@ class Note extends React.Component {
    } DEPR */ 
 
   	handleLike(postID, userID) {
-    	setLikeById(this.token, postID).then((res) => {
+    	setLike(this.token, postID).then((res) => {
       	if(res.data.success) {
 	        	this.setState({
 		       	...this.state.post,
@@ -117,7 +117,7 @@ class Note extends React.Component {
    }
 
   	handleSave(token, id, data) {
-  		postUpdate(token, id, data).then((res) => {
+  		updatePost(token, id, data).then((res) => {
   			if(res.data.success) {
   				this.setState({
 	  				isEditing: false

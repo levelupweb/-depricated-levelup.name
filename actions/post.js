@@ -5,6 +5,9 @@ import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 import randomString from '../utils/randomString.js'
 import hash from 'object-hash'
 
+// actions
+import * as MESSAGE from './message.js'
+
 // models
 import * as MODEL from '../models/post.js'
 
@@ -13,40 +16,16 @@ export function findPost(query) {
    return MODEL.findPost(query)
 }
 
-// TODO: rewrite name -> getUserPosts
-export function getPostsByUserId(id) {
+export function getUserPosts(id) {
 	return MODEL.getUserPosts(id)
 }
 
-// TODO: rewrite name -> setLike
-export function setLikeById(token, id) {
+export function setLike(token, id) {
    return MODEL.setLike(token, id)
 }
 
-// TODO: rewrite name -> updatePost
-export function postUpdate(token, id, post) {
+export function updatePost(token, id, post) {
    return MODEL.updatePost(token, id, post)
-}
-
-// TODO: rewrite
-export function getPosts(page, options, token) {
-	var params = options;
-	if(!params.perPage) { params.perPage = 10 }
-	params.skip = (page - 1) * params.perPage
-
-	if(!params.personal) {
-		return axiosNoAuth({
-			url: 'post/entries',
-			method: 'GET',
-			params: params
-	   })
-	} else {
-		return axiosAuth(token, {
-			url: 'post/entries/personal',
-			method: 'GET',
-			params: params
-	   })
-	}
 }
 
 export function setPostField(field, value) {
@@ -79,40 +58,6 @@ export function prepareNewPost(user, type) {
 	}
 }
 
-// TODO: return data
-export function createPost(token, defaultPost) {
-	return (dispatch) => {
-		var post = {
-			...defaultPost,
-			postTitle: defaultPost.postTitle || 'Безымянный' 
-		}
-		return MODEL.addPost(token, post).then((res) => {
-	   	dispatch(setPost(res.data.post))
-	   	return res.data.post._id
-	   }).then((id) => {
-	   	dispatch(displayStatus('Сохранено в черновиках'))
-	   	return id
-	   })
-	}
-}
-
-// TODO: return data / dispatch setPost from post to res.data.post
-export function savePost(token, post, message) {
-	return (dispatch) => {
-		console.log(post)
-		return MODEL.updatePost(token, post._id, post).then((res) => {
-	   	if(res.data.success) {
-	   		dispatch(setPost(post))
-	   	} else {
-	   		console.warn('Ошибка при обновлении поста', res.data)
-	   	}
-	   	return res.data
-	   }).then(() => {
-	   	dispatch(displayStatus(message || 'Сохранено'))
-	   })
-	}
-}
-
 export function pushTag(tag) {
 	return (dispatch) => {
 		if(tag.length > 0) {
@@ -133,20 +78,48 @@ export function pullTag(tag) {
 	}
 }
 
-export function displayStatus(value) {
-	return async (dispatch) => {
-		await dispatch(setStatus(value))
-	   await setTimeout(() => {
-        dispatch(setStatus(null))
-      }, 3000)
+export function createPost(token, defaultPost) {
+	return (dispatch) => {
+		var post = {
+			...defaultPost,
+			postTitle: defaultPost.postTitle || 'Безымянный' 
+		}
+		return MODEL.addPost(token, post).then((res) => {
+			if(res.data.success) {
+	   		dispatch(setPost(res.data.post))
+	   		return res.data.post._id;
+	   	} else {
+	   		dispatch(MESSAGE.handleWarn(
+					'Ошибка при создании поста', true
+				));
+	   	}
+	   }).then((id) => {
+	   	dispatch(MESSAGE.handleWarn(
+				'Сохранено в черновиках', true
+			));
+	   	return id
+	   })
 	}
 }
 
-function setStatus(value) {
-   return {
-   	type: 'SET_POST_STATUS', 
-   	payload: value
-   }
+// TODO: return data 
+export function savePost(token, post, message) {
+	return (dispatch) => {
+		return MODEL.updatePost(token, post._id, post).then((res) => {
+	   	if(res.data.success) {
+	   		dispatch(setPost(post))
+	   	} else {
+	   		dispatch(MESSAGE.handleError(
+					'Ошибка при сохранении поста', true
+				));
+	   	}
+	   	return res.data
+	   }).then(() => {
+	   	dispatch(MESSAGE.handleWarn(
+				message || 'Сохранено', true
+			));
+	   })
+	}
 }
 
 // PostsStorage Actions
@@ -165,7 +138,9 @@ export function fetchPosts(key, defaultOptions, skip) {
 			   })
 			}
 		} else {
-			console.warn('Инстанция не найдена')
+			dispatch(MESSAGE.handleError(
+				'Инстанция не найдена', true
+			));
 		}
 	}
 }
@@ -190,16 +165,13 @@ export function pushPost(token, key, post) {
 		return MODEL.addPost(token, postFinal).then((response) => {
 			if(response.data.success) {
 				dispatch(pushPostEnd(key, response.data.post))
-				return {
-					success: true,
-					message: 'Пост успешно добавлен'
-				}
+				dispatch(MESSAGE.handleSuccess(
+					'Пост успешно добавлен', true
+				));
 			} else {
-				return {
-					success: false,
-					message: 'Ошибка при публикации нового поста..'
-				}
-				console.warn('Ошибка при публикации нового поста..')
+				dispatch(MESSAGE.handleError(
+					'Ошибка при добавлении поста', true
+				));
 			}
 			return response;
 		})
@@ -224,22 +196,19 @@ function pushPostEnd(key, post) {
 	}
 }
 
-// add remove model to dispatch
 export function removePost(token, key, id) {
 	return (dispatch) => {
 		dispatch(removePostStart(key, id))
 		return MODEL.removePost(token, id).then((res) => {
 			if(res.data.success) {
 				dispatch(removePostEnd(key, id))
-				return {
-					success: true,
-					message: 'Пост успешно удалён'
-				}
+				dispatch(MESSAGE.handleSuccess(
+					'Пост успешно удалён', true
+				));
 			} else {
-				return {
-					success: false,
-					message: 'Ошибка при удалении'
-				}
+				dispatch(MESSAGE.handleError(
+					'Ошибка при удалении поста', true
+				));
 			}
 		})
 	}
@@ -280,4 +249,21 @@ function fetchPostsEnd(key, posts) {
 			key, posts
 		}
 	}
+}
+
+// DEPRICATED METHODS
+// DANGER ZONE
+
+// TODO: rewrite
+export function getPosts(defaultOptions, skip) {
+	var options = {
+		...defaultOptions,
+		perPage: defaultOptions.perPage || 10,
+		skip: skip
+	}
+	return axiosNoAuth({
+		url: 'post/entries',
+		method: 'GET',
+		params: options
+   })
 }

@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 
 // Actions
 import { getUserById } from '../../../actions/user.js'
-import { setLikeById, getUsersWhoLikes } from '../../../actions/post.js'
+import { setLike, getUsersWhoLikes } from '../../../actions/post.js'
 import { getBlogById } from '../../../actions/blog.js'
 
 // Utils
@@ -232,7 +232,7 @@ class Actions extends React.Component {
 
   // Specific Methods
   handleLike(postID, userID) {
-    setLikeById(this.token, postID).then((res) => {
+    setLike(this.token, postID).then((res) => {
       if(res.data.success) {
         this.setState({
           isLiked: !this.state.isLiked,

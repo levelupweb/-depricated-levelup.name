@@ -3,6 +3,7 @@ import app from './app.js'
 import postState from './postState.js'
 import userFaces from './userFaces.js'
 import postsStorage from './postsStorage.js'
+import message from './message.js'
 import { combineReducers } from 'redux'
 
 const reducers = {
@@ -10,7 +11,8 @@ const reducers = {
 	currentUser,
 	postState,
 	userFaces,
-	postsStorage
+	postsStorage,
+	message
 }
 
 export default combineReducers(reducers)

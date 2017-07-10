@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import dynamic from 'next/dynamic'
 
 // Actions
-import { setLikeById } from '../../../../actions/post.js'
+import { setLike } from '../../../../actions/post.js'
 
 // Components
 import User from '../../user.js'
@@ -52,7 +52,7 @@ class Default extends React.Component {
   // Specific Methods
 
   handleLike(token, postID, userID) {
-    setLikeById(token, postID).then((res) => {
+    setLike(token, postID).then((res) => {
       if(res.data.success) {
         this.setState({
           ...this.state.post,
