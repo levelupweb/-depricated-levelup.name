@@ -6,7 +6,7 @@ import router from 'next/router'
 
 // Actions
 import { getUserById, updateUserById, getUserStats } from '../../../../actions/user.js'
-import { createBlog, getAllBlogs, getUserBlog } from '../../../../actions/blog.js'
+import { createBlog, getUserBlog } from '../../../../actions/blog.js'
 import { updateImage } from '../../../../actions/app.js'
 
 // Components

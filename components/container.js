@@ -8,7 +8,7 @@ import Header from './isomorphic/header/index.js'
 import Sidebar from './isomorphic/sidebar/index.js'
 
 // Actions
-import * as MESSAGE from '../actions/message.js'
+import { handleSuccess, handleWarn, handleError, hideMessage } from '../actions/app.js'
 
 class Container extends React.Component {
   constructor(props) {
@@ -43,7 +43,7 @@ class Component extends React.Component {
   componentDidMount() {
     var hasVisited = cookies.get('hasVisited');
     if (!hasVisited) {
-      this.dispatch(MESSAGE.handleWarn(
+      this.dispatch(handleWarn(
         'Данный сайт использует ваши cookie-данные для лучшей работы', true
       ));
     }
@@ -97,7 +97,7 @@ class Message extends React.Component {
               </div>
             </div>
             <div className="actions">
-              {isClosable && (<i onClick={() => {this.dispatch(MESSAGE.hideMessage())}} className="fa fa-close"></i>) }
+              {isClosable && (<i onClick={() => {this.dispatch(hideMessage())}} className="fa fa-close"></i>) }
             </div>
           </div>
 

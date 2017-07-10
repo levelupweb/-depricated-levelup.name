@@ -3,54 +3,49 @@ import config from '../app.config.js'
 import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 import cookies from 'js-cookie'
 
+// actions
+import { handleWarn, handleError, handleSuccess } from './app.js'
+
+// models
+import * as MODEL from '../models/user.js'
+
 export function authenticateUser(token) {
 	return (dispatch) => {
 		if(token) { 
-			axiosAuth(token, {
-				url: 'user/auth',
-				method: 'GET'
-		    }).then((res) => {
-		    	// Записываем пользователя в Store
+			return MODEL.authenticateUser(token).then((res) => {
 		    	dispatch(setUser(res.data))
-		    	// Возвращаем пользователя
 		    	return res.data
 		    })
 		} else {
-			// Записываем ошибку в Store
 			dispatch({type: 'LOGIN_FAILURE'})
 			return false
 		}
 	}
 }
 
-export function signIn(data) {
+export function signIn(user) {
 	return (dispatch) => {
-	   return axiosNoAuth({
-		   url: config.API + 'user/signin',
-		   method: 'POST',
-		   data: data
-		}).then((res) => {
+	   return MODEL.signIn(user).then((res) => {
 			if(res.data.success) {
-				// Записываем пользователя
 				dispatch(setUser(res.data.user))
 			} 
 			return res
 		}).then((res) => {
 			if(res.data.token && res.data.success) {
-				// Записываем токен
 				cookies.set(
 					'x-access-token', 
 					res.data.token, 
 					{ expires: 7, path: '' }
 				);
-				// Возвращаем пользователя и сообщение
+				dispatch(handleSuccess(
+					'Привет, ' + res.data.user.userName, true
+				));
 				return {
 					success: true,
 					message: res.data.message,
 					user: res.data.user
 				}
 			} else {
-				// Возвращаем ошибку
 				return {
 					success: false,
 					message: res.data.message
@@ -60,20 +55,15 @@ export function signIn(data) {
 	}
 }
 
-export function signUp(data) {
+export function signUp(user) {
 	return (dispatch) => {
-	   return axiosNoAuth({
-		   url: config.API + 'user/signup',
-		   method: 'POST',
-		   data: data
-		}).then((res) => {
+	   return MODEL.signUp(user).then((res) => {
 			if(res.data.success) {
 				return {
 					success: true,
 					message: res.data.message
 				}
 			} else {
-				// Возвращаем ошибку
 				return {
 					success: false,
 					message: res.data.message,
@@ -86,111 +76,52 @@ export function signUp(data) {
 
 
 export function setUser(user) {
-	return (dispatch) => {
-		if (user) {
-			dispatch({type: 'LOGIN_SUCCESS', payload: user})
-		} else {
-			dispatch({type: 'LOGIN_FAILURE'})
+	if (user) {
+		return {
+			type: 'LOGIN_SUCCESS', 
+			payload: user
+		}
+	} else {
+		return {
+			type: 'LOGIN_FAILURE'
 		}
 	}
+	
 }
 
 export function getLogout() {
 	return (dispatch) => {
-		dispatch({type: 'LOGOUT'})
+		dispatch({
+			type: 'LOGOUT'
+		})
 	}
 }
 
-export function getAllUsers() {
-	return axios.get(config.API + 'user/entries')	
+export function getUsers() {
+	return MODEL.getUsers()
 }
 
-export function getUserById(id) {
-	return axios.get(config.API + 'user/entries/id/' + id)	
+export function getUser(id) {
+	return MODEL.getUser(id)
 }
 
-export function updateUserById(id, data) {
-	return axios.post(config.API + 'user/entries/' + id + '/update', data)
+export function updateUser(id, user) {
+	return MODEL.updateUser(id, user)
 }
 
-export function removeUserById(id) {
-	return axios.get(config.API + `user/entries/` + id + `/remove`)
+export function removeUser(token, id) {
+	return MODEL.removeUser(token, id)
 }
 
-export function subscribeToUser(token, id) {
-	return axios({
-		url: config.API + 'user/' + id + '/subscribe/author',
-		method: 'GET',
-		headers: {
-			'authorization': token
-		}
-    })
+export function createUser(token, user) {
+	return MODEL.createUser(token, user)
 }
 
-export function getUserField(id, field) {
-	return axios.get(config.API + `user/entries/` + id + `/field/` + field)
-}
-
-export function registerUser(data) {
-	return axios({
-		url: config.API + 'user/add',
-		method: 'POST',
-		data: data,
-    })
-}
-
-export function getUserSubscriptions(userID) {
-	return axios.get(config.API + 'user/entries/' + userID + '/getsubscriptions')	
-}
-
-export function addSocialToUser(token, id, data) {
-	return axios({
-		url: config.API + 'user/entries/' + id + '/addsocial',
-		method: 'POST',
-		data: data,
-		headers: {
-			'authorization': token
-		}
-    })
-}
-
-export function getUserLikesCount(userID) {
-	return axios.get(config.API + 'user/entries/' + userID + '/getlikecount')	
-}
-
-export function getUserPostsCount(userID) {
-	return axios.get(config.API + 'user/entries/' + userID + '/getpostscount')	
-}
-
-export function removeUserSocial(token, userid, data) {
-	return axios({
-		url: config.API + 'user/entries/' + userid + '/removesocial/',
-		method: 'POST',
-		data: data,
-		headers: {
-			'authorization': token
-		}
-    })
-}
-
-export function uploadImage(token, userID, data) {
-    return axiosAuth(token, {
-		url: 'user/entries/' + userID + '/upload',
-		method: 'POST',
-		data: data
-    })
-}
-
-
-export function getUserStats(userID) {
-    return axiosNoAuth({
-		url: 'user/entries/' + userID + '/getstats',
-		method: 'GET'
-    })
+export function getUserStats(id) {
+   return MODEL.getUserStats(id)
 }
 
 // Faces Reducer
-
 function setFaces(faces) {
 	return (dispatch) => {
 		dispatch({type: 'SET_FACES', payload: faces});
@@ -209,23 +140,37 @@ export function setFace(face) {
 	}
 }
 
+// DEPRICATED
 export function setUserFaces(user) {
 	return (dispatch) => {
-	   return axiosNoAuth({
-			url: 'user/entries/' + user._id + '/getfaces',
-			method: 'GET'
-	   }).then((res) => {
+	   return MODEL.getFaces(user._id).then((res) => {
 	    	dispatch(setFaces(res.data.concat(user)))
 	   })
 	}
 }
 
 export function findUser(query) {   
-    return axiosNoAuth({
-      url: 'search/entries/users',
-      method: 'GET',
-      params: {
-        query: query
-      }
+	return MODEL.findUser(query)
+}
+
+// DEPRICATED
+export function getUserSubscriptions(id) {
+	return MODEL.getUserSubscriptions(id)
+}
+
+// DEPRICATED
+export function addSocial(token, id, social) {
+	return MODEL.addSocial(token, id, social)
+}
+
+// DEPRICATED
+export function removeUserSocial(token, userid, data) {
+	return axios({
+		url: config.API + 'user/entries/' + userid + '/removesocial/',
+		method: 'POST',
+		data: data,
+		headers: {
+			'authorization': token
+		}
     })
 }

@@ -6,9 +6,9 @@ import { connect } from 'react-redux'
 import dynamic from 'next/dynamic'
 
 // Actions
-import { getUserById } from '../../../actions/user.js'
+import { getUser } from '../../../actions/user.js'
 import { setLike, getUsersWhoLikes } from '../../../actions/post.js'
-import { getBlogById } from '../../../actions/blog.js'
+import { getBlog } from '../../../actions/blog.js'
 
 // Utils
 import declOfNum from '../../../utils/declarationOfNum.js'
@@ -44,13 +44,13 @@ class Post extends React.Component {
         post: this.props.defaultPost
       }, () => {
         if(this.props.defaultPost.postAuthor.authorType == 'user') {
-          getUserById(this.props.defaultPost.postAuthor.authorID).then((res) => {
+          getUser(this.props.defaultPost.postAuthor.authorID).then((res) => {
             this.setState({
               user: res.data
             })
           })
         } else {
-          getBlogById(this.props.defaultPost.postAuthor.authorID).then((res) => {
+          getBlog(this.props.defaultPost.postAuthor.authorID).then((res) => {
             this.setState({
               blog: res.data
             })

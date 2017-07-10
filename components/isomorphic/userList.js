@@ -2,7 +2,7 @@
 import React from 'react';
 
 // Actions
-import { getUserById, getUserSubscriptions, getAllUsers } from '../../actions/user.js'
+import { getUser, getUserSubscriptions, getUsers } from '../../actions/user.js'
 
 // Components
 import Avatar from 'react-avatar'
@@ -29,7 +29,7 @@ export default class UserList extends React.Component {
 					})
 				})
 			} else {
-				getAllUsers().then((res) => {
+				getUsers().then((res) => {
 					this.setState({
 						users: res.data
 					})

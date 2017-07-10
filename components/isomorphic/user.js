@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import router from 'next/router'
 
 // Actions
-import { getUserById } from '../../actions/user.js'
+import { getUser } from '../../actions/user.js'
 
 // Components
 import Avatar from 'react-avatar'
@@ -33,7 +33,8 @@ class User extends React.Component {
 
   getUser(id) {
     if(id) {
-      getUserById(id).then((res) => {
+      getUser(id).then((res) => {
+        console.log(res.data)
         this.setState({
           user: {
             ...this.state.user,

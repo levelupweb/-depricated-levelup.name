@@ -7,7 +7,7 @@ import cookies from 'js-cookie'
 import { UI } from '../../../../utils/initScripts.js'
 
 // Actions
-import { updateUserById, addSocialToUser, removeUserSocial } from '../../../../actions/user'
+import { updateUser, addSocial, removeUserSocial } from '../../../../actions/user'
 
 // Components
 import Avatar from 'react-avatar'
@@ -62,7 +62,7 @@ class UserSingle extends React.Component {
 
   handleAddSocial() {
     var newSocial = { title: this.newSocialTitle.innerHTML, link: this.newSocialLink.value }
-    addSocialToUser(this.token, this.currentUser._id, newSocial).then((res) => {
+    addSocial(this.token, this.currentUser._id, newSocial).then((res) => {
       if(res.data.success) {
         // Добавление социальной сети в интерфейсе
       } else {
@@ -92,7 +92,7 @@ class UserSingle extends React.Component {
   }
 
   handleSave() {
-    updateUserById(this.state.user._id, this.state.user).then((res) => {
+    updateUser(this.state.user._id, this.state.user).then((res) => {
       // handle success
     })
   }

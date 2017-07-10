@@ -116,8 +116,8 @@ class Note extends React.Component {
 	   })
    }
 
-  	handleSave(token, id, data) {
-  		updatePost(token, id, data).then((res) => {
+  	handleSave(token, id, post) {
+  		updatePost(token, id, post).then((res) => {
   			if(res.data.success) {
   				this.setState({
 	  				isEditing: false

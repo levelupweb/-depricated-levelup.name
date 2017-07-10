@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cookies from 'js-cookie'
 
 // Actions
-import { getTags, subscribeToTag, getTagSubscribers, findTag } from '../../../actions/tag.js'
+import { getTags, getTagSubscribers, findTag } from '../../../actions/tag.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';

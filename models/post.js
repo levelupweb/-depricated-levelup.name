@@ -3,18 +3,18 @@ import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 // Rules: 
 // Models names: [action][instance] () {...}
 
+export function createPost(token, post) {
+	return axiosAuth(token, {
+		url: 'post/add',
+		method: 'POST',
+		data: post
+   })
+}
+
 export function removePost(token, id) {
 	return axiosAuth(token, {
 		url: 'post/entries/' + id + '/remove',
 		method: 'GET'
-   })
-}
-
-export function addPost(token, data) {
-	return axiosAuth(token, {
-		url: 'post/add',
-		method: 'POST',
-		data: data
    })
 }
 

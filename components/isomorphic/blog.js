@@ -5,7 +5,7 @@ import config from '../../app.config.js'
 import router from 'next/router'
 
 // Actions
-import { getBlogById } from '../../actions/blog.js'
+import { getBlog } from '../../actions/blog.js'
 
 // Components
 import Avatar from 'react-avatar'
@@ -34,7 +34,7 @@ export class Blog extends React.Component {
 
   getBlog(id) {
     if(id) {
-      getBlogById(id).then((res) => {
+      getBlog(id).then((res) => {
         this.setState({
           blog: res.data,
           isLoaded: true

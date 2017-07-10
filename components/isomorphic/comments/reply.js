@@ -4,7 +4,7 @@ import cookies from 'js-cookie'
 import { connect } from 'react-redux'
 
 // Actions
-import { addComment } from '../../../actions/comment.js'
+import { createComment } from '../../../actions/comment.js'
 
 // Components
 import Link from 'next/link'
@@ -46,7 +46,7 @@ class ReplyForm extends React.Component {
 	}
 
 	submitComment(token, comment) {
-		addComment(token, comment).then((res) => {
+		createComment(token, comment).then((res) => {
 			if(res.data.success) {
 				this.props.onSubmit(res.data.comment)
 			} else {

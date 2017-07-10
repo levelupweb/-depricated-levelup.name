@@ -2,7 +2,7 @@
 import React from 'react';
 
 // Actions
-import { getUserTags, getTags, getTagById } from '../../actions/tag.js'
+import { getUserTags, getTags } from '../../actions/tag.js'
 
 // Components
 import Link from 'next/link'

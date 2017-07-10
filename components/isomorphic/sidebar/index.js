@@ -10,7 +10,7 @@ import { UI } from '../../../utils/initScripts.js'
 import AuthService from '../../../utils/AuthService.js'
 
 // Actions
-import { getLogout, getUserField } from '../../../actions/user.js'
+import { getLogout } from '../../../actions/user.js'
 
 // Components
 import Link from 'next/link'

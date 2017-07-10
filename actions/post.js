@@ -1,12 +1,11 @@
 import axios from 'axios'
 import config from '../app.config.js'
 import cookies from 'js-cookie'
-import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 import randomString from '../utils/randomString.js'
 import hash from 'object-hash'
 
 // actions
-import * as MESSAGE from './message.js'
+import { handleWarn, handleError, handleSuccess } from './app.js'
 
 // models
 import * as MODEL from '../models/post.js'
@@ -84,17 +83,17 @@ export function createPost(token, defaultPost) {
 			...defaultPost,
 			postTitle: defaultPost.postTitle || 'Безымянный' 
 		}
-		return MODEL.addPost(token, post).then((res) => {
+		return MODEL.createPost(token, post).then((res) => {
 			if(res.data.success) {
 	   		dispatch(setPost(res.data.post))
 	   		return res.data.post._id;
 	   	} else {
-	   		dispatch(MESSAGE.handleWarn(
+	   		dispatch(handleWarn(
 					'Ошибка при создании поста', true
 				));
 	   	}
 	   }).then((id) => {
-	   	dispatch(MESSAGE.handleWarn(
+	   	dispatch(handleWarn(
 				'Сохранено в черновиках', true
 			));
 	   	return id
@@ -109,13 +108,13 @@ export function savePost(token, post, message) {
 	   	if(res.data.success) {
 	   		dispatch(setPost(post))
 	   	} else {
-	   		dispatch(MESSAGE.handleError(
+	   		dispatch(handleError(
 					'Ошибка при сохранении поста', true
 				));
 	   	}
 	   	return res.data
 	   }).then(() => {
-	   	dispatch(MESSAGE.handleWarn(
+	   	dispatch(handleWarn(
 				message || 'Сохранено', true
 			));
 	   })
@@ -138,7 +137,7 @@ export function fetchPosts(key, defaultOptions, skip) {
 			   })
 			}
 		} else {
-			dispatch(MESSAGE.handleError(
+			dispatch(handleError(
 				'Инстанция не найдена', true
 			));
 		}
@@ -162,14 +161,14 @@ export function pushPost(token, key, post) {
 	}
 	return (dispatch) => {
 		dispatch(pushPostStart(key))
-		return MODEL.addPost(token, postFinal).then((response) => {
+		return MODEL.createPost(token, postFinal).then((response) => {
 			if(response.data.success) {
 				dispatch(pushPostEnd(key, response.data.post))
-				dispatch(MESSAGE.handleSuccess(
+				dispatch(handleSuccess(
 					'Пост успешно добавлен', true
 				));
 			} else {
-				dispatch(MESSAGE.handleError(
+				dispatch(handleError(
 					'Ошибка при добавлении поста', true
 				));
 			}
@@ -202,11 +201,11 @@ export function removePost(token, key, id) {
 		return MODEL.removePost(token, id).then((res) => {
 			if(res.data.success) {
 				dispatch(removePostEnd(key, id))
-				dispatch(MESSAGE.handleSuccess(
+				dispatch(handleSuccess(
 					'Пост успешно удалён', true
 				));
 			} else {
-				dispatch(MESSAGE.handleError(
+				dispatch(handleError(
 					'Ошибка при удалении поста', true
 				));
 			}
