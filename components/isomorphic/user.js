@@ -34,7 +34,6 @@ class User extends React.Component {
   getUser(id) {
     if(id) {
       getUser(id).then((res) => {
-        console.log(res.data)
         this.setState({
           user: {
             ...this.state.user,

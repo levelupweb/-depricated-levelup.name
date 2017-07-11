@@ -17,16 +17,14 @@ import Avatar from 'react-avatar'
 import User from '../../../isomorphic/user.js'
 import Link from 'next/link'
 
-
-
 class UserBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = { user: null }
-    this.currentUser = this.props.currentUser;
     this.token = cookies.get('x-access-token');
   }
 
+  // React Lifecycle
   componentWillMount() {
     this.setState({
       ...this.state,
@@ -38,7 +36,6 @@ class UserBar extends React.Component {
     })
   }
 
-
   componentWillReceiveProps(nextProps) {
     this.setState({
       ...this.state,
@@ -46,6 +43,7 @@ class UserBar extends React.Component {
     })
   }
 
+  // Specific Methods
   handleUpload(e) {
     var image = e.target.files[0];
     var userID = this.state.user._id;
@@ -61,11 +59,11 @@ class UserBar extends React.Component {
   }
 
   render() {
-    if(this.state.user) {
-      var user = this.state.user;
-      var currentUser = this.props.user.profile || {};
+    var user = this.state.user;
+    if (user) {
+      var currentUser = this.props.currentUser;
       return (
-        <div>
+        <div className="wrapper">
           <div className="userbar">
             <div className="user">
               <div className="image">
@@ -85,8 +83,7 @@ class UserBar extends React.Component {
                   field="userDescription"
                   title="Должность/профессия"
                   size="normal"
-                  align="center"
-                />
+                  align="center" />
                 <EditableInput 
                   value={user.userName} 
                   entryType="user"
@@ -94,22 +91,19 @@ class UserBar extends React.Component {
                   field="userName"
                   title="Полное имя пользователя"
                   size="large"
-                  align="center"
-                />
+                  align="center" />
                 <div className="actions">
                   {this.currentUser &&
                     <EditButton 
                       user={user} 
-                      currentUser={this.currentUser} 
-                    />
+                      currentUser={this.currentUser} />
                   }
                   <SubscribeButton 
                     additionalClasses="small" 
                     entryType="user"
                     entryID={user._id} 
                     subscribeText="Подписаться" 
-                    unsubscribeText="Отписаться" 
-                  />
+                    unsubscribeText="Отписаться"  />
                   {user.userSocials &&
                     user.userSocials.map((item, i) => {
                       var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
@@ -125,7 +119,7 @@ class UserBar extends React.Component {
             </div>
           </div>
           <div>
-            <Statistic userID={this.state.user._id} />
+            <Statistic currentUserID={currentUser._id} userID={this.state.user._id} />
           </div>
         	<style jsx>{`
             .userbar.block-shadow {
@@ -307,7 +301,9 @@ class Statistic extends React.Component {
               </div>
             </div>
             <div className="right">
-              <UserBlog userID={this.props.userID} />
+              <UserBlog 
+                currentUserID={this.props.currentUserID} 
+                userID={this.props.userID} />
             </div>
             <style jsx>{`
             .stats {
@@ -410,6 +406,10 @@ class UserBlog extends React.Component {
     })
   }
 
+  isOwner(currentUserID, id) {
+    return currentUserID == id
+  }
+
   render() {
     var blog = this.state.blog;
     if (blog == null) { 
@@ -429,9 +429,11 @@ class UserBlog extends React.Component {
               <div className="ui button primary" onClick={() => this.createBlog()}>Далее</div>
             </div>
           </div>
-          <div onClick={() => { $('.form-blog.modal').modal('show'); this.blogTitle.focus() }} className="image ui circular">
-            <i className="fa fa-plus"></i>
-          </div>
+          {this.isOwner(this.props.currentUserID, this.props.userID) && 
+            <div onClick={() => { $('.form-blog.modal').modal('show'); this.blogTitle.focus() }} className="image ui circular">
+              <i className="fa fa-plus"></i>
+            </div>
+          }
           <style jsx>{`
             .blog .image {
               width:40px;
@@ -561,7 +563,9 @@ class Blank extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return { currentUser: state.currentUser }
+  return { 
+    currentUser: state.currentUser 
+  }
 }
 
 export default connect(mapStateToProps)(UserBar)

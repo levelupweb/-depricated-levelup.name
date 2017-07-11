@@ -1,6 +1,5 @@
 import popArray from '../utils/popArray.js'
 
-
 export default (state = {}, action) => {
    switch (action.type) {
    case 'CREATE_POSTS_INSTANCE': 
@@ -54,15 +53,16 @@ export default (state = {}, action) => {
         ...state,
         [action.payload.key]: {
           ...state[action.payload.key],
-          isHydrating: true
+          isHydrating: true,
+          posts: [ ...state[action.payload.key].posts ]
         }
       }
     case 'REMOVE_POST_END': 
       var index = state[action.payload.key].posts.findIndex((i) => { 
         return i._id == action.payload.id
       })
-      var array = state[action.payload.key].posts.splice()
-      var posts = array.slice(index, 1);
+      var array = state[action.payload.key].posts.slice()
+      var posts = array.splice(index + 1, array.length);
       return {
         ...state,
         [action.payload.key]: {

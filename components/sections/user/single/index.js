@@ -14,37 +14,38 @@ import Feed from '../../../isomorphic/feed/feed.js'
 class User extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: null
+    this.dispatch = this.props.dispatch;
+    this.state = {}
+  }
+
+  // Generic Methods
+  mapDataToState (data) {
+    if(!!data) {
+      for(var name in data) {
+        this.setState({
+          [name]: data[name] || false
+        })
+      }
     }
   }
 
+  // React Lifecycle
   componentWillMount() {
-    if(this.props.pageData != null) {
-      this.getInitialState(
-        this.props.pageData.user
-      )
+    if(!this.state.blog) {
+      this.mapDataToState(this.props.app.pageData)
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.pageData != null) {
-      this.getInitialState(
-        nextProps.pageData.user
-      )
-    }
-  }
-
-  getInitialState(user) {
-    if (user) {
-      this.setState({
-        user: user
-      })
-    }
+    this.mapDataToState(nextProps.app.pageData)
   }
 
   render() {
-    var user = this.state.user
+    var user = this.state.user;
+    var options = {
+      userID: user._id,
+      status: ['published']
+    }
     if (user) {
       return (
         <div className="profile-feed blocks">
@@ -52,13 +53,7 @@ class User extends React.Component {
             <UserBar user={user} /> 
           </div>
           <div className="block-item">
-            <Feed 
-              flashPost={true}
-              options={{ 
-                userID : user._id, 
-                status: ['published'] 
-              }} 
-            />
+            <Feed flashPost={true} options={{ ...options }} />
           </div>
           <style jsx>{`
             .content {
@@ -78,7 +73,9 @@ class User extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return { pageData: state.app.pageData }
+  return { 
+    app: state.app
+  }
 }
 
 export default connect(mapStateToProps)(User)

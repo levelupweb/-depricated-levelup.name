@@ -85,8 +85,20 @@ class Feed extends React.Component {
     )
   }
 
+  isOwner(currentUserID, options) {
+    if(options.userID) {
+      return currentUserID == options.userID
+    } else if(options.blogOwner) {
+      return currentUserID == options.blogOwner
+    } else {
+      return true
+    }
+  }
+
   render() {
     var instance = this.props.postsStorage[this.state.key];
+    var currentUser = this.props.currentUser;
+    var options = this.props.options
     if(instance) {
       var components = instance.posts.map((post, i) => {
         return <Item 
@@ -97,19 +109,17 @@ class Feed extends React.Component {
       })
       return (
         <div className="grid">
-          {this.props.flashPost && 
+          {(this.props.flashPost && this.isOwner(currentUser._id, options)) && 
             <FlashPost 
               onSubmit={(key) => {this.pushItem(this.token, key, this.props.postState.post)}}
-              hashKey={this.state.key}
-            />
+              hashKey={this.state.key} />
           }
           <InfiniteScroll
             children={components}
             loadMore={() => {this.loadMore(this.state.key, this.state.options, instance.posts.length)}} 
-            hasMore={!instance.uisFll}
+            hasMore={!instance.isFull}
             threshold={10}
-            elementIsScrollable={false}
-          />
+            elementIsScrollable={false} />
         </div>
       )
     } else {

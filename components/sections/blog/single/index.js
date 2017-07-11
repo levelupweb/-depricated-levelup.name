@@ -18,48 +18,68 @@ import Avatar from 'react-avatar'
 import EditableInput from '../../../isomorphic/editableInput.js'
 import Link from 'next/link'
 
-  
 class Blog extends React.Component {
-   constructor(props) {
-    	super(props);
-    	this.token = cookies.get('x-access-token');
-    	this.currentUser = this.props.currentUser;
-    	this.state = {
-    		blog: null
-    	}
-   }
+  constructor(props) {
+  	super(props);
+  	this.token = cookies.get('x-access-token');
+  	this.state = {}
+  }
 
-   componentWillMount() {
-  		this.setState({
-  			blog: this.props.app.pageData.blog
-  		})
-   }
+  // Generic Methods
+  mapDataToState (data) {
+    if(!!data) {
+      for(var name in data) {
+        this.setState({
+          [name]: data[name] || false
+        })
+      }
+    }
+  }
 
-   componentDidMount() {
-	  	UI()
-	  	$('.button.info').popup({
-	  		popup: '.popup.statistic',
-	  		position   : 'bottom center',
-	  	})
-   }
+	// React Lifecycle
+  componentWillMount() {
+   	if(!this.state.blog) {
+	   	this.mapDataToState(this.props.app.pageData)
+	  }
+  }
 
-   updateImage(e) {
-    	var image = e.target.files[0];
-    	var blogID = this.state.blog._id;
-    	var entryType = 'blog';
-    	updateImage(this.token, entryType, blogID, image).then((res) => {
-	      this.setState({
-	        blog: {
-	          ...this.state.blog,
-	          blogImage: res.path
-	        }
-	      })
-    	})
-   }
+  componentWillReceiveProps(nextProps) {
+   	if(this.state.blog) {
+   		this.mapDataToState(nextProps.app.pageData)
+   	}
+  }
 
-   render() {
+  componentDidMount() {
+  	UI()
+  	$('.button.info').popup({
+  		popup: '.popup.statistic',
+  		position   : 'bottom center',
+  	})
+  }
+
+  // Specific Methods
+  updateImage(e) {
+  	var image = e.target.files[0];
+  	var blogID = this.state.blog._id;
+  	var entryType = 'blog';
+  	updateImage(this.token, entryType, blogID, image).then((res) => {
+      this.setState({
+        blog: {
+          ...this.state.blog,
+          blogImage: res.path
+        }
+      })
+  	})
+  }
+
+  render() {
   	var blog = this.state.blog;
   	if (blog) { 
+  		var options = { 
+        blogID: blog._id,
+        blogOwner: blog.blogOwner, 
+        status: ['published'] 
+      }
 	    return (
 	      <div className="blog blocks">
 	      	<div className="header-wrapper block-item">
@@ -70,8 +90,7 @@ class Blog extends React.Component {
 		      				round={true} 
 		      				size={70} 
 		      				src={blog.blogImage} 
-		      				name={blog.blogTitle} 
-		      			/>
+		      				name={blog.blogTitle}  />
 		      			<input type="file" onChange={(e) => {this.updateImage(e)}} ref={(e) => {this.imageUploader = e}} className="ui hidden" />
 		      		</div>
 		      		<div className="title">
@@ -81,24 +100,21 @@ class Blog extends React.Component {
 			      			entryID={blog._id}
 			      			field="blogTitle"
 			      			title="Название блога"
-			      			size="large"
-			      		/>
+			      			size="large" />
 			      		<EditableInput 
 			      			value={blog.blogDescription} 
 			      			entryType="blog"
 			      			entryID={blog._id}
 			      			field="blogDescription"
 			      			title="Описание блога"
-			      			size="normal"
-			      		/>
+			      			size="normal" />
 			      	</div>
 		      		<div>
 	      				<SubscribeButton 
 		      				subscribeText="Подписаться" 
 		      				unsubscribeText="Отписаться"
 		      				entryType="blog"
-		      				entryID={blog._id}
-	      				/>
+		      				entryID={blog._id} />
 	      				<div href="#" className="info ui button circular icon basic">
 		      				<i className="fa fa-info icon" aria-hidden="true"></i>
 		      				<div className="ui popup statistic">
@@ -120,56 +136,50 @@ class Blog extends React.Component {
 	      		</div>
 	      	</div>
 	      	<div className="feed block-item">
-            	<Feed 
-                  flashPost={true}
-                  options={{ 
-                     blogID: blog._id, 
-                     status: ['published'] 
-                  }} />
+            <Feed flashPost={true} options={options} />
 	      	</div>
 
 	      <style jsx>{`
-	      .blog .menu a {
-				margin-right:17px;
-	      }
-			.blog .header-wrapper > .main-content {
-				padding:70px 0px;
-				padding-top:60px;
-				display:flex;
-				justify-content:center;
-				align-items:center;
-				flex-direction:column;
-			}
-			.blog .header-wrapper .main-content h2 {
-				margin-top:10px;
-				margin-bottom:0px;
-			}
-			.blog .header-wrapper .main-content .statistic {
-				text-align:left
-			}
-
-			.blog .header-wrapper .main-content .statistic .item {
-				text-align:left;
-				margin-bottom:5px;
-			}
-			.blog .header-wrapper .main-content .statistic .item .value {
-				font-weight:bold;
-				display:inline-block;
-				margin-right:10px;
-			}
-			.blog .header-wrapper .main-content .statistic .item .content {
-				display:inline-block;
-			}
-			.blog .title {
-				margin:10px 0px;
-				text-align:center;
-			}
+		      .blog .menu a {
+						margin-right:17px;
+		      }
+					.blog .header-wrapper > .main-content {
+						padding:70px 0px;
+						padding-top:60px;
+						display:flex;
+						justify-content:center;
+						align-items:center;
+						flex-direction:column;
+					}
+					.blog .header-wrapper .main-content h2 {
+						margin-top:10px;
+						margin-bottom:0px;
+					}
+					.blog .header-wrapper .main-content .statistic {
+						text-align:left
+					}
+					.blog .header-wrapper .main-content .statistic .item {
+						text-align:left;
+						margin-bottom:5px;
+					}
+					.blog .header-wrapper .main-content .statistic .item .value {
+						font-weight:bold;
+						display:inline-block;
+						margin-right:10px;
+					}
+					.blog .header-wrapper .main-content .statistic .item .content {
+						display:inline-block;
+					}
+					.blog .title {
+						margin:10px 0px;
+						text-align:center;
+					}
 	      `}</style>
 	      </div>
 	    );
-	} else {
-		return (<NoContent />)
-	}
+		} else {
+			return (<NoContent />)
+		}
   }
 }
 
@@ -206,4 +216,11 @@ var Image = (props) => {
 
 
 
-export default connect((store) => store)(Blog)
+function mapStateToProps(state) {
+  return {
+		app: state.app,
+		currentUser: state.currentUser
+	}
+}
+
+export default connect(mapStateToProps)(Blog)

@@ -197,7 +197,7 @@ function pushPostEnd(key, post) {
 
 export function removePost(token, key, id) {
 	return (dispatch) => {
-		dispatch(removePostStart(key, id))
+		dispatch(removePostStart(key))
 		return MODEL.removePost(token, id).then((res) => {
 			if(res.data.success) {
 				dispatch(removePostEnd(key, id))
@@ -213,12 +213,12 @@ export function removePost(token, key, id) {
 	}
 }
 
-function removePostStart(id) {
+function removePostStart(key) {
 	return { 
 		type: 'REMOVE_POST_START',
 		payload: {
 			isRemoving: true,
-			id: id
+			key
 		}
 	}
 }
