@@ -4,10 +4,7 @@ import { connect } from 'react-redux';
 import cookies from 'js-cookie'
 
 // Actions
-import { subscribeToEntry } from '../../actions/app'
-
-
-
+import { subscribeToEntry } from '../../models/app'
 
 class SubscribeButton extends React.Component {
   constructor(props) {
@@ -37,7 +34,7 @@ class SubscribeButton extends React.Component {
 
   isSubscribed(entryID, entryType) {
     if(this.currentUser.isLogged) {
-      if(this.currentUser.userSubscriptions[entryType + 's'].indexOf(entryID) != -1) {
+      if(this.currentUser.subscriptions[entryType + 's'].indexOf(entryID) != -1) {
         return true
       } else {
         return false
@@ -51,7 +48,6 @@ class SubscribeButton extends React.Component {
 
   handleSubscription(token, entryType, entryID) {
     subscribeToEntry(token, entryType, entryID).then((res) => {
-      console.log(res.data)
       this.set(!this.state.isSubscribed)
     })
   }

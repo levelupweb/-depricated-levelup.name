@@ -25,18 +25,18 @@ class Editor extends React.Component {
    	super(props);
    	this.dispatch = this.props.dispatch;
    	this.token = cookies.get('x-access-token');
-   	this.currentUser = this.props.currentUser;
   }
 
   // React Lifecycle
 
   componentWillMount() {
-   	if(this.props.defaultPost._id) {
-   		this.dispatch(setPost(this.props.defaultPost))
+    const { defaultPost, currentUser, postState, dispatch } = this.props;
+   	if(defaultPost._id) {
+   		dispatch(setPost(defaultPost))
    	} else {
-   		this.dispatch(prepareNewPost(this.currentUser, 'post'))
+   		dispatch(prepareNewPost('post'))
       .then(() => {
-        this.dispatch(createPost(this.token, this.props.postState.post)).then((id) => {
+        dispatch(createPost(this.token, this.props.postState.post)).then((id) => {
           router.replace('/editor?id=' + id, 
             '/editor?id=' + id, 
             { shallow: true })
@@ -48,7 +48,8 @@ class Editor extends React.Component {
   // Isomorphic Methods
 
   getField(field) {
-   	return this.props.postState.post[field]
+    const { postState } = this.props;
+   	return postState.post[field]
   }
 
   handleChange(field, value) {
@@ -64,45 +65,37 @@ class Editor extends React.Component {
    		setPostField('slug', createSlug(value.slice(0, 35)))
    	) 
     this.dispatch(
-      setPostField('postTitle', value)
+      setPostField('title', value)
     )
   }
 
   render() {
-    console.log(this.props.postState.post.slug)
-    var postState = this.props.postState;
+    const { postState, currentUser } = this.props;
+    console.log(postState)
 	  return (
       <div className="module-wrapper">
          <Sidebar 
-         	user={this.props.currentUser}
-         	post={this.props.postState.post}
-         />
-         <div className="main">
+         	user={currentUser}
+         	post={postState.post} />
+         <div>
           	<div className="inner blocks">
           		<div className="header block-item">
              		<Header
              			onChange={(field, value) => {
              				this.handleSlug(value);
              			}}
-                  value={this.props.postState.post.postTitle}
-                  status={postState.status}
-             		/>
+                  value={postState.post.title}
+                  status={postState.status} />
              	</div>
              	<div className="description block-item">
              		<Description 
-             			onChange={(value) => {
-             				this.handleChange('postDescription', value)
-             			}}
-                  value={this.props.postState.post.postDescription}
-             		/>
+             			onChange={(value) => { this.handleChange('description', value) }}
+                  value={this.props.postState.post.description} />
           		</div>
             		<div className="textarea block-item">
             			<Textarea 
-            				value={this.getField('postContent')}
-            				onChange={(value) => {
-            					this.handleChange('postContent', value)
-            				}}
-            			/>
+            				value={this.getField('content')}
+            				onChange={(value) => { this.handleChange('content', value) }} />
             		</div>
           	</div>
         	</div>
@@ -122,19 +115,22 @@ class Header extends React.Component {
   }
 
   render() {
+    const { value, status, onChange } = this.props
     return (
       <div className="header">
       	<div className="title"> 
         		<input 
-        			onInput={(e) => {this.props.onChange('postTitle', e.target.value)}} 
+        			onInput={(e) => {
+                onChange('title', e.target.value)
+              }} 
         			type="text" 
         			placeholder="Заголовок вашего поста" 
-              value={this.props.value || ''}
+              value={value || ''}
         		/>
       	</div>
       	<div className="status">
-      		{this.props.status &&
-            <span>{this.props.status}</span>
+      		{status &&
+            <span>{status}</span>
           }
       	</div>
       	<style jsx>{`
@@ -180,13 +176,14 @@ class Description extends React.Component {
   }
 
   render() {
+    const { value, onChange } = this.props;
     return (
       <div className="description">
 	      <textarea 
 	      	maxLength="140" 
-	      	onInput={(e) => {this.props.onChange(e.target.value)}} 
+	      	onInput={(e) => {onChange(e.target.value)}} 
 	      	placeholder="Описание к вашему посту"
-          value={this.props.value || ''}
+          value={value || ''}
         ></textarea>
 	      <style jsx>{`
 				.description textarea {

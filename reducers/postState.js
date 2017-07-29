@@ -3,17 +3,17 @@ import popArray from '../utils/popArray.js'
 const defaultState = {
 	post: {
     slug: null, 
-    postTitle: null,
-    postType: 'post',
-    postDescription: null,
-    postContent: '',
-    postAuthor: {
-      authorID: null,
-      authorType: null
+    title: null,
+    type: 'note',
+    description: null,
+    content: '',
+    author: {
+      blog: null,
+      user: null
     },
-    postTags: [],
-    postImage: null,
-    postStatus: null
+    tags: [],
+    image: null,
+    status: 'published'
   }
 }
 
@@ -41,7 +41,7 @@ export default (state = defaultState, action) => {
         ...state,
         post: {
           ...state.post,
-          postTags: state.post.postTags.concat([action.payload])
+          tags: state.post.postTags.concat([action.payload])
         }
       }
     case 'POST_PULL_TAG':
@@ -50,7 +50,7 @@ export default (state = defaultState, action) => {
         ...state,
         post: {
           ...state.post,
-          postTags: array
+          tags: array
         }
       }
     case 'FLUSH_POST':
@@ -58,10 +58,10 @@ export default (state = defaultState, action) => {
         ...state,
         post: {
           ...state.post,
-          postContent: '',
-          postImage: null,
-          postVideo: null,
-          postLink: null
+          content: '',
+          image: null,
+          video: null,
+          link: null
         }
       }
    default: return state

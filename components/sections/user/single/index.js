@@ -41,8 +41,8 @@ class User extends React.Component {
   }
 
   render() {
-    var user = this.state.user;
-    var options = {
+    const user = this.state.user;
+    const options = {
       userID: user._id,
       status: ['published']
     }
@@ -50,7 +50,9 @@ class User extends React.Component {
       return (
         <div className="profile-feed blocks">
         	<div className="block-item">
-            <UserBar user={user} /> 
+            <UserBar 
+              statistics={true}
+              user={user} /> 
           </div>
           <div className="block-item">
             <Feed flashPost={true} options={{ ...options }} />

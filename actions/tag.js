@@ -29,6 +29,7 @@ export function findTag(query) {
    return MODEL.findTag(query)
 }
 
+
 // DEPRICATED
 export async function getTagSubscribers(tagID) {
 	return await axios.get(config.API + 'tag/entries/' + tagID + '/getsubscribers')	

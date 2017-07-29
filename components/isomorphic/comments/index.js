@@ -48,51 +48,53 @@ class Comments extends React.Component {
 	}
 
 	pushComment(comment) {
-		var comm = { ...comment }
-		comm.commentAuthor = this.props.currentUser;
+		const { currentUser } = this.props;
+		const { comments } = this.state;
+		comment.author.user = this.props.currentUser;
 		this.setState({
-	      comments: [...this.state.comments, <Comment 
-	      	onRemove={(token, id) => {this.removeComment(token, id)}} 
-	      	comment={comm} 
-	      	key={comm._id}  
-	      />]
+      comments: [...comments, <Comment 
+      	onRemove={(token, id) => {this.removeComment(token, id)}} 
+      	comment={comment} 
+      	key={comment._id}  
+      />]
 	   })
 	}
 
 	removeComment(token, id) {
-    	removeComment(token, id).then((res) => {
-  			if(res.data.success) {
-  				this.state.comments.map((item, i) => {
-  					if(item.key == id) {
-  						var array = this.state.comments.slice();
-		    			array.splice(i, 1);
-		    			this.setState({
-				    		comments: array
-				    	});
-  					}
-  				})
-  			} else {
-  				console.log(res.data)
-  			}
-  		})
-  	}
+		const { comments } = this.state;
+  	removeComment(token, id).then((response) => {
+			if(response.data.success) {
+				comments.map((item, i) => {
+					if(item.key == id) {
+						var array = comments.slice();
+	    			array.splice(i, 1);
+	    			this.setState({
+			    		comments: array
+			    	});
+					}
+				})
+			} else {
+				console.log(response.data)
+			}
+		})
+	}
 
 	render() {
-		if(this.state.comments.length > 0) {
+		const { comments, isHided } = this.state;
+		const { isSingle, currentUser, postID, isRevealed } = this.props;
+ 		if(comments.length > 0) {
 			return (
 				<div>
-					{this.props.isSingle &&
-						<p>Всего комментариев: {this.state.comments.length}</p>
-					}
+					{isSingle && <p>Всего комментариев: {comments.length}</p> }
 					<div className="ui comments">
 					   <div className="comments">
-					   	{(this.state.comments.length > 3) &&
+					   	{(comments.length > 3) &&
 					   		<div>
-						   		{this.state.isHided ? 
+						   		{isHided ? 
 							   		<div 
 							   			className="ui button fluid default small"
 							   			onClick={() => {this.setState({isHided: false})}}>
-							   			Загрузить комментарии ({this.state.comments.length - 3})
+							   			Загрузить комментарии ({comments.length - 3})
 							   		</div>
 							   		:
 							   		<div 
@@ -108,9 +110,9 @@ class Comments extends React.Component {
 				         	transitionName="fadeInOut"
 				         	transitionEnterTimeout={500}
 				         	transitionLeaveTimeout={300}>
-				          	{this.state.comments.map((comment, i) => {
-				          		if(this.state.isHided) {
-					          		if(i >= this.state.comments.length - 3) {
+				          	{comments.map((comment, i) => {
+				          		if(isHided) {
+					          		if(i >= comments.length - 3) {
 					          			return comment
 					          		}
 					          	} else {
@@ -119,10 +121,10 @@ class Comments extends React.Component {
 				          	})}
 				         </ReactCSSTransitionGroup>
 					   </div>
-					   {(this.props.currentUser) && 
+					   {currentUser && 
 						   <ReplyForm
-						   	postID={this.props.postID} 
-						   	isRevealed={this.props.isRevealed} 
+						   	postID={postID} 
+						   	isRevealed={isRevealed} 
 						   	onSubmit={(comment, user) => {this.pushComment(comment, user)}}
 						   />
 						}
@@ -139,15 +141,15 @@ class Comments extends React.Component {
 				</div>
 			)
 		} else {
-			if(this.props.currentUser) {
+			if(currentUser) {
 				return (
 					<div>
-						{this.props.isSingle &&
+						{isSingle &&
 							<p>Будьте первым, кто оставит комментарий!</p>
 						}
 						<ReplyForm
-							isRevealed={this.props.isRevealed} 
-							postID={this.props.postID} 
+							isRevealed={isRevealed} 
+							postID={postID} 
 							onSubmit={(comment) => {this.pushComment(comment)}}
 						/>
 						<style jsx>{`

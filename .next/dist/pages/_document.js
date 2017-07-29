@@ -95,20 +95,32 @@ var MyDocument = function (_Document) {
           fileName: _jsxFileName,
           lineNumber: 23
         }
+      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/datepicker.css', __source: {
+          fileName: _jsxFileName,
+          lineNumber: 24
+        }
+      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/input-range.css', __source: {
+          fileName: _jsxFileName,
+          lineNumber: 25
+        }
+      }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'http://localhost:3000/static/css/ui/autocorrect.css', __source: {
+          fileName: _jsxFileName,
+          lineNumber: 26
+        }
       })), _react2.default.createElement('body', {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 25
+          lineNumber: 28
         }
       }, this.props.customValue, _react2.default.createElement(_document.Main, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 27
+          lineNumber: 30
         }
       }), _react2.default.createElement(_document.NextScript, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 28
+          lineNumber: 31
         }
       })));
     }

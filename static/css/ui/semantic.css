@@ -13876,7 +13876,7 @@ ol.ui.list ol li,
 .ui.list .list > a.item,
 .ui.list > a.item {
   cursor: pointer;
-  color: #4183C4;
+  color: #46978c;
 }
 
 .ui.list .list > a.item:hover,
@@ -13896,7 +13896,7 @@ ol.ui.list ol li,
 .ui.list .list > .item a.header,
 .ui.list > .item a.header {
   cursor: pointer;
-  color: #4183C4 !important;
+  color: #46978c !important;
 }
 
 .ui.list .list > .item a.header:hover,
@@ -16892,7 +16892,7 @@ ol.ui.horizontal.list li:before,
 }
 
 .ui.steps .step.active .title {
-  color: #4183C4;
+  color: #46978c;
 }
 
 .ui.ordered.steps .step.active:before,
@@ -17239,7 +17239,7 @@ ol.ui.horizontal.list li:before,
 /* Link */
 
 .ui.breadcrumb a {
-  color: #4183C4;
+  color: #46978c;
 }
 
 .ui.breadcrumb a:hover {
@@ -25195,9 +25195,7 @@ Floated Menu / Item
   flex-direction: column;
   width: 290px;
   min-height: 0px;
-  background: #FFFFFF;
   padding: 0em;
-  border: none;
   border-radius: 0.28571429rem;
   -webkit-transition: box-shadow 0.1s ease, -webkit-transform 0.1s ease;
   transition: box-shadow 0.1s ease, -webkit-transform 0.1s ease;
@@ -25328,7 +25326,7 @@ Floated Menu / Item
   border-top: 1px solid rgba(34, 36, 38, 0.1);
   background: none;
   margin: 0em;
-  padding: 1em 1em;
+  padding: 1em 0em;
   box-shadow: none;
   font-size: 1em;
   border-radius: 0em;
@@ -25603,7 +25601,7 @@ Floated Menu / Item
   background: none;
   width: auto;
   margin: 0em 0em;
-  padding: 0.75em 1em;
+  padding: 0.75em 0em;
   top: 0em;
   left: 0em;
   color: rgba(0, 0, 0, 0.4);

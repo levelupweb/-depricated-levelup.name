@@ -23,10 +23,9 @@ class Item extends React.Component {
   }
 
   render() {
-    var currentUser = this.props.currentUser;
-    var post = this.props.article;
+    var { currentUser, post } = this.props
     if (post) { 
-      switch(post.postType) {
+      switch(post.type) {
         case 'note':
         return <Note 
           post={post} 

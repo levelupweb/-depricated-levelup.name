@@ -15,135 +15,137 @@ import Link from 'next/link'
 class User extends React.Component {
   constructor(props) {
     super(props);
+    this.dispatch = this.props.dispatch;
     this.state = {
       isLoaded: false,
       user: null
     }
   }
 
+  // React Lifecycle
   componentWillMount() {
-    this.getUser(this.props.id)
+    const { id, user } = this.props
+    if(id != undefined) {
+      this.getUser(id)
+    } else {
+      this.setUser(user)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.props.id != nextProps.id) {
-      this.getUser(nextProps.id)
+    const { id, user } = nextProps
+    if(id) {
+      if(this.props.id != id) {
+        this.getUser(id)
+      }
+    } else {
+      this.setUser(user)
     }
   }
 
   getUser(id) {
+    const { currentUser, user } = this.props;
     if(id) {
-      getUser(id).then((res) => {
-        this.setState({
-          user: {
-            ...this.state.user,
-            ...res.data
-          },
-          isLoaded: true
-        })
+      getUser(id).then((response) => {
+        this.setUser(response.data)
       })
     } else {
-      if(this.props.user.isLogged) {
-        this.setState({
-          ...this.state,
-          user: this.props.user.profile,
-          isLoaded: true
-        })
+      if(currentUser.isLogged) {
+        this.setUser(currentUser)
       } 
     }
   }
 
+  setUser(user) {
+    this.setState({
+      user,
+      isLoaded: true
+    })
+  }
+
   render() {
-    var user = this.state.user;
-    if(this.state.isLoaded && this.state.user != null) {
+    const { user, isLoaded } = this.state;
+    const { size, classNames, imageSize } = this.props;
+    if(isLoaded && user) {
+        const { slug, fullName, description, subscribers, image } = user;
         return (
-          <div className={`${this.props.size} user ${this.props.classNames}`}>
+          <div className={`${size} user ${classNames}`}>
             <div className="image">
-              <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-                <Avatar color={`#46978c`} round={true} size={this.props.imageSize || 32} src={user.userImage} name={user.userName} />
+              <Link href={{ pathname: 'user', query: { slug }}}><a>
+                <Avatar color={`#46978c`} round={true} size={imageSize || 32} src={image || null} name={fullName} />
               </a></Link>
             </div>
             <div className="content">
-              <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-                <span className="name">{user.userName}</span>
+              <Link href={{ pathname: 'user', query: { slug }}}><a>
+                <span className="name">{fullName}</span>
               </a></Link>
-              <div className={(this.props.size == 'small') ? `hidden` : `description`}>
-                {(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}
+              <div className={(size == 'small') ? `hidden` : `description`}>
+                {description ? description : `Подписчиков:`}
               </div>
             </div>
           
         		<style jsx>{`
-      			.user {
-      				display: flex;
-              margin: 6px 0px;
-              align-items: center;
-      			}
-            .user .image,
-            .user .content {
-              display:flex;
-              align-items:flex-start;
-              flex-direction:column;
-            }
-            .user.small {
-              margin-bottom:6px;
-            }
-            .user.medium {
-              margin-bottom:4px;
-            }
-            .user.small .image {
-              width:20px;
-              height:20px;
-              margin:0px;
-            }
-            .user.medium .image {
-              width:30px;
-              height:30px;
-            }
-            .user.dropdown .content {
-              display:none;
-            }
-            .user .image a {
-              display:flex;
-              justify-content:center;
-              align-items:center;
-            }
-      			.user .content {
-      				padding-left:12px;
-      			}
-            .user.small .content {
-              padding-left:8px;
-              margin:5px 0px;
-            }
-      			.user .content .name {
-      				display:block;
-      				font-size:16px;
-      				font-weight:bold;
-      			}
-            .user.small .content .name {
-              font-size:14px;
-              font-weight:100;
-            }
-            .user.medium .content .name {
-              font-size:14px;
-            }
-      			.user .content .description {
-      				font-size:13px;
-      				color:rgba(0,0,0,0.4);
-      			}
-            .user.medium .content .description {
-              font-size:13px;
-              margin-top:0px;
-            }
-            .user.inverted .content .name,
-            .user.inverted .content .description {
-              color:#fff;
-            }
-
+        			.user {
+        				display: flex;
+                margin: 6px 0px;
+                align-items: center;
+        			}
+              .user .image,
+              .user .content {
+                display:flex;
+                align-items:flex-start;
+                flex-direction:column;
+              }
+              .user.small {
+                margin-bottom:6px;
+              }
+              .user.medium {
+                margin-bottom:4px;
+              }
+              .user.dropdown .content {
+                display:none;
+              }
+              .user .image a {
+                display:flex;
+                justify-content:center;
+                align-items:center;
+              }
+        			.user .content {
+        				padding-left:12px;
+        			}
+              .user.small .content {
+                padding-left:8px;
+                margin:5px 0px;
+              }
+        			.user .content .name {
+        				display:block;
+        				font-size:16px;
+        				font-weight:bold;
+        			}
+              .user.small .content .name {
+                font-size:14px;
+                font-weight:bold;
+              }
+              .user.medium .content .name {
+                font-size:14px;
+              }
+        			.user .content .description {
+        				font-size:13px;
+        				color:rgba(0,0,0,0.4);
+        			}
+              .user.medium .content .description {
+                font-size:13px;
+                margin-top:0px;
+              }
+              .user.inverted .content .name,
+              .user.inverted .content .description {
+                color:#fff;
+              }
         		`}</style>
           </div>
         ) 
     } else {
-      return (<Blank size={this.props.size} />)
+      return (<Blank size={size} />)
     }
   }
 }
@@ -155,7 +157,8 @@ export class Blank extends React.Component {
   }
 
   render() {
-    if(this.props.size != 'dropdown') {
+    var { size } = this.props;
+    if(size != 'dropdown') {
       return (
         <div className="user">
           <div className="blank string"></div>
@@ -174,7 +177,7 @@ export class Blank extends React.Component {
 
 
 function mapStateToProps(state) {
-  return { user: state.currentUser }
+  return { currentUser: state.currentUser }
 }
 
 

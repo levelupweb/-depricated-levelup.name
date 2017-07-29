@@ -60,26 +60,20 @@ class Blog extends React.Component {
   // Specific Methods
   updateImage(e) {
   	var image = e.target.files[0];
-  	var blogID = this.state.blog._id;
-  	var entryType = 'blog';
-  	updateImage(this.token, entryType, blogID, image).then((res) => {
+    this.props.dispatch(updateImage(this.token, 'blog', this.state.blog._id, image)).then((response) => {
       this.setState({
-        blog: {
-          ...this.state.blog,
-          blogImage: res.path
-        }
+      	blog: {
+      		...this.state.blog,
+      		image: response.path
+      	}
       })
-  	})
+    })
   }
 
   render() {
-  	var blog = this.state.blog;
+  	const { blog } = this.state
   	if (blog) { 
-  		var options = { 
-        blogID: blog._id,
-        blogOwner: blog.blogOwner, 
-        status: ['published'] 
-      }
+      const { _id, image, title, description, subscribers, created, owner, posts } = blog;
 	    return (
 	      <div className="blog blocks">
 	      	<div className="header-wrapper block-item">
@@ -89,23 +83,26 @@ class Blog extends React.Component {
 		      				color={`#57c1b3`} 
 		      				round={true} 
 		      				size={70} 
-		      				src={blog.blogImage} 
-		      				name={blog.blogTitle}  />
-		      			<input type="file" onChange={(e) => {this.updateImage(e)}} ref={(e) => {this.imageUploader = e}} className="ui hidden" />
+		      				src={image} 
+		      				name={title}  />
+		      			<input 
+		      				type="file" 
+		      				onChange={(e) => {this.updateImage(e)}} ref={(e) => {this.imageUploader = e}} 
+		      				className="ui hidden" />
 		      		</div>
 		      		<div className="title">
 			      		<EditableInput 
-			      			value={blog.blogTitle} 
+			      			value={title} 
 			      			entryType="blog"
-			      			entryID={blog._id}
-			      			field="blogTitle"
+			      			entry={blog}
+			      			field="title"
 			      			title="Название блога"
 			      			size="large" />
 			      		<EditableInput 
-			      			value={blog.blogDescription} 
+			      			value={description} 
 			      			entryType="blog"
-			      			entryID={blog._id}
-			      			field="blogDescription"
+			      			entry={blog}
+			      			field="description"
 			      			title="Описание блога"
 			      			size="normal" />
 			      	</div>
@@ -114,16 +111,16 @@ class Blog extends React.Component {
 		      				subscribeText="Подписаться" 
 		      				unsubscribeText="Отписаться"
 		      				entryType="blog"
-		      				entryID={blog._id} />
+		      				entryID={_id} />
 	      				<div href="#" className="info ui button circular icon basic">
 		      				<i className="fa fa-info icon" aria-hidden="true"></i>
 		      				<div className="ui popup statistic">
 							  <div className="item">
-							  	<div className="value">{dateFormat(blog.created, "dd.mm.yyyy")}</div>
+							  	<div className="value">{dateFormat(created, "dd.mm.yyyy")}</div>
 							  	<div className="content">Блог зарегистрирован</div>
 							  </div>
 							  <div className="item">
-							  	<div className="value">{blog.blogSubscribersCount}</div>
+							  	<div className="value">{subscribers}</div>
 							  	<div className="content">Подписчика</div>
 							  </div>
 							  <div className="item">
@@ -136,7 +133,11 @@ class Blog extends React.Component {
 	      		</div>
 	      	</div>
 	      	<div className="feed block-item">
-            <Feed flashPost={true} options={options} />
+            <Feed defaultPosts={posts} flashPost={true} options={{ 
+			        blogID: _id,
+			        blogOwner: owner._id, 
+			        status: ['published'] 
+			      }} />
 	      	</div>
 
 	      <style jsx>{`

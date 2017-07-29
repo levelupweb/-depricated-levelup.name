@@ -21,11 +21,15 @@ export default class MyDocument extends Document {
           <link rel="stylesheet" href="http://localhost:3000/static/frontend/global.css" />
           <link rel="stylesheet" href="http://localhost:3000/static/frontend/loader.css" />
           <link rel="stylesheet" href="http://localhost:3000/static/libs/quill/quill.snow.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/css/ui/datepicker.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/css/ui/input-range.css" />
+          <link rel="stylesheet" href="http://localhost:3000/static/css/ui/autocorrect.css" />
        </Head>
        <body>
          {this.props.customValue}
          <Main />
          <NextScript />
+
        </body>
      </html>
     )

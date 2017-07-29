@@ -30,6 +30,14 @@ blockquote {
 	padding-left:0px!important;
 	padding-right:0px!important;
 }
+.no-content {
+	font-size:17px;
+	color:#c0c0c0;
+}
+.no-content.fluid {
+	text-align:center;
+	margin:15px 0px;
+}
 
 /* Specific styles */
 .main {
@@ -64,23 +72,27 @@ blockquote {
 .block-item {
 	margin:0px 19px;
  	padding: 15px 0px;
-   border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+.block-item:first-child {
+	padding-top:0px;
 }
 .block-item:last-child {
-   border-bottom: 0px;
+  border-bottom: 0px;
+  padding-bottom: 0px;
 }
 .block-item.full {
 	margin-left:0px;
 	margin-right:0px;
 }
+.block-content {
+
+}
 .block-section {
 	border-bottom:1px solid #eee;
-	padding-bottom:10px;
+	padding-bottom:15px;
 	margin-bottom:10px;
-}
-.block-section h4.ui.header {
-	margin-top:5px!important;
-	margin-bottom:5px!important;
+	padding-top:10px;
 }
 .block-section:last-child {
 	margin-bottom:0px;
@@ -90,16 +102,16 @@ blockquote {
 
 /* Typography */
 p.primary {
-	font-size:20px;
-	color:rgba(0,0,0,0.4);
+	font-size:18px;
+	color:rgba(0,0,0,0.8);
 } 
 
 
 /* Global article styles */
 .article .meta .item {
 	margin-right:15px;
-	font-size:14px;
-	color:#57c1b3;
+	font-size:15px;
+	color:#adadad;
 }
 .article .meta .item .fa {
 	color:rgba(0,0,0,0.3);
@@ -279,6 +291,10 @@ p.primary {
 }
 .bil-svg-container {
 	min-height:300px;
+}
+
+.recharts-legend-item {
+	margin:16px 10px;
 }
 
 /* Common */

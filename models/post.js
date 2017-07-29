@@ -5,7 +5,7 @@ import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
 export function createPost(token, post) {
 	return axiosAuth(token, {
-		url: 'post/add',
+		url: 'post/entries',
 		method: 'POST',
 		data: post
    })
@@ -18,16 +18,24 @@ export function removePost(token, id) {
    })
 }
 
+
+export function getRandomAdv(id) {
+	return axiosNoAuth({
+		url: 'post/entries/' + id + '/adv',
+		method: 'GET'
+   })
+}
+
 export function fetchPosts(options, skip) {
 	return axiosNoAuth({
 		url: 'post/entries',
 		method: 'GET',
 		params: {
 			skip: skip,
-			limit: options.perPage,
+			limit: options.perPage || 10,
 			...options
 		}
-   })
+  })
 }
 
 export function findPost(query) {

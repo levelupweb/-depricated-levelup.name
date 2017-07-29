@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 
 // Actions
-import { makeSearch } from '../../../actions/app.js'
+import { makeSearch } from '../../../models/app.js'
 
 // Components
 import PostList from '../../isomorphic/postList.js'

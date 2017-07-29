@@ -3,6 +3,7 @@ import React from 'react';
 
 // Utils
 import { getPosts } from '../../actions/post.js'
+import { getUserSubscriptions } from '../../models/blog.js'
 
 // Components
 import Loader from './loader.js'
@@ -94,12 +95,12 @@ class Post extends React.Component {
 				return (
 					<div className="item">
 						<Link href={{ pathname: 'post', query: { slug: post.slug }}}><a>
-		                <Avatar color={`#46978c`} round={true} size={32} src={post.postImage} name={post.postTitle} />
-		            </a></Link>
-		            <div className="content">
+                <Avatar color={`#46978c`} round={true} size={32} src={post.image} name={post.title} />
+            </a></Link>
+            <div className="content">
 							<h4 className="ui header">
 								<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-									<a>{post.postTitle}</a>
+									<a>{post.title}</a>
 								</Link>
 								<div className="sub header">
 									<TimeAgo datetime={post.updated} locale='ru' />
@@ -118,9 +119,9 @@ class Post extends React.Component {
 								max-width:100%;
 							}
 							.item:last-child {
-					        	border-bottom:0px;
-					        	padding-bottom:0px!important;
-					      }
+			        	border-bottom:0px;
+			        	padding-bottom:0px!important;
+				      }
 							.item .header .sub {
 								white-space:nowrap;
 								max-width:100%;
@@ -169,7 +170,7 @@ class Post extends React.Component {
 		 					<span><TimeAgo datetime={post.updated} locale='ru' /></span>
 						</div>
 		 				<Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-							<a><h3>{post.postTitle}</h3></a>
+							<a><h3>{post.title}</h3></a>
 						</Link>
 						<p className="primary">{post.postDescription}</p>
 					</div>

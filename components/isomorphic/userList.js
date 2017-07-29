@@ -2,7 +2,7 @@
 import React from 'react';
 
 // Actions
-import { getUser, getUserSubscriptions, getUsers } from '../../actions/user.js'
+import { getUser, getUsers, getSubscriptions } from '../../actions/user.js'
 
 // Components
 import Avatar from 'react-avatar'
@@ -12,53 +12,62 @@ import SubscribeButton from './subscribeButton.js'
 
 
 export default class UserList extends React.Component {
-   constructor(props) {
+  constructor(props) {
 		super(props);
 		this.state = {
 			users: [],
 			isLoaded: false
 		}
-   } 
+  } 
 
 	componentWillMount() {
-		if(this.props.users === undefined) {
-			if(this.props.subscriber) {
-				getUserSubscriptions(this.props.subscriber).then((res) => {
-					this.setState({
-						users : res.data
-					})
+		const { users, subscriber } = this.props
+		if(users === undefined) {
+			if(subscriber) {
+				getSubscriptions(subscriber, 'users').then((response) => {
+					this.setUsers(response.data)
 				})
 			} else {
-				getUsers().then((res) => {
-					this.setState({
-						users: res.data
-					})
+				getUsers().then((response) => {
+					this.setUsers(response.data)
 				})
 			}
 		} else {
-			this.setState({
-				users: this.props.users
-			})
+			this.setUsers(users)
 		}
 	}
 
 	componentWillReceiveProps(nextProps) {
-	   if(nextProps.users) {
-	      this.setState({
-	        	users: nextProps.users
-	      })
-	   }
+		const { users } = nextProps;
+	  if(users) {
+      this.setUsers(users)
+	  }
 	}
 
-   componentDidMount() {
+  componentDidMount() {
 		this.setState({
 			isLoaded: true
 		})
-   }
+  }
 
-   render() {
-	   if(this.state.isLoaded) {
-	  	   if(this.state.users.length == 0) {
+  setUsers(users) {
+  	this.setState({
+  		users,
+  		isLoaded: true
+  	})
+  }
+
+  renderUsers(users, size) {
+    return users.map((user, i) => {
+     	return <User size={size} user={user} key={i} />
+   	})
+  }
+
+  render() {
+  	const { isLoaded, users } = this.state
+  	const { size } = this.props
+	  if(isLoaded) {
+	  	if(users.length == 0) {
 		   	return (
 		        <div className="no-content">
 		          <p><i className="fa fa-ellipsis-h"></i></p>
@@ -67,21 +76,19 @@ export default class UserList extends React.Component {
 		   } else {
 		   	return (
 		       <div className="user-list">
-		         {this.state.users.map((item, i) => {
-		           return <User size={this.props.size} userData={item} key={i} />
-		         })}
+		         {this.renderUsers(users, size)}
 		         <style jsx>{`
-						.user-list {
-							width:100%;
-						}
+							.user-list {
+								width:100%;
+							}
 		         `}</style>
 		       </div>
 		     )
 		   }
-	   } else {
-		   return <Loader />
-	   }
-   }
+	  } else {
+		  return <Loader />
+	  }
+  }
 }
 
 
@@ -90,20 +97,22 @@ class User extends React.Component {
 		super(props);
 	}
 	render() {
-		var user = this.props.userData
+		const { size } = this.props;
+		const user = this.props.user;
 		if(user) {
-			if(this.props.size != 'block') {
+			const { image, fullName, slug, description, updated, subscribers, _id } = user;
+			if(size != 'block') {
 				return (
 					<div className="item">
-						<Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-			                <Avatar color={`#46978c`} round={true} size={32} src={user.userImage} name={user.userName} />
-			            </a></Link>
-			            <div className="content">
+						<Link href={{ pathname: 'user', query: { slug }}}><a>
+              <Avatar color={`#46978c`} round={true} size={32} src={image} name={fullName} />
+          	</a></Link>
+			      <div className="content">
 							<h4 className="ui header">
-								<Link href={{ pathname: 'user', query: { slug: user.slug }}}>
-									<a>{user.userName}</a>
+								<Link href={{ pathname: 'user', query: { slug }}}>
+									<a>{fullName}</a>
 								</Link>
-								<div className="sub header">{(user.userDescription) ? user.userDescription : `Подписчиков: ${user.userSubscribersCount}`}</div>
+								<div className="sub header">{description ? description : `Подписчиков: ${subscribers.length}`}</div>
 							</h4>
 						</div>
 						<style jsx>{`
@@ -113,6 +122,7 @@ class User extends React.Component {
 								align-items:center;
 								flex-direction:row;
 								margin:5px 0px;
+								margin-bottom:10px;
 							}
 							.item:last-child {
 								border-bottom:0px;
@@ -134,32 +144,31 @@ class User extends React.Component {
 			} else {
 				return (
 					<div className="item">
-					  	<div className="image">
-					    	<Avatar color={`#46978c`} round={true} size={50} src={user.userImage} name={user.userName} />
-					  	</div>
-					  	<div className="content">
-			        	<div className="left">
-			  		    	<Link href={{ pathname: 'user', query: { slug: user.slug }}}>
-			            	<a className="header">{user.userName}</a> 
-			          	</Link>
-			          	<span className="subscribers">{user.userSubscribersCount} подписчик</span>
-			  		    	<div className="description">
-			  		      	{user.userDescription}
-			  		    	</div>
-			        	</div>
-			        	<div className="right">
-			          	<div className="action">
-				          	<SubscribeButton 
-					          subscribeText="Подписаться" 
-					          unsubscribeText="Отписаться"
-					          entryType="user"
-					          entryID={user._id} 
-					          additionalClasses="small" 
-				          	/>
-			        		</div>
-			        	</div>
-					</div>
-
+				  	<div className="image">
+				    	<Avatar color={`#46978c`} round={true} size={50} src={image} name={fullName} />
+				  	</div>
+				  	<div className="content">
+		        	<div className="left">
+		  		    	<Link href={{ pathname: 'user', query: { slug }}}>
+		            	<a className="header">{fullName}</a> 
+		          	</Link>
+		          	<span className="subscribers">{subscribers.length} подписчик</span>
+		  		    	<div className="description">
+		  		      	{description}
+		  		    	</div>
+		        	</div>
+		        	<div className="right">
+		          	<div className="action">
+			          	<SubscribeButton 
+				          subscribeText="Подписаться" 
+				          unsubscribeText="Отписаться"
+				          entryType="user"
+				          entryID={_id} 
+				          additionalClasses="small" 
+			          	/>
+		        		</div>
+		        	</div>
+						</div>
 			      <style jsx>{`
 			        .item {
 			          display:flex;
@@ -167,8 +176,8 @@ class User extends React.Component {
 			          width:100%;
 			          border-bottom:1px solid #eee;
 			          padding-bottom:8px;
-						 margin:0px!important;
-						 margin-bottom:8px!important;
+								margin:0px!important;
+								margin-bottom:8px!important;
 			        }
 			        .item:last-child {
 			        	border-bottom:0px;
@@ -194,7 +203,7 @@ class User extends React.Component {
 				)
 			}
 		} else {
-			return (<div></div>)
+			return null
 		}
 	}
 }

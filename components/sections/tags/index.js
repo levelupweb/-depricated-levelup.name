@@ -18,8 +18,8 @@ class Tags extends React.Component {
     super(props);    
     this.state = {
       isHydrating: false,
-    	entries: [],
-    	loaded: false,
+    	tags: [],
+    	isLoaded: false,
       isFull: false,
       perPage: 5,
       page: 1
@@ -29,22 +29,19 @@ class Tags extends React.Component {
   componentWillMount() {
     if(this.props.tags) {
     	this.setState({
-        entries: this.props.tags
+        tags: this.props.tags,
+        isLoaded: true
       })
     } else {
       getTags({perPage: this.state.perPage, skip: 0}).then((res) => {
         this.setState({
-          entries: res.data
+          tags: res.data,
+          isLoaded: true
         })
       })
     }
   }
 
-  componentDidMount() {
-  	this.setState({
-  		loaded: true
-  	})
-  }
 
   loadMore() {
     var skip = (this.state.page) * this.state.perPage
@@ -52,7 +49,8 @@ class Tags extends React.Component {
       .then((res) => {
         if(res.data.length > 0) {
           this.setState({
-            entries: this.state.entries.concat(res.data)
+            tags: this.state.tags.concat(res.data),
+            isLoaded: true
           })
         } else {
           this.setState({
@@ -70,7 +68,8 @@ class Tags extends React.Component {
   search(query) {
     return findTag(query).then((res) => {
       this.setState({
-        entries: res.data.tags
+        tags: res.data.tags,
+        isLoaded: true
       })
     })
     .then(() => {
@@ -88,12 +87,15 @@ class Tags extends React.Component {
     })
   }
 
-  render() {
-    var tags = this.state.entries.map((item, i) => {
+  renderTags(tags) {
+    return tags.map((item, i) => {
       return <Tag tag={item} key={i} />
     })
+  }
 
-  	if(this.state.loaded) {
+  render() {
+    const { tags, isLoaded, isFull } = this.state
+  	if(isLoaded) {
 	    return (
 	      <div className="blocks">
           <div className="block-item">
@@ -114,9 +116,9 @@ class Tags extends React.Component {
           </div>
           <div className="block-item">
             <InfiniteScroll
-              items={tags}
+              items={this.renderTags(tags)}
               loadMore={() => {this.loadMore()}} 
-              hasMore={!this.state.isFull}
+              hasMore={!isFull}
               threshold={10}
               elementIsScrollable={false}
               className="tags grid ui"
@@ -125,7 +127,7 @@ class Tags extends React.Component {
         </div>
 	    )
 	} else {
-  		return (<Loader />)
+  		return <Loader />
   	}
   }
 }
@@ -137,23 +139,23 @@ class Tag extends React.Component {
   }
 
   render() {
-    var tag = this.props.tag;
-    var subscribersCount = tag.tagSubscribersCount;
+    const { tag } = this.props;
+    const { image, title, slug, description, updated, _id } = tag
     return (
-      <div className={(subscribersCount > 10 && tag.tagDescription) ? `sixteen wide column` : `eight wide column`}>
+      <div className="eight wide column">
         <div className="tag">
           <div className="info">
-            <span>{subscribersCount} подписчиков</span>
+            <span>подписчиков</span>
           </div>
           <div className="image">
-            <img src={tag.tagImage} />
+            <img src={image} />
           </div>
           <div className="content">
-            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
-              <a className="header">{tag.tagTitle}</a>
+            <Link href={{ pathname: 'search', query: { query: slug }}}>
+              <a className="header">{title}</a>
             </Link>
             <div className="meta">
-              <p>{(tag.tagDescription) && tag.tagDescription}</p>
+              {description && <p>{description}</p>}
             </div>
           </div>
           <div className="action">
@@ -161,7 +163,7 @@ class Tag extends React.Component {
             subscribeText="Подписаться" 
             unsubscribeText="Отписаться"
             entryType="tag"
-            entryID={tag._id}
+            entryID={_id}
             additionalClasses="small"
           />
           </div>

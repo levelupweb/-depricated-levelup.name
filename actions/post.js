@@ -23,6 +23,10 @@ export function setLike(token, id) {
    return MODEL.setLike(token, id)
 }
 
+export function getRandomAdv(id) {
+   return MODEL.getRandomAdv(id)
+}
+
 export function updatePost(token, id, post) {
    return MODEL.updatePost(token, id, post)
 }
@@ -48,12 +52,12 @@ export function setPost(post) {
 	}
 }
 
-export function prepareNewPost(user, type) {
+export function prepareNewPost(type) {
 	return (dispatch) => {
-	   return Promise.all([
-	   	dispatch(setPostField('postType', type)),
-        	dispatch(setPostField('postStatus', 'draft'))
-      ])
+	  return Promise.all([
+	   	dispatch(setPostField('type', type)),
+      dispatch(setPostField('status', 'draft'))
+    ])
 	}
 }
 
@@ -81,7 +85,7 @@ export function createPost(token, defaultPost) {
 	return (dispatch) => {
 		var post = {
 			...defaultPost,
-			postTitle: defaultPost.postTitle || 'Безымянный' 
+			title: defaultPost.title || 'Безымянный' 
 		}
 		return MODEL.createPost(token, post).then((res) => {
 			if(res.data.success) {
@@ -144,20 +148,18 @@ export function fetchPosts(key, defaultOptions, skip) {
 	}
 }
 
-export function createPostsInstance(key, options) {
+export function createPostsInstance(key, options, initialPosts) {
 	return {
 		type: 'CREATE_POSTS_INSTANCE',
-		payload: {
-			key, 
-			options
-		}
+		payload: { key, options, initialPosts }
 	}
 }
+
 
 export function pushPost(token, key, post) {
 	var postFinal = {
 		...post,
-		postStatus: 'published'
+		status: 'published'
 	}
 	return (dispatch) => {
 		dispatch(pushPostStart(key))

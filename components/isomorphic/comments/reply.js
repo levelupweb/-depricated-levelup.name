@@ -12,9 +12,9 @@ import Avatar from 'react-avatar'
 
 const defaultState = {
 	comment: {
-		commentContent: '',
-		commentAuthor: null,
-		commentPost: null
+		content: '',
+		author: null,
+		post: null
 	}
 }
 
@@ -27,53 +27,58 @@ class ReplyForm extends React.Component {
 
 	// React lifecycle
 	componentWillMount() {
-		this.settingUp(this.props.currentUser._id, this.props.postID)
+		const { postID, currentUser } = this.props 
+		this.settingUp(currentUser._id, postID)
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.settingUp(nextProps.currentUser._id, nextProps.postID)
+		const { postID, currentUser } = nextProps
+		this.settingUp(currentUser._id, postID)
 	}
 
 	// Specific Methods
 	settingUp(userID, postID) {
+		const { comment } = this.state;
 		this.setState({
 			comment: {
-				...this.state.comment,
-				commentAuthor: userID,
-				commentPost: postID
+				...comment,
+				author: userID,
+				post: postID
 			}
 		})
 	}
 
 	submitComment(token, comment) {
-		createComment(token, comment).then((res) => {
-			if(res.data.success) {
-				this.props.onSubmit(res.data.comment)
+		createComment(token, comment).then((response) => {
+			if(response.data.success) {
+				this.props.onSubmit(response.data.comment)
 			} else {
-				console.log(res.data)
+				console.log(response.data)
 			}
 		})
 	}
 
 	render() {
-		var user = this.props.currentUser
-		if (this.props.isRevealed) {
+		const { comment } = this.state;
+		const { currentUser, isRevealed } = this.props;
+		const { image, fullName, slug } = currentUser;
+		if (isRevealed) {
 			return (
 				<form className="ui reply form">
 			     	<div className="field">
 			     		<div className="user">
-				      	<Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-		                  <Avatar color={`#46978c`} round={true} size={32} src={user.userImage} name={user.userName} />
-		               </a></Link>
+				      	<Link href={{ pathname: 'user', query: { slug }}}><a>
+                  <Avatar color={`#46978c`} round={true} size={32} src={image} name={fullName} />
+               	</a></Link>
 		            </div>
 		            <div className="textarea">
 				      	<textarea 
-				      		onChange={(e) => {this.setState({comment: {...this.state.comment, commentContent: e.target.value}})}}
+				      		onChange={(e) => {this.setState({comment: {...comment, content: e.target.value}})}}
 				      		placeholder="Оставьте ваш комментарий" 
 				      		ref={(e) => {this.textarea = e}}>
 				      	</textarea>
 				      	<div 
-					    		onClick={() => {this.submitComment(this.token, this.state.comment, this.props.currentUser)}}
+					    		onClick={() => {this.submitComment(this.token, comment)}}
 					    		className="ui button primary small circular">
 					      	Отправить
 					    	</div>

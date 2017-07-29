@@ -6,10 +6,14 @@ Object.defineProperty(exports, "__esModule", {
 exports.authenticateUser = authenticateUser;
 exports.signIn = signIn;
 exports.signUp = signUp;
-exports.setUser = setUser;
+exports.authenticateUserSuccess = authenticateUserSuccess;
 exports.getLogout = getLogout;
 exports.getUsers = getUsers;
 exports.getUser = getUser;
+exports.getUserByToken = getUserByToken;
+exports.getUserPosts = getUserPosts;
+exports.getUserSubscriptions = getUserSubscriptions;
+exports.getUserCampaigns = getUserCampaigns;
 exports.updateUser = updateUser;
 exports.removeUser = removeUser;
 exports.createUser = createUser;
@@ -17,9 +21,17 @@ exports.getUserStats = getUserStats;
 exports.setFace = setFace;
 exports.setUserFaces = setUserFaces;
 exports.findUser = findUser;
-exports.getUserSubscriptions = getUserSubscriptions;
+exports.getSubscriptions = getSubscriptions;
 exports.addSocial = addSocial;
-exports.removeUserSocial = removeUserSocial;
+exports.removeSocial = removeSocial;
+
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
 var _promise = require('babel-runtime/core-js/promise');
 
@@ -53,13 +65,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function authenticateUser(token) {
 	return function (dispatch) {
 		if (token) {
-			return MODEL.authenticateUser(token).then(function (res) {
-				dispatch(setUser(res.data));
-				return res.data;
+			return MODEL.authenticateUser(token).then(function (response) {
+				dispatch(authenticateUserSuccess(response.data.user));
+				return response.data.user;
 			});
 		} else {
 			dispatch({ type: 'LOGIN_FAILURE' });
-			return false;
+			return _promise2.default.resolve(false);
 		}
 	};
 }
@@ -67,24 +79,24 @@ function authenticateUser(token) {
 // models
 function signIn(user) {
 	return function (dispatch) {
-		return MODEL.signIn(user).then(function (res) {
-			if (res.data.success) {
-				dispatch(setUser(res.data.user));
+		return MODEL.signIn(user).then(function (response) {
+			if (response.data.success) {
+				dispatch(authenticateUserSuccess(response.data.user));
 			}
-			return res;
-		}).then(function (res) {
-			if (res.data.token && res.data.success) {
-				_jsCookie2.default.set('x-access-token', res.data.token, { expires: 7, path: '' });
-				dispatch((0, _app.handleSuccess)('Привет, ' + res.data.user.userName, true));
+			return response;
+		}).then(function (response) {
+			if (response.data.token && response.data.success) {
+				_jsCookie2.default.set('x-access-token', response.data.token, { expires: 7, path: '' });
+				dispatch((0, _app.handleSuccess)('Привет, ' + response.data.user.fullName, true));
 				return {
 					success: true,
-					message: res.data.message,
-					user: res.data.user
+					message: response.data.message,
+					user: response.data.user
 				};
 			} else {
 				return {
 					success: false,
-					message: res.data.message
+					message: response.data.message
 				};
 			}
 		});
@@ -93,24 +105,24 @@ function signIn(user) {
 
 function signUp(user) {
 	return function (dispatch) {
-		return MODEL.signUp(user).then(function (res) {
-			if (res.data.success) {
+		return MODEL.signUp(user).then(function (response) {
+			if (response.data.success) {
 				return {
 					success: true,
-					message: res.data.message
+					message: response.data.message
 				};
 			} else {
 				return {
 					success: false,
-					message: res.data.message,
-					errors: res.data.errors
+					message: response.data.message,
+					errors: response.data.errors
 				};
 			}
 		});
 	};
 }
 
-function setUser(user) {
+function authenticateUserSuccess(user) {
 	if (user) {
 		return {
 			type: 'LOGIN_SUCCESS',
@@ -139,8 +151,24 @@ function getUser(id) {
 	return MODEL.getUser(id);
 }
 
-function updateUser(id, user) {
-	return MODEL.updateUser(id, user);
+function getUserByToken(token) {
+	return MODEL.getUserByToken(token);
+}
+
+function getUserPosts(id, limit, skip) {
+	return MODEL.getUserPosts(id, limit, skip);
+}
+
+function getUserSubscriptions(id, limit, skip) {
+	return MODEL.getUserSubscriptions(id, limit, skip);
+}
+
+function getUserCampaigns(id, limit, skip) {
+	return MODEL.getUserCampaigns(id, limit, skip);
+}
+
+function updateUser(token, id, user) {
+	return MODEL.updateUser(token, id, user);
 }
 
 function removeUser(token, id) {
@@ -157,25 +185,36 @@ function getUserStats(id) {
 
 // Faces Reducer
 function setFaces(faces) {
-	return function (dispatch) {
-		dispatch({ type: 'SET_FACES', payload: faces });
+	return {
+		type: 'SET_FACES',
+		payload: faces
 	};
 }
 
 function setFace(face) {
 	return function (dispatch) {
-		return _promise2.default.all([dispatch({ type: 'SET_FACE', payload: face }), dispatch({ type: 'SET_POST_FIELD', payload: { field: 'postAuthor', value: {
-					authorID: face._id,
-					authorType: face.type
-				} } })]);
+		var _id = face._id,
+		    author = face.author;
+
+		return _promise2.default.all([dispatch({
+			type: 'SET_FACE',
+			payload: face
+		}), dispatch({
+			type: 'SET_POST_FIELD',
+			payload: {
+				field: 'author',
+				value: (0, _defineProperty3.default)({}, author, _id)
+			}
+		})]);
 	};
 }
 
-// DEPRICATED
 function setUserFaces(user) {
 	return function (dispatch) {
-		return MODEL.getFaces(user._id).then(function (res) {
-			dispatch(setFaces(res.data.concat(user)));
+		var _id = user._id;
+
+		return MODEL.getFaces(_id).then(function (response) {
+			dispatch(setFaces([].concat((0, _toConsumableArray3.default)(response.data), [user])));
 		});
 	};
 }
@@ -185,8 +224,8 @@ function findUser(query) {
 }
 
 // DEPRICATED
-function getUserSubscriptions(id) {
-	return MODEL.getUserSubscriptions(id);
+function getSubscriptions(id, type) {
+	return MODEL.getSubscriptions(id, type);
 }
 
 // DEPRICATED
@@ -195,13 +234,6 @@ function addSocial(token, id, social) {
 }
 
 // DEPRICATED
-function removeUserSocial(token, userid, data) {
-	return (0, _axios2.default)({
-		url: _appConfig2.default.API + 'user/entries/' + userid + '/removesocial/',
-		method: 'POST',
-		data: data,
-		headers: {
-			'authorization': token
-		}
-	});
+function removeSocial(token, id, social) {
+	return MODEL.removeSocial(token, id, social);
 }

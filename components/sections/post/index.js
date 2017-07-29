@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 
 // Actions
 import { getUser } from '../../../actions/user.js'
-import { setLike, getUsersWhoLikes } from '../../../actions/post.js'
+import { setLike, getUsersWhoLikes, getRandomAdv } from '../../../actions/post.js'
 import { getBlog } from '../../../actions/blog.js'
 
 // Utils
@@ -28,36 +28,25 @@ class Post extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token');
-    this.currentUser = this.props.currentUser;
     this.state = {
-      post: null,
-      user: null,
-      blog: null,
       isLiked: false,
+      adv: {},
       isMounted: false
     }
   }
 
   componentWillMount() {
-    if (this.props.defaultPost) {
+    const { defaultPost } = this.props;
+    if(defaultPost) {
       this.setState({
-        post: this.props.defaultPost
-      }, () => {
-        if(this.props.defaultPost.postAuthor.authorType == 'user') {
-          getUser(this.props.defaultPost.postAuthor.authorID).then((res) => {
-            this.setState({
-              user: res.data
-            })
-          })
-        } else {
-          getBlog(this.props.defaultPost.postAuthor.authorID).then((res) => {
-            this.setState({
-              blog: res.data
-            })
-          })
-        }
+        post: defaultPost
       })
     }
+    getRandomAdv(defaultPost._id).then((response) => {
+      this.setState({
+        adv: response.data
+      })
+    })
   }
 
   componentDidMount() {
@@ -66,80 +55,108 @@ class Post extends React.Component {
     })
   }
 
+  renderAuthor(author) {
+    const { blog, user } = author
+    return (user) ? 
+    <User user={user} /> : 
+    <Blog blog={blog} />          
+  }
+
   render() {
-    var user = this.state.user;
-    var post = this.state.post;
-    var blog = this.state.blog;
-    if(post && (user || blog)) {
+    const { post, adv } = this.state;
+    const { currentUser } = this.props;
+    if (post) {
+      const { image, description, title, _id, tags, comments, likes, author, content } = post
       return (
         <div className="wrapper">
+          <div className="adv">
+            <div className="ui card">
+              <div className="image">
+                <img src={adv.image} alt={adv.title} width="100%" className="ui image rounded" />
+              </div>
+              <div className="content">
+                <a className="header" href={adv.link} target="_blank">{adv.title}</a>
+                <div className="meta">
+                  <span>Спонсор данной статьи</span>
+                </div>
+                <div className="description">
+                  {adv.description}
+                </div>
+              </div>
+              <div className="extra content">
+                <a href={adv.link} target="_blank">{adv.displayLink}</a>
+              </div>
+            </div>
+          </div>
           <article className="article single blocks">
             <div className="user block-item">
-              {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
+              {this.renderAuthor(author)}
             </div>
-            {post.postImage && 
+            {image && 
             	<div className="image block-item">
-                <img src={post.postImage} width="100%" />
+                <img src={image} width="100%" />
               </div>
             }
             <div className="title block-item">
               <h1 className="ui header">
-                {post.postTitle}
+                {title}
               </h1>
               <p className="primary">
-                {post.postDescription}
+                {description}
               </p>
               <div className="tags">
-                {post.postTags.map((item, i) => {
-                  return <Link key={i} href={{ pathname: 'search', query: { query: item }}}><a className="ui label">
-                    {item}
+                {tags.map((query, i) => {
+                  return <Link key={i} href={{ pathname: 'search', query: { query }}}><a className="ui label">
+                    {query}
                   </a></Link>
                 })}
               </div>
             </div>
             <div className="ui divider dot"></div>
             <div className="content block-item" 
-              dangerouslySetInnerHTML={{__html: post.postContent}}>
+              dangerouslySetInnerHTML={{__html: content}}>
             </div>
             <div className="block-border-bottom">
               <div className="ui divider dot"></div>
             </div>
             <div className="user block-item">
-              {user ? <User id={user._id} /> : <Blog id={blog._id} /> }
+              {this.renderAuthor(author)}
               <SubscribeButton 
                 additionalClasses="small" 
-                entryType="user"
-                entryID={user ? user._id : blog._id} 
+                entryType={author.user ? 'user' : 'blog'}
+                entryID={author.user ? author.user._id : author.blog._id} 
                 subscribeText="Подписаться" 
                 unsubscribeText="Отписаться" 
               />
             </div>
             <div className="comments-wrapper block-item">
               <Comments 
-                comments={post.postComments}
+                comments={comments}
                 postID={post._id}
                 isRevealed={true}
-                isSingle={true}
-              />
+                isSingle={true} />
             </div>
             <div className="related block-item">
               <p className="primary">
                 Возможно вам это будет интересно
               </p>
             </div>
-
             <Actions 
-              likeCount={post.postLikes.length}
-              commentCount={post.postCommentsCount}
+              likeCount={likes.length}
+              commentCount={comments.length}
               isLiked={post.liked}
-              currentUser={this.currentUser}
-              post={post}
-            />
+              currentUser={currentUser}
+              post={post} />
           </article>
           <style jsx>{`
             .wrapper {
               background:#fff;
               border-right:1px solid #eee;
+            }
+            .wrapper .adv {
+              position:fixed;
+              left:998px;
+              top:100px;
             }
             .article {
               margin:0px!important;
@@ -197,7 +214,6 @@ class Actions extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token');
-    this.currentUser = this.props.currentUser;
     this.post = this.props.post
     this.state = {
       isMounted: false,
@@ -258,7 +274,7 @@ class Actions extends React.Component {
               <span className={(this.state.likeCount > 0) && 'ui teal label'}>{this.state.likeCount}</span>
             </div>
             <FacebookShareButton 
-              title={this.props.post.postTitle}
+              title={this.props.post.title}
               description={this.props.post.postDescription}
               picture={this.props.post.postImage}
               url={window.location.href}>
@@ -279,7 +295,7 @@ class Actions extends React.Component {
                 </div>
             </GooglePlusShareButton>
             <VKShareButton 
-              title={this.props.post.postTitle}
+              title={this.props.post.title}
               description={this.props.post.postDescription}
               image={this.props.post.postImage}
               url={window.location.href}>
@@ -291,7 +307,7 @@ class Actions extends React.Component {
                 </div>
             </VKShareButton>
             <TwitterShareButton 
-              title={this.props.post.postTitle}
+              title={this.props.post.title}
               url={window.location.href}>
                 <div className="item">
                   <i className="fa fa-twitter"></i>

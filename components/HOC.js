@@ -1,129 +1,49 @@
 // Important
 import React from 'react';
-import config from '../app.config.js'
-import cookies from 'js-cookie'
-import queryString from 'query-string';
 
 // Actions
-import { setUser, authenticateUser } from '../actions/user'
-import { setQuery, setPageData, getModule, setPageSettings, setAccessError } from '../actions/app'
+import { authenticateUser } from '../actions/user'
+import { settingUpPageProperties, settingUpPageData, setAccessStatus } from '../actions/app'
 
 // Utils
 import getToken from '../utils/getToken.js'
-import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
 
-// Components
-import Loader from './isomorphic/loader.js'
+function withAuth(Component, pageSlug, pageBuilder) {
+  return class HOC extends Component {
+    static async getInitialProps ({ req, store, query, isServer }) {
+      const { dispatch } = store;
+      let token = getToken(req);
 
-/* 
-
-*** Запрос к API, учитывающий необходимые данные для данной страницы
-
-* query - объект, содержащий параметры GET-запроса
-* builder - объект с информацией о том, какие данные могут понадобиться дочернему контейнеру 
-
-*/
-
-async function prepareData(builder, query) {
-  if(builder) {
-    var data = {}
-    var queries = await Object.values(builder)
-    await Promise.all(queries.map(async (item) => {
-      var value = item.single ? query[item.by] || query.slug : ``;
-      if(item.custom) {
-        var url = item.type + '/' + item.url
-      } else {
-        if(!item.options) {
-          if(value) {
-            if(item.by) {
-              var url = item.type + `/entries/` + encodeURI(value) + `/by` + item.by
-            } else {
-              var url = item.type + `/entries/` + encodeURI(value)
-            }
+      await dispatch(authenticateUser(token)).then(async (user) => {
+        await dispatch(settingUpPageProperties(pageSlug)).then(async (properties) => {
+          if (canUserPass(user, properties.userMustBeLoggedIn)) {
+            await dispatch(settingUpPageData(pageBuilder, query))
           } else {
-            var url = item.type + `/entries/`
+            await dispatch(setAccessStatus(false))
           }
-        } else {
-          var url = item.type + `/entries?` + queryString.stringify(item.options)
-        }
-      }
-      await axiosNoAuth({
-          url: url,
-          method: 'GET'
-      }).then(async (res) => {
-        data[item.type] = res.data
+        })
       })
-    }));
-
-    return new Promise((resolve, reject) => {
-      return resolve(data);
-    })
-
-  } else {
-    return null
-  }
-}
-
-// Добавить уровни доступа // Вынести в UTILS и добавить уровни доступа
-function canUserPass(options, user) {
-  if(user.isLogged) {
-    return true
-  } else {
-    if(options.userMustBeLoggedIn) {
-      return false
-    } else {
-      return true
     }
-  }
-}
- 
-/* 
 
-*** Функция, отвечающая за подготовку данных, которые могут понадобиться дочернему контейнеру
+    constructor(props) {
+      super(props)
+    }
 
-* Component - дочерний компонент
-* slug - ключевое слово для генерируемой страницы
-* builder - объект с информацией о том, какие данные могут понадобиться дочернему контейнеру 
-
-*/
-
-export default function page(Component, slug, builder) {
-  return class GetAuth extends Component {
-
-    static async getInitialProps ({ req, store, query }) {
-      var token         = await getToken(req); // находим токен
-      var user          = await store.dispatch(authenticateUser(token)); // + запихиваем информацию о user в store
-      
-      await getModule(slug).then(async (res) => {
-          await prepareData(builder, query).then(async (data) => {
-            var state =   await store.getState();
-            var canPass = await canUserPass(res.data, state.currentUser);
-            if (canPass) {
-              await store.dispatch(setQuery(builder, query));
-              await store.dispatch(setPageData(data));
-              await store.dispatch(setPageSettings(res.data))
-            } else {
-              await store.dispatch(setAccessError())
-            }
-          });
-      })
-
-      return {
-        user: user
-      }
-  }
-
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
+    render() {
       return (
         <Component {...this.props} />
       )
     }
   }
 }
-  
 
 
+function canUserPass(user, userMustBeLoggedIn) {
+  if(user) {
+    return true
+  } else {
+    return !userMustBeLoggedIn
+  }
+}
+
+export default withAuth

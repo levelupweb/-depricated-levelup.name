@@ -26,39 +26,36 @@ class Feed extends React.Component {
     this.dispatch = this.props.dispatch;
     this.state = {
       defaultSkip: 0,
+      isMounted: false,
       key: null
     }
   }
 
   // React Lifecycle
   componentWillMount() {
-    const key = hash(this.props.options)
+    const { options, initialPosts, defaultPosts } = this.props;
+    const key = hash(options)
     if (key != this.state.key) {
-      this.createInstance(this.props.options)
+      this.createInstance(options, initialPosts, defaultPosts)
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const key = hash(nextProps.options)
+    const { options, initialPosts, defaultPosts } = nextProps;
+    const key = hash(options)
     if (key != this.state.key) {
-      this.createInstance(nextProps.options)
+      this.createInstance(options, initialPosts, defaultPosts)
     } 
   }
 
-  createInstance(options) {
-    const key = hash(options)
+  createInstance(options, initialPosts = [], defaultPosts = []) {
+    const key = hash(options);
     if(!this.props.postsStorage[key]) {
-      this.dispatch(
-        createPostsInstance(
-          key, 
-          options
-        )
-      )
-      this.loadMore(
-        key,
+      this.dispatch(createPostsInstance(
+        key, 
         options,
-        this.state.defaultSkip
-      )
+        [...initialPosts, ...defaultPosts]
+      ))
     }
     this.setState({
       key,
@@ -68,62 +65,77 @@ class Feed extends React.Component {
 
   // Specific Methods
   loadMore(options, skip, key) {
-    this.dispatch(
-      fetchPosts(...arguments)
-    )
+    this.dispatch(fetchPosts(...arguments))
   }
 
   pushItem(token, key, post) {
-    this.dispatch(
-      pushPost(...arguments)
-    )
+    this.dispatch(pushPost(...arguments))
   }
 
   removeItem(token, key, id) {
-    this.dispatch(
-      removePost(...arguments)
-    )
+    this.dispatch(removePost(...arguments))
   }
 
   isOwner(currentUserID, options) {
-    if(options.userID) {
-      return currentUserID == options.userID
-    } else if(options.blogOwner) {
-      return currentUserID == options.blogOwner
+    const { userID, blogOwner } = options;
+    if(userID) {
+      return currentUserID == userID
+    } else if(blogOwner) {
+      return currentUserID == blogOwner
     } else {
       return true
     }
   }
 
-  render() {
-    var instance = this.props.postsStorage[this.state.key];
-    var currentUser = this.props.currentUser;
-    var options = this.props.options
-    if(instance) {
-      var components = instance.posts.map((post, i) => {
+  renderPosts(posts) {
+    if(posts) {
+      return posts.map((post, i) => {
         return <Item 
-          article={post} 
+          post={post} 
           key={post._id} 
-          onRemove={(postID) => {this.removeItem(this.token, this.state.key, postID)}}
-        />
+          onRemove={(postID) => {this.removeItem(this.token, this.state.key, postID)}} />
       })
+    }
+  }
+
+  displayPosts(posts, options, skip, isFull) {
+    const { key } = this.state;
+    const instance = this.props.postsStorage[key]
+    if(posts) {
+      if(posts.length) {
+        return (<InfiniteScroll
+          children={posts}
+          loadMore={() => {this.loadMore(key, options, skip)}} 
+          hasMore={!isFull}
+          threshold={10}
+          elementIsScrollable={false} />)
+      } else {
+        return <div className="no-content">
+          <div className="divider ui dot"></div>
+        </div>
+      }
+    } else {
+      return <Loader />
+    }
+  }
+
+  render() {
+    const { postsStorage, currentUser, options, postState, flashPost, defaultPosts, initialPosts } = this.props;
+    const instance = postsStorage[this.state.key];
+    if(instance) {
+      const { isFull, posts } = instance;
       return (
         <div className="grid">
-          {(this.props.flashPost && this.isOwner(currentUser._id, options)) && 
+          {(flashPost && this.isOwner(currentUser._id, options)) && 
             <FlashPost 
-              onSubmit={(key) => {this.pushItem(this.token, key, this.props.postState.post)}}
+              onSubmit={(key) => {this.pushItem(this.token, key, postState.post)}}
               hashKey={this.state.key} />
           }
-          <InfiniteScroll
-            children={components}
-            loadMore={() => {this.loadMore(this.state.key, this.state.options, instance.posts.length)}} 
-            hasMore={!instance.isFull}
-            threshold={10}
-            elementIsScrollable={false} />
+          {this.displayPosts(this.renderPosts(posts), options, posts.length, isFull)}
         </div>
       )
     } else {
-      return null
+      return <div>{this.renderPosts(this.props.initialPosts)}</div>
     }
   }
 }
@@ -132,7 +144,8 @@ function mapStateToProps(state) {
   return { 
     currentUser: state.currentUser,
     postsStorage: state.postsStorage,
-    postState: state.postState
+    postState: state.postState,
+    initialPosts: state.app.pageData.initialPosts
   }
 }
 

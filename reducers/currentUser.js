@@ -10,19 +10,16 @@ export default (state = defaultState, action) => {
     		isLogged: true,
     		...action.payload
     	}
-
     case 'LOGIN_FAILURE': 
     	return {
     		...state,
     		isLogged: false
     	}
-
     case 'LOGOUT':
-        return {
-            ...state,
-            isLogged: false
-        }
-
+      return {
+        ...state,
+        isLogged: false
+      }
     default: return state
   }
 }

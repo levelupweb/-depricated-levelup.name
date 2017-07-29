@@ -1,192 +1,182 @@
-import axios from 'axios'
 import config from '../app.config.js'
 import { axiosAuth, axiosNoAuth } from '../utils/axiosAuth.js'
+import pageDataBuilder from '../utils/pageDataBuilder.js'
 
 // models
 import * as MODEL from '../models/app.js'
 
-// DANGER ZONE: 
-// CORE APPLICATION ACTIONS
-export function setQuery(builder, query) {
-  return (dispatch) => {
-    dispatch({
-      type: 'SET_PAGE_QUERY', 
-      payload: query
-    });
-    dispatch({
-      type: 'SET_PAGE_BUILDER', 
-      payload: builder
+// Clear Actions
+const SET_PAGE_DATA = 'SET_PAGE_DATA'
+export const setPageData = pageData => ({
+  type: SET_PAGE_DATA, 
+  payload: pageData
+})
+
+const SET_PAGE_SETTINGS = 'SET_PAGE_SETTINGS'
+export const setPageProperties = pageProperties => ({
+  type: SET_PAGE_SETTINGS, 
+  payload: pageProperties
+})
+
+const SET_ACCESS_STATUS = 'SET_ACCESS_STATUS'
+export const setAccessStatus = status => ({
+  type: SET_ACCESS_STATUS, 
+  payload: status
+})
+
+const CACHE_DATA = 'CACHE_DATA'
+export const cacheData = (key, value) => ({
+  type: CACHE_DATA, 
+  payload: { key, value }
+})
+
+
+const CREATE_MESSAGE = 'CREATE_MESSAGE'
+export const createMessage = (title, description, isClosable) => ({
+  type: CREATE_MESSAGE, 
+  payload: { title, description, isClosable }
+})
+
+const CLEAR_MESSAGE = 'CLEAR_MESSAGE'
+export const clearMessage = () => ({
+  type: CLEAR_MESSAGE
+})
+
+const HIDE_MESSAGE_START = 'HIDE_MESSAGE_START'
+export const hideMessageStart = () => ({
+  type: HIDE_MESSAGE_START
+})
+
+const HIDE_MESSAGE_END = 'HIDE_MESSAGE_END'
+export const hideMessageEnd = () => ({
+  type: HIDE_MESSAGE_END
+})
+
+// Action Creators
+export function settingUpPageData(pageBuilder, query) {
+  return dispatch => {
+    return pageDataBuilder(pageBuilder, query).then((data) => {
+      dispatch(setPageData(data))
+      return data
     })
-	}
+  }
 }
 
-export function setPageData(data) {
-  return (dispatch) => {
-    dispatch({
-      type: 'SET_PAGE_DATA', 
-      payload: data
-    });
-	}
+export function settingUpPageProperties(slug) {
+  return dispatch => {
+    return MODEL.getModule(slug).then((response) => {
+      dispatch(setPageProperties(response.data))
+      return response.data
+    })
+  }
 }
 
-export function setPageSettings(data) {
-  return (dispatch) => {
-    dispatch({
-      type: 'SET_PAGE_SETTINGS', 
-      payload: data
-    });
-	}
-}
+// return errors or run callback with filepath
+export function updateImage(token, type, id, image, callback) {
+  return dispatch => {
+    let form = new FormData();
+    if (image && form) {
+      form.append('image', image);
+      form.append('type', type);
+      form.append('id', id);
 
-export function setAccessError() {
-  return (dispatch) => {
-    dispatch({
-      type: 'SET_APP_ACCESSABILITY', 
-      payload: false
-    });
-	}
-}
-
-// COMMON ACTIONS
-export function getModule(slug) {
-  return MODEL.getModule(slug)
-}
-
-export function makeSearch(query) {   
-  return MODEL.makeSearch(query)
-}
-
-export function updateField(token, type, id, data) {
-  return MODEL.updateField(token, type, id, data)
-}
-
-export function subscribeToEntry(token, type, id) {
-  return MODEL.subscribeToEntry(token, type, id)
-}
-
-// TODO: handle error, rewrite to actions
-export function updateImage(token, entryType, entryID, image) {
-    if (image) {
-      var data = new FormData();
-      data.append('image', image);
-      data.append('type', entryType);
-      data.append('id', entryID);
-
-      return axiosAuth(token, {
-        url: 'app/entries/' + entryID + '/upload',
-        method: 'POST',
-        data: data
-      })
-      .then((res) => {
-        if(res.data.success) { 
-            var path = config.storage + entryType+'s' + '/' + entryID + '/' + res.data.filename
-            return { path, ...res.data }
+      return MODEL.updateImage(token, id, form)
+      .then((response) => {
+        const { success, filepath } = response.data;
+        if(success) { 
+          MODEL.updateField(token, type, id, {
+            field: 'image',
+            value: filepath
+          }).then((response) => {
+            const { success, errors } = response.data
+            if(success) {
+              dispatch(handleSuccess('Изображение обновлено!', true))
+              return callback(filepath)
+            } else {
+              return dispatch(handleError(errors, 'Ошибка при обновлении данных', true))
+            }
+          })
         } else {
-            return { errors: res.data.errors }
-        }
-      })
-      .then((res) => {
-        if(res.success) { 
-            updateField(token, entryType, entryID, {
-                field: entryType + 'Image',
-                value: res.path
-            })
-            return res;
-        } else {
-            return {  errors: res.errors }
+          return dispatch(handleError(errors, 'Ошибка при загрузке', true))
         }
       })
     } else {
-        console.log('Не найдено изображение')
+      return dispatch(handleError(null, 'Не найдено изображение', true))
     }
+  }
 }
 
-// TODO: handle error, rewrite to actions
-export function uploadImage(token, image) {
-    if (image) {
-      var data = new FormData();
-      data.append('image', image);
-      return axiosAuth(token, {
-        url: 'app/entries/upload',
-        method: 'POST',
-        data: data
-      })
-      .then((res) => {
-        if(res.data.success) { 
-            var path = config.storage + 'temp' + '/' + res.data.filename
-            return { path, ...res.data }
+// return errors or run callback with filepath
+export function uploadUnsignedImage(token, image, callback) {
+  return dispatch => {
+    if (image && token) {
+      let form = new FormData();
+      form.append('image', image);
+      return MODEL.uploadUnsignedImage(token, form)
+      .then((response) => {
+        if(response.data.success) { 
+          const { errors, filepath } = response.data
+          dispatch(handleSuccess(
+            'Изображение успешно загружено!'
+          ))
+          return callback(filepath)
         } else {
-            return { errors: res.data.errors }
+          dispatch(handleError(
+            errors, 'Ошибка при загрузке изображения'
+          ))
         }
       })
     } else {
-        console.log('Не найдено изображение')
+      dispatch(handleError(
+        errors, 'Изображение не найдено'
+      ))
     }
+  }
 }
-
-// MESSAGE SYSTEM:
 
 export function handleSuccess(description, isClosable) {
-  return (dispatch) => {
-    return dispatch(displayMessage(
+  return dispatch => {
+    dispatch(displayMessage(
       'Успех!', description, isClosable
     ))
   }
 }
 
 export function handleWarn(description, isClosable) {
-  return (dispatch) => {
-    return dispatch(displayMessage(
+  return dispatch => {
+    dispatch(displayMessage(
       'Внимание!', description, isClosable
     ))
   }
 }
 
 export function handleError(description, isClosable) {
-  return (dispatch) => {
-    return dispatch(displayMessage(
+  return dispatch => {
+    dispatch(displayMessage(
       'Ошибка!', description, isClosable
     ))
   }
 }
 
 export function displayMessage(title, description, isClosable) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(createMessage(title, description, isClosable))
     if(!isClosable) {
       return setTimeout(() => {
         dispatch(hideMessage())
-      }, 5000) 
+      }, 5000)
     }
   }
 }
 
 export function hideMessage() {
-  return (dispatch) => {
-    dispatch(unableMessage())
-    return setTimeout(() => {
-      dispatch(flushMessage())
-    }, 1000)
+  return dispatch => {
+    dispatch(hideMessageStart())
+    return Promise.resolve(setTimeout(() => {
+      dispatch(clearMessage())
+    }, 1000))
+    .then(() => {
+      dispatch(hideMessageEnd())
+    })
   } 
-}
-
-export function createMessage(title, description, isClosable) {
-  return {
-    type: 'CREATE_MESSAGE',
-    payload: {
-      title, description, isClosable
-    }
-  }
-}
-
-export function flushMessage() {
-  return {
-    type: 'FLUSH_MESSAGE'
-  }
-}
-
-export function unableMessage() {
-  return {
-    type: 'UNABLE_MESSAGE'
-  }
 }

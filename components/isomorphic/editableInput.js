@@ -1,14 +1,17 @@
 // Important 
 import React from 'react';
+import { connect } from 'react-redux'
 import cookies from 'js-cookie'
 
 // Utils
 import { UI } from '../../utils/initScripts.js'
 
 // Actions
-import { updateField } from '../../actions/app.js'
+import { updateField } from '../../models/app.js'
+import { getBlog } from '../../actions/blog.js'
 
-export default class EditableInput extends React.Component {
+
+class EditableInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +19,6 @@ export default class EditableInput extends React.Component {
     	editing: false,
     	temp: ''
     }
-
     this.token = cookies.get('x-access-token');
   }
 
@@ -39,11 +41,11 @@ export default class EditableInput extends React.Component {
 
   save() {
   	if(this.state.temp != '') { 
-	  	updateField(this.token, this.props.entryType, this.props.entryID, {
+	  	updateField(this.token, this.props.entryType, this.props.entry._id, {
 	  		field: this.props.field,
 	  		value: this.state.temp
-	  	}).then((res) => {
-	  		if(res.data.success) {
+	  	}).then((response) => {
+	  		if(response.data.success) {
 	  			this.setState({
 			  		value: this.state.temp,
 			  		editing: false,
@@ -51,12 +53,12 @@ export default class EditableInput extends React.Component {
 			  	})
 	  		}
 	  	})
-	} else {
-		this.setState({
-	  		editing: false
-	  	})
-	}
-  }	
+		} else {
+			this.setState({
+		  		editing: false
+		  })
+		}
+	}	
 
   edit() {
   	this.setState({
@@ -78,97 +80,149 @@ export default class EditableInput extends React.Component {
   		if(self.state.temp != '') { 
 		    if (e.keyCode === 13) { return self.save() }
 		    if (e.keyCode === 27) { return self.cancel() }
-		}
-	});
+			}
+		});
+  }
+
+  canEdit(currentUserID, entry, entryType) {
+  	if(entryType == 'user') {
+  		return currentUserID == entry._id;
+  	} else if(entryType == 'blog') {
+  		return currentUserID == entry.owner._id;
+  	}
   }
 
   render() {
-   var description = this.state.value;
-	if (!this.state.editing) {
-		return (
-			<p  data-inverted="" 
-				data-tooltip="Нажмите для редактирования" 
-				data-position={(this.props.align) ? `bottom ${this.props.align}` : `bottom center`}
-				className={`${this.props.size}`}
-				onClick={() => {this.edit()}}>
-				
-				{description ? <span>{description}</span> : `Добавьте ${this.props.title.toLowerCase()}` }
+  const { value, editing, description } = this.state;
+  const { currentUser, entry, entryType, align, title, size } = this.props;
+  if(this.canEdit(currentUser._id, entry, entryType)) {
+			if (!editing) {
+				return (
+					<p data-inverted="" 
+						data-tooltip="Нажмите для редактирования" 
+						data-position={align ? `bottom ${align}` : `bottom center`}
+						className={`${size}`}
+						onClick={() => {this.edit()}}>
+						
+						{value ? <span>{value}</span> : `Добавьте ${title.toLowerCase()}` }
 
-				<style jsx>{`
-					p {
-						font-size: 16px;
-						margin:0px;
-						color: #c0c0c0;
-					}
-					p span {
-						color: #000;
-					}
-					.big {
-						font-size:32px;
-						font-weight:bold;
-					}
-					.large {
-						font-size:23px;
-					}
-					.medium {
-						font-size:18px;
-					}
-					.normal {
-						font-size:16px;
-					}
-					.mini {
-						font-size:14px;
-					}
-				`}</style>
-			</p>
-		)
-	} else {
-		return (
-			<div className="description">
-				<div className="ui form">
-	 				<div className="field" data-inverted="" data-tooltip="Enter чтобы сохранить, Esc чтобы отменить" data-position="bottom center">
-						<input 
-							onChange={() => {this.setState({temp: this.input.value})}} 
-							defaultValue={description} 
-							ref={(e) => {this.input = e}}
-							type="text" 
-							className={`${this.props.align} add mini`} 
-							placeholder={this.props.title} 
-							autoFocus
-						/>
+						<style jsx>{`
+							p {
+								font-size: 16px;
+								margin:0px;
+								color: #c0c0c0;
+							}
+							p span {
+								color: #000;
+							}
+							.big {
+								font-size:32px;
+								font-weight:bold;
+							}
+							.large {
+								font-size:23px;
+							}
+							.medium {
+								font-size:18px;
+							}
+							.normal {
+								font-size:16px;
+							}
+							.mini {
+								font-size:14px;
+							}
+						`}</style>
+					</p>
+				)
+			} else {
+				return (
+					<div className="description">
+						<div className="ui form">
+			 				<div className="field" data-inverted="" data-tooltip="Enter чтобы сохранить, Esc чтобы отменить" data-position="bottom center">
+								<input 
+									onChange={() => {this.setState({temp: this.input.value})}} 
+									defaultValue={value} 
+									ref={(e) => {this.input = e}}
+									type="text" 
+									className={`${align} add mini`} 
+									placeholder={title} 
+									autoFocus
+								/>
+							</div>
+						</div>
+
+						<style jsx>{`
+							.description .form {
+								margin:10px 0px;
+							}
+							.description .form .field {
+								margin-bottom:0px!important;
+							}
+							input {
+								border:0px!important;
+								width:270px!important;
+								font-size:17px!important;
+								text-align:center!important;
+								padding:0px!important;
+							}
+							input.left {
+								text-align:left!important;
+							}
+							input.center {
+								text-align:center;
+							}
+							.description .form {
+								display:flex;
+								flex-direction:row;
+							}
+							.description .form .field {
+								margin-right:10px;
+							}
+						`}</style>
 					</div>
-				</div>
+				)
+			}
+		} else {
+			return (
+				<p className={`${size}`}>
+					{value && <span>{value}</span> }
 
-				<style jsx>{`
-					.description .form {
-						margin:10px 0px;
-					}
-					.description .form .field {
-						margin-bottom:0px!important;
-					}
-					input {
-						border:0px!important;
-						width:270px!important;
-						font-size:17px!important;
-						text-align:center!important;
-						padding:0px!important;
-					}
-					input.left {
-						text-align:left!important;
-					}
-					input.center {
-						text-align:center;
-					}
-					.description .form {
-						display:flex;
-						flex-direction:row;
-					}
-					.description .form .field {
-						margin-right:10px;
-					}
-				`}</style>
-			</div>
-		)
-	}
+					<style jsx>{`
+						p {
+							font-size: 16px;
+							margin:0px;
+							color: #c0c0c0;
+						}
+						p span {
+							color: #000;
+						}
+						.big {
+							font-size:32px;
+							font-weight:bold;
+						}
+						.large {
+							font-size:23px;
+						}
+						.medium {
+							font-size:18px;
+						}
+						.normal {
+							font-size:16px;
+						}
+						.mini {
+							font-size:14px;
+						}
+					`}</style>
+				</p>
+			)
+		}
   }
 }
+
+function mapStateToProps(state) {
+  return { 
+  	currentUser: state.currentUser
+  }
+}
+
+export default connect(mapStateToProps)(EditableInput)

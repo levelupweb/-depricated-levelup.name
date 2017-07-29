@@ -37,11 +37,19 @@ export function getUser(id) {
 	})
 }
 
-export function updateUser(token, id, post) {
+export function getUserByToken(token) {
 	return axiosAuth(token, {
-		url: 'user/entries' + id + '/update',
+		url: 'user/me',
+		method: 'GET'
+	})
+}
+
+
+export function updateUser(token, id, user) {
+	return axiosAuth(token, {
+		url: 'user/entries/' + id + '/update',
 		method: 'POST',
-		data: post
+		data: user
 	})
 }
 
@@ -60,9 +68,9 @@ export function createUser(token, user) {
 	})
 }
 
-export function getUserSubscriptions(id) {
+export function getSubscriptions(id, type) {
 	return axiosNoAuth({
-		url: 'user/entries/' + id + '/getsubscriptions',
+		url: 'user/entries/' + id + '/subscriptions/' + type,
 		method: 'GET'
 	})
 }
@@ -75,14 +83,48 @@ export function getUserStats(id) {
 }
 
 export function findUser(query) {   
-    return axiosNoAuth({
-      url: 'search/entries/users',
-      method: 'GET',
-      params: {
-        query: query
-      }
-    })
+  return axiosNoAuth({
+    url: 'search/entries/users',
+    method: 'GET',
+    params: {
+      query: query
+    }
+  })
 }
+
+export function getUserPosts(id, limit, skip) {   
+  return axiosNoAuth({
+    url: 'user/entries/' + id + '/getposts',
+    method: 'GET',
+    params: {
+      limit,
+      skip
+    }
+  })
+}
+
+export function getUserSubscriptions(id, limit, skip) {   
+  return axiosNoAuth({
+    url: 'user/entries/' + id + '/getsubscriptions',
+    method: 'GET',
+    params: {
+      limit,
+      skip
+    }
+  })
+}
+
+export function getUserCampaigns(id, limit, skip) {   
+  return axiosNoAuth({
+    url: 'user/entries/' + id + '/getcampaigns',
+    method: 'GET',
+    params: {
+      limit,
+      skip
+    }
+  })
+}
+
 
 // DEPRICATED
 export function getFaces(id) {
@@ -104,7 +146,7 @@ export function addSocial(token, id, social) {
 // DEPRICATED
 export function removeSocial(token, id, social) {
 	return axiosAuth(token, {
-		url: 'user/entries/' + userid + '/removesocial/',
+		url: 'user/entries/' + id + '/removesocial/',
 		method: 'POST',
 		data: social
 	})

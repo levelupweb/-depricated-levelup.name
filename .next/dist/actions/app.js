@@ -3,38 +3,30 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setQuery = setQuery;
-exports.setPageData = setPageData;
-exports.setPageSettings = setPageSettings;
-exports.setAccessError = setAccessError;
-exports.getModule = getModule;
-exports.makeSearch = makeSearch;
-exports.updateField = updateField;
-exports.subscribeToEntry = subscribeToEntry;
+exports.hideMessageEnd = exports.hideMessageStart = exports.clearMessage = exports.createMessage = exports.cacheData = exports.setAccessStatus = exports.setPageProperties = exports.setPageData = undefined;
+exports.settingUpPageData = settingUpPageData;
+exports.settingUpPageProperties = settingUpPageProperties;
 exports.updateImage = updateImage;
-exports.uploadImage = uploadImage;
+exports.uploadUnsignedImage = uploadUnsignedImage;
 exports.handleSuccess = handleSuccess;
 exports.handleWarn = handleWarn;
 exports.handleError = handleError;
 exports.displayMessage = displayMessage;
 exports.hideMessage = hideMessage;
-exports.createMessage = createMessage;
-exports.flushMessage = flushMessage;
-exports.unableMessage = unableMessage;
 
-var _extends2 = require('babel-runtime/helpers/extends');
+var _promise = require('babel-runtime/core-js/promise');
 
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _axios = require('axios');
-
-var _axios2 = _interopRequireDefault(_axios);
+var _promise2 = _interopRequireDefault(_promise);
 
 var _appConfig = require('../app.config.js');
 
 var _appConfig2 = _interopRequireDefault(_appConfig);
 
 var _axiosAuth = require('../utils/axiosAuth.js');
+
+var _pageDataBuilder = require('../utils/pageDataBuilder.js');
+
+var _pageDataBuilder2 = _interopRequireDefault(_pageDataBuilder);
 
 var _app = require('../models/app.js');
 
@@ -44,140 +36,168 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// DANGER ZONE: 
-// CORE APPLICATION ACTIONS
-function setQuery(builder, query) {
-  return function (dispatch) {
-    dispatch({
-      type: 'SET_PAGE_QUERY',
-      payload: query
-    });
-    dispatch({
-      type: 'SET_PAGE_BUILDER',
-      payload: builder
-    });
-  };
-}
+// Clear Actions
+var SET_PAGE_DATA = 'SET_PAGE_DATA';
 
 // models
-function setPageData(data) {
+var setPageData = exports.setPageData = function setPageData(pageData) {
+  return {
+    type: SET_PAGE_DATA,
+    payload: pageData
+  };
+};
+
+var SET_PAGE_SETTINGS = 'SET_PAGE_SETTINGS';
+var setPageProperties = exports.setPageProperties = function setPageProperties(pageProperties) {
+  return {
+    type: SET_PAGE_SETTINGS,
+    payload: pageProperties
+  };
+};
+
+var SET_ACCESS_STATUS = 'SET_ACCESS_STATUS';
+var setAccessStatus = exports.setAccessStatus = function setAccessStatus(status) {
+  return {
+    type: SET_ACCESS_STATUS,
+    payload: status
+  };
+};
+
+var CACHE_DATA = 'CACHE_DATA';
+var cacheData = exports.cacheData = function cacheData(key, value) {
+  return {
+    type: CACHE_DATA,
+    payload: { key: key, value: value }
+  };
+};
+
+var CREATE_MESSAGE = 'CREATE_MESSAGE';
+var createMessage = exports.createMessage = function createMessage(title, description, isClosable) {
+  return {
+    type: CREATE_MESSAGE,
+    payload: { title: title, description: description, isClosable: isClosable }
+  };
+};
+
+var CLEAR_MESSAGE = 'CLEAR_MESSAGE';
+var clearMessage = exports.clearMessage = function clearMessage() {
+  return {
+    type: CLEAR_MESSAGE
+  };
+};
+
+var HIDE_MESSAGE_START = 'HIDE_MESSAGE_START';
+var hideMessageStart = exports.hideMessageStart = function hideMessageStart() {
+  return {
+    type: HIDE_MESSAGE_START
+  };
+};
+
+var HIDE_MESSAGE_END = 'HIDE_MESSAGE_END';
+var hideMessageEnd = exports.hideMessageEnd = function hideMessageEnd() {
+  return {
+    type: HIDE_MESSAGE_END
+  };
+};
+
+// Action Creators
+function settingUpPageData(pageBuilder, query) {
   return function (dispatch) {
-    dispatch({
-      type: 'SET_PAGE_DATA',
-      payload: data
+    return (0, _pageDataBuilder2.default)(pageBuilder, query).then(function (data) {
+      dispatch(setPageData(data));
+      return data;
     });
   };
 }
 
-function setPageSettings(data) {
+function settingUpPageProperties(slug) {
   return function (dispatch) {
-    dispatch({
-      type: 'SET_PAGE_SETTINGS',
-      payload: data
+    return MODEL.getModule(slug).then(function (response) {
+      dispatch(setPageProperties(response.data));
+      return response.data;
     });
   };
 }
 
-function setAccessError() {
+// return errors or run callback with filepath
+function updateImage(token, type, id, image, callback) {
   return function (dispatch) {
-    dispatch({
-      type: 'SET_APP_ACCESSABILITY',
-      payload: false
-    });
+    var form = new FormData();
+    if (image && form) {
+      form.append('image', image);
+      form.append('type', type);
+      form.append('id', id);
+
+      return MODEL.updateImage(token, id, form).then(function (response) {
+        var _response$data = response.data,
+            success = _response$data.success,
+            filepath = _response$data.filepath;
+
+        if (success) {
+          MODEL.updateField(token, type, id, {
+            field: 'image',
+            value: filepath
+          }).then(function (response) {
+            var _response$data2 = response.data,
+                success = _response$data2.success,
+                errors = _response$data2.errors;
+
+            if (success) {
+              dispatch(handleSuccess('Изображение обновлено!', true));
+              return callback(filepath);
+            } else {
+              return dispatch(handleError(errors, 'Ошибка при обновлении данных', true));
+            }
+          });
+        } else {
+          return dispatch(handleError(errors, 'Ошибка при загрузке', true));
+        }
+      });
+    } else {
+      return dispatch(handleError(null, 'Не найдено изображение', true));
+    }
   };
 }
 
-// COMMON ACTIONS
-function getModule(slug) {
-  return MODEL.getModule(slug);
+// return errors or run callback with filepath
+function uploadUnsignedImage(token, image, callback) {
+  return function (dispatch) {
+    if (image && token) {
+      var form = new FormData();
+      form.append('image', image);
+      return MODEL.uploadUnsignedImage(token, form).then(function (response) {
+        if (response.data.success) {
+          var _response$data3 = response.data,
+              _errors = _response$data3.errors,
+              filepath = _response$data3.filepath;
+
+          dispatch(handleSuccess('Изображение успешно загружено!'));
+          return callback(filepath);
+        } else {
+          dispatch(handleError(errors, 'Ошибка при загрузке изображения'));
+        }
+      });
+    } else {
+      dispatch(handleError(errors, 'Изображение не найдено'));
+    }
+  };
 }
-
-function makeSearch(query) {
-  return MODEL.makeSearch(query);
-}
-
-function updateField(token, type, id, data) {
-  return MODEL.updateField(token, type, id, data);
-}
-
-function subscribeToEntry(token, type, id) {
-  return MODEL.subscribeToEntry(token, type, id);
-}
-
-// TODO: handle error, rewrite to actions
-function updateImage(token, entryType, entryID, image) {
-  if (image) {
-    var data = new FormData();
-    data.append('image', image);
-    data.append('type', entryType);
-    data.append('id', entryID);
-
-    return (0, _axiosAuth.axiosAuth)(token, {
-      url: 'app/entries/' + entryID + '/upload',
-      method: 'POST',
-      data: data
-    }).then(function (res) {
-      if (res.data.success) {
-        var path = _appConfig2.default.storage + entryType + 's' + '/' + entryID + '/' + res.data.filename;
-        return (0, _extends3.default)({ path: path }, res.data);
-      } else {
-        return { errors: res.data.errors };
-      }
-    }).then(function (res) {
-      if (res.success) {
-        updateField(token, entryType, entryID, {
-          field: entryType + 'Image',
-          value: res.path
-        });
-        return res;
-      } else {
-        return { errors: res.errors };
-      }
-    });
-  } else {
-    console.log('Не найдено изображение');
-  }
-}
-
-// TODO: handle error, rewrite to actions
-function uploadImage(token, image) {
-  if (image) {
-    var data = new FormData();
-    data.append('image', image);
-    return (0, _axiosAuth.axiosAuth)(token, {
-      url: 'app/entries/upload',
-      method: 'POST',
-      data: data
-    }).then(function (res) {
-      if (res.data.success) {
-        var path = _appConfig2.default.storage + 'temp' + '/' + res.data.filename;
-        return (0, _extends3.default)({ path: path }, res.data);
-      } else {
-        return { errors: res.data.errors };
-      }
-    });
-  } else {
-    console.log('Не найдено изображение');
-  }
-}
-
-// MESSAGE SYSTEM:
 
 function handleSuccess(description, isClosable) {
   return function (dispatch) {
-    return dispatch(displayMessage('Успех!', description, isClosable));
+    dispatch(displayMessage('Успех!', description, isClosable));
   };
 }
 
 function handleWarn(description, isClosable) {
   return function (dispatch) {
-    return dispatch(displayMessage('Внимание!', description, isClosable));
+    dispatch(displayMessage('Внимание!', description, isClosable));
   };
 }
 
 function handleError(description, isClosable) {
   return function (dispatch) {
-    return dispatch(displayMessage('Ошибка!', description, isClosable));
+    dispatch(displayMessage('Ошибка!', description, isClosable));
   };
 }
 
@@ -194,30 +214,11 @@ function displayMessage(title, description, isClosable) {
 
 function hideMessage() {
   return function (dispatch) {
-    dispatch(unableMessage());
-    return setTimeout(function () {
-      dispatch(flushMessage());
-    }, 1000);
-  };
-}
-
-function createMessage(title, description, isClosable) {
-  return {
-    type: 'CREATE_MESSAGE',
-    payload: {
-      title: title, description: description, isClosable: isClosable
-    }
-  };
-}
-
-function flushMessage() {
-  return {
-    type: 'FLUSH_MESSAGE'
-  };
-}
-
-function unableMessage() {
-  return {
-    type: 'UNABLE_MESSAGE'
+    dispatch(hideMessageStart());
+    return _promise2.default.resolve(setTimeout(function () {
+      dispatch(clearMessage());
+    }, 1000)).then(function () {
+      dispatch(hideMessageEnd());
+    });
   };
 }

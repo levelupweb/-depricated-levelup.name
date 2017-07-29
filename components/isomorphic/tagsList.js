@@ -57,8 +57,10 @@ export default class TagsList extends React.Component {
   }
 
   render() {
-    if(this.state.isLoaded) {
-      if(this.state.tags.length == 0) {
+    const { isLoaded, tags } = this.state;
+    const { size } = this.props
+    if(isLoaded) {
+      if(tags.length == 0) {
         return (
           <div className="no-content">
             <p><i className="fa fa-ellipsis-h"></i></p>
@@ -67,15 +69,15 @@ export default class TagsList extends React.Component {
       } else {
         return (
           <div className="tag-list">
-            {this.state.tags.map((item) => {
-              return <Tag size={this.props.size} tag={item} key={item._id} />
+            {tags.map((item) => {
+              return <Tag size={size} tag={item} key={item._id} />
             })}
           </div>
         )
       }
     } else {
       return (
-          <Loader />
+        <Loader />
       )
     }
   }
@@ -87,23 +89,24 @@ class Tag extends React.Component {
   }
 
   render() {
-    var tag = this.props.tag;
-    if(this.props.size == 'block') {
+    const { tag, size } = this.props
+    const { image, title, description, slug, updated } = tag 
+    if(size == 'block') {
       return (
         <div className="tag">
           <div>
             <div className="info">
-              <span>{tag.tagSubscribersCount} подписчиков</span>
+              <span>подписчиков</span>
             </div>
             <div className="image">
-              <img src={tag.tagImage} />
+              <img src={image} />
             </div>
             <div className="content">
-              <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
-                <a className="header">{tag.tagTitle}</a>
+              <Link href={{ pathname: 'search', query: { query: slug }}}>
+                <a className="header">{title}</a>
               </Link>
               <div className="meta">
-                <p>{(tag.tagDescription) ? tag.tagDescription : `У этого тега пока нет описания`}</p>
+                <p>{description ? description : "У этого тега пока нет описания"}</p>
               </div>
             </div>
           </div>
@@ -147,11 +150,11 @@ class Tag extends React.Component {
         </div>
       );
     } else {
-      if(this.props.size == 'menu') {
+      if(size == 'menu') {
         return (
           <div className="tag">
-            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
-              <a className="header">{tag.tagTitle}</a>
+            <Link href={{ pathname: 'search', query: { query: slug }}}>
+              <a className="header">{title}</a>
             </Link>
             <style jsx>{`
               .tag {
@@ -174,10 +177,9 @@ class Tag extends React.Component {
       } else {
         return (
           <div className="tag">
-            <Link href={{ pathname: 'search', query: { query: tag.slug }}}>
-              <a>{tag.tagTitle}</a>
+            <Link href={{ pathname: 'search', query: { query: slug }}}>
+              <a>{title}</a>
             </Link>
-            
           </div>
         );
       }

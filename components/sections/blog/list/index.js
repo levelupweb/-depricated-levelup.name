@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 
 // Actions 
-import { findBlog } from '../../../../actions/blog.js'
+import { findBlog } from '../../../../models/blog.js'
 
 // Components
 import BlogList from '../../../isomorphic/blogList.js'

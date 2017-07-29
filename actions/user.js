@@ -10,45 +10,45 @@ import { handleWarn, handleError, handleSuccess } from './app.js'
 import * as MODEL from '../models/user.js'
 
 export function authenticateUser(token) {
-	return (dispatch) => {
+	return dispatch => {
 		if(token) { 
-			return MODEL.authenticateUser(token).then((res) => {
-		    	dispatch(setUser(res.data))
-		    	return res.data
-		    })
+			return MODEL.authenticateUser(token).then((response) => {
+	    	dispatch(authenticateUserSuccess(response.data.user))
+	    	return response.data.user
+	    })
 		} else {
 			dispatch({type: 'LOGIN_FAILURE'})
-			return false
+			return Promise.resolve(false)
 		}
 	}
 }
 
 export function signIn(user) {
 	return (dispatch) => {
-	   return MODEL.signIn(user).then((res) => {
-			if(res.data.success) {
-				dispatch(setUser(res.data.user))
+	   return MODEL.signIn(user).then((response) => {
+			if(response.data.success) {
+				dispatch(authenticateUserSuccess(response.data.user))
 			} 
-			return res
-		}).then((res) => {
-			if(res.data.token && res.data.success) {
+			return response
+		}).then((response) => {
+			if(response.data.token && response.data.success) {
 				cookies.set(
 					'x-access-token', 
-					res.data.token, 
+					response.data.token, 
 					{ expires: 7, path: '' }
 				);
 				dispatch(handleSuccess(
-					'Привет, ' + res.data.user.userName, true
+					'Привет, ' + response.data.user.fullName, true
 				));
 				return {
 					success: true,
-					message: res.data.message,
-					user: res.data.user
+					message: response.data.message,
+					user: response.data.user
 				}
 			} else {
 				return {
 					success: false,
-					message: res.data.message
+					message: response.data.message
 				}
 			}
 		})
@@ -57,17 +57,17 @@ export function signIn(user) {
 
 export function signUp(user) {
 	return (dispatch) => {
-	   return MODEL.signUp(user).then((res) => {
-			if(res.data.success) {
+	   return MODEL.signUp(user).then((response) => {
+			if(response.data.success) {
 				return {
 					success: true,
-					message: res.data.message
+					message: response.data.message
 				}
 			} else {
 				return {
 					success: false,
-					message: res.data.message,
-					errors: res.data.errors
+					message: response.data.message,
+					errors: response.data.errors
 				}
 			}
 		})
@@ -75,7 +75,7 @@ export function signUp(user) {
 }
 
 
-export function setUser(user) {
+export function authenticateUserSuccess(user) {
 	if (user) {
 		return {
 			type: 'LOGIN_SUCCESS', 
@@ -105,8 +105,24 @@ export function getUser(id) {
 	return MODEL.getUser(id)
 }
 
-export function updateUser(id, user) {
-	return MODEL.updateUser(id, user)
+export function getUserByToken(token) {
+	return MODEL.getUserByToken(token)
+}
+
+export function getUserPosts(id, limit, skip) {
+	return MODEL.getUserPosts(id, limit, skip)
+}
+
+export function getUserSubscriptions(id, limit, skip) {
+	return MODEL.getUserSubscriptions(id, limit, skip)
+}
+
+export function getUserCampaigns(id, limit, skip) {
+	return MODEL.getUserCampaigns(id, limit, skip)
+}
+
+export function updateUser(token, id, user) {
+	return MODEL.updateUser(token, id, user)
 }
 
 export function removeUser(token, id) {
@@ -123,29 +139,41 @@ export function getUserStats(id) {
 
 // Faces Reducer
 function setFaces(faces) {
-	return (dispatch) => {
-		dispatch({type: 'SET_FACES', payload: faces});
+	return {
+		type: 'SET_FACES', 
+		payload: faces
 	}
 }
 
 export function setFace(face) {
 	return (dispatch) => {
+		const { _id, author } = face
 		return Promise.all([
-			dispatch({type: 'SET_FACE', payload: face}),
-			dispatch({type: 'SET_POST_FIELD', payload: {field: 'postAuthor', value: {
-				authorID: face._id,
-				authorType: face.type
-			}}})
+			dispatch({
+				type: 'SET_FACE', 
+				payload: face
+			}),
+			dispatch({
+				type: 'SET_POST_FIELD', 
+				payload: {
+					field: 'author', 
+					value: {
+						[author]: _id,
+					}
+				}
+			})
 		])
 	}
 }
 
-// DEPRICATED
 export function setUserFaces(user) {
 	return (dispatch) => {
-	   return MODEL.getFaces(user._id).then((res) => {
-	    	dispatch(setFaces(res.data.concat(user)))
-	   })
+		const { _id } = user;
+	  return MODEL.getFaces(_id).then((response) => {
+	    dispatch(setFaces(
+	    	[...response.data, user]
+	    ))
+	  })
 	}
 }
 
@@ -154,8 +182,8 @@ export function findUser(query) {
 }
 
 // DEPRICATED
-export function getUserSubscriptions(id) {
-	return MODEL.getUserSubscriptions(id)
+export function getSubscriptions(id, type) {
+	return MODEL.getSubscriptions(id, type)
 }
 
 // DEPRICATED
@@ -164,13 +192,6 @@ export function addSocial(token, id, social) {
 }
 
 // DEPRICATED
-export function removeUserSocial(token, userid, data) {
-	return axios({
-		url: config.API + 'user/entries/' + userid + '/removesocial/',
-		method: 'POST',
-		data: data,
-		headers: {
-			'authorization': token
-		}
-    })
+export function removeSocial(token, id, social) {
+	return MODEL.removeSocial(token, id, social)
 }

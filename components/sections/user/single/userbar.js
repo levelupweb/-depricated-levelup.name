@@ -6,7 +6,7 @@ import router from 'next/router'
 
 // Actions
 import { getUserById, updateUserById, getUserStats } from '../../../../actions/user.js'
-import { createBlog, getUserBlog } from '../../../../actions/blog.js'
+import { createBlog, getUserBlog } from '../../../../models/blog.js'
 import { updateImage } from '../../../../actions/app.js'
 
 // Components
@@ -20,92 +20,119 @@ import Link from 'next/link'
 class UserBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { user: null }
+    this.state = {}
     this.token = cookies.get('x-access-token');
   }
 
   // React Lifecycle
   componentWillMount() {
+    const { currentUser, user } = this.props
     this.setState({
-      ...this.state,
-      user: this.props.user,
+      user,
       tempBlog: {
-        ...this.state.tempBlog,
-        blogOwner: this.props.user._id
+        owner: currentUser._id
       }
     })
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      ...this.state,
-      user: nextProps.user
-    })
+    const { user } = nextProps;
+    this.setState({ user })
   }
 
   // Specific Methods
   handleUpload(e) {
-    var image = e.target.files[0];
-    var userID = this.state.user._id;
-    var entryType = 'user';
-    updateImage(this.token, entryType, userID, image).then((res) => {
-      this.setState({
-        user: {
-          ...this.state.user,
-          userImage: res.path
-        }
-      })
+    const { dispatch } = this.props;
+    const image = e.target.files[0];
+    const id = this.state.user._id;
+    const type = 'user';
+    
+    dispatch(updateImage(this.token, type, id, image, filepath => {
+      this.handleChange('image', filepath)
+    }))
+  }
+
+  // Isomorphic Methods
+  handleChange(field, value) { 
+    this.setState({
+      user: {
+        ...this.state.user,
+        [field]: value
+      }
     })
   }
 
   render() {
-    var user = this.state.user;
+    const { user } = this.state;
+    const { currentUser } = this.props;
     if (user) {
-      var currentUser = this.props.currentUser;
+      const { _id, slug, image, description, bio, socials, fullName } = user;
       return (
         <div className="wrapper">
           <div className="userbar">
             <div className="user">
               <div className="image">
-                <Link href={{ pathname: 'user', query: { slug: user.slug }}}><a>
-                  <Avatar color={`#eee`} fgColor={`#eee`} round={true} size={95} src={user.userImage} name={user.userName} />
+                <Link href={{ pathname: 'user', query: { slug }}}><a>
+                  <Avatar 
+                    color={`#eee`} 
+                    fgColor={`#eee`} 
+                    round={true} 
+                    size={95} 
+                    src={image} 
+                    name={fullName} />
                 </a></Link>
-                <div onClick={() => {this.fileUploader.click()}} data-position="left center" data-tooltip="Загрузить изображение" data-inverted="" className={(user.userImage) ? 'edit' : 'edit visible'}>
+                <div onClick={() => {this.fileUploader.click()}} 
+                  data-position="left center" 
+                  data-tooltip="Загрузить изображение" 
+                  data-inverted="" 
+                  className={(user.userImage) ? 'edit' : 'edit visible'}>
+
                   <i className="fa fa-user" aria-hidden="true"></i>
-                  <input onChange={(e) => {this.handleUpload(e)}} type="file" ref={(file) => {this.fileUploader = file}} className="ui hidden" />
+                  <input 
+                    onChange={(e) => {
+                      this.handleUpload(e)
+                    }} 
+                    type="file" 
+                    ref={(file) => {
+                      this.fileUploader = file
+                    }} 
+                    className="ui hidden" />
                 </div>
               </div>
               <div className="content">
                 <EditableInput 
-                  value={user.userDescription} 
+                  entry={user}
+                  value={description} 
                   entryType="user"
-                  entryID={user._id}
-                  field="userDescription"
+                  field="description"
                   title="Должность/профессия"
                   size="normal"
                   align="center" />
                 <EditableInput 
-                  value={user.userName} 
+                  entry={user}
+                  value={fullName} 
                   entryType="user"
-                  entryID={user._id}
-                  field="userName"
+                  field="fullName"
                   title="Полное имя пользователя"
                   size="large"
                   align="center" />
+                <EditableInput
+                  entry={user} 
+                  value={bio} 
+                  entryType="user"
+                  field="bio"
+                  title="Биография"
+                  size="tiny"
+                  align="center" />
                 <div className="actions">
-                  {this.currentUser &&
-                    <EditButton 
-                      user={user} 
-                      currentUser={this.currentUser} />
-                  }
                   <SubscribeButton 
                     additionalClasses="small" 
                     entryType="user"
-                    entryID={user._id} 
+                    entryID={_id} 
                     subscribeText="Подписаться" 
                     unsubscribeText="Отписаться"  />
-                  {user.userSocials &&
-                    user.userSocials.map((item, i) => {
+                  {socials &&
+                    socials.map((item, i) => {
                       var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
                       return (
                         <a key={i} href={item.link} target="_blank"><button className={'ui social circular icon button small ' }>
@@ -118,9 +145,16 @@ class UserBar extends React.Component {
               </div>
             </div>
           </div>
-          <div>
-            <Statistic currentUserID={currentUser._id} userID={this.state.user._id} />
-          </div>
+          
+          {this.props.statistics &&
+            <div>
+              <Statistic 
+                blog={this.props.blog} 
+                currentUserID={currentUser._id} 
+                userID={_id} />
+            </div>
+          }
+         
         	<style jsx>{`
             .userbar.block-shadow {
               border:0px;
@@ -133,7 +167,6 @@ class UserBar extends React.Component {
               padding-top:0px;
             }
             .userbar {
-              border-bottom:1px solid #eee;
               padding:50px 15px;
               text-align:center;
             }
@@ -162,7 +195,7 @@ class UserBar extends React.Component {
               margin-top:7px;
             }
             .user .content {
-              margin-left:15px;
+              margin-top:15px;
             }
             .user .content h2 {
               margin-top:0px;
@@ -207,13 +240,12 @@ class UserBar extends React.Component {
         </div>
       );
     } else {
-      return (<div></div>)
+      return null
     }
   }
 }
 
 // Clever Component. Accepts User ID
-
 class Statistic extends React.Component {
   constructor(props) {
     super(props);
@@ -240,7 +272,6 @@ class Statistic extends React.Component {
   componentWillReceiveProps(nextProps) {
     var id = nextProps.userID;
     if(id != this.props.userID) {
-      console.log('Update state...')
       getUserStats(id).then((res) => {
         this.setState({ 
           ...res.data,
@@ -253,9 +284,9 @@ class Statistic extends React.Component {
   render() {
     if(this.state.isLoaded) {
       return (
-          <div className="stats">
+          <div className={(this.props.blog ? 'stats' : 'stats no-blog')}>
             <div className="left">
-              <div className="summary statistics mini">
+              <div className="ui statistics mini">
                 <div className="statistic">
                   <div className="value">
                     {this.state.score}
@@ -264,8 +295,6 @@ class Statistic extends React.Component {
                     балл.
                   </div>
                 </div>
-              </div>
-              <div className="common">
                 <div className="statistic">
                   <div className="value">
                     {this.state.subscribers}
@@ -300,50 +329,54 @@ class Statistic extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="right">
-              <UserBlog 
-                currentUserID={this.props.currentUserID} 
-                userID={this.props.userID} />
-            </div>
+            {this.props.blog && 
+              <div className="right">
+                <UserBlog 
+                  currentUserID={this.props.currentUserID} 
+                  userID={this.props.userID} />
+              </div>
+            }
             <style jsx>{`
-            .stats {
-              display:flex;
-              align-items:center;
-              justify-content:space-between;
-              position:relative;
-              padding:25px 0px;
-              padding-bottom:10px;
-            }
-            .stats .left {
-              display:flex;
-              align-items:center;
-              justify-content:space-between;
-            }
-            .stats .summary {
-              min-width:90px;
-              position:relative;
-            }
-            .stats .summary::after {
-              position:absolute;
-              left:100%;
-              top:50%;
-              margin-top:-10px;
-              font-size:21px;
-              content: '=';
-            }
-            .stats .common {
-              display:flex;
-              justify-content:center;
-              align-items:center;
-              margin-left:40px;
-            }
-            .stats .statistic {
-              text-align:center;
-              margin-right:20px;
-            }
-            .stats .statistic .value {
-              font-size:20px;
-            }
+              .statistics {
+                margin:0px;
+              }
+              .statistics .statistic {
+                margin-bottom:0px;
+              }
+              .stats {
+                border-top:1px solid #eee;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                position:relative;
+                padding:25px 0px;
+                padding-bottom:10px;
+              }
+              .stats.no-blog {
+                justify-content:center;
+              }
+              .stats .left {
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+              }
+              .stats .summary {
+                min-width:90px;
+                position:relative;
+              }
+              .stats .common {
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                margin-left:40px;
+              }
+              .stats .statistic {
+                text-align:center;
+                margin-right:20px;
+              }
+              .stats .statistic .value {
+                font-size:20px;
+              }
             `}</style>
           </div>        
       )
@@ -362,23 +395,19 @@ class UserBlog extends React.Component {
       blog: null,
       isLoaded: false,
       tempBlog: {
-        blogTitle: null,
-        blogOwner: null
+        title: null,
+        owner: null
       }
     }
   }
 
   componentWillMount() {
-    this.getBlog(this.props.userID).then(() => {
-      this.setState({ isLoaded: true })
-    })
+    this.getBlog(this.props.userID)
   }
 
   componentWillReceiveProps(nextProps) {
     if(nextProps.userID != this.props.userID) {
-      this.getBlog(nextProps.userID).then(() => {
-        this.setState({ isLoaded: true })
-      })
+      this.getBlog(nextProps.userID)
     }
   }
 
@@ -386,17 +415,18 @@ class UserBlog extends React.Component {
     return getUserBlog(id).then((res) => {
       this.setState({ 
         blog: res.data,
+        isLoaded: true,
         tempBlog: {
           ...this.state.tempBlog,
-          blogOwner: id
+          owner: id
         }
       })
     })
   }
 
   createBlog() {
-    createBlog(this.token, this.state.tempBlog).then((res) => {
-      if(res.data.success) {
+    createBlog(this.token, this.state.tempBlog).then((response) => {
+      if(response.data.success) {
         $('.ui.modal').modal('hide')
         router.replace('/blog?slug=' + res.data.blog.slug)
       } else {
@@ -421,7 +451,9 @@ class UserBlog extends React.Component {
               <div className="ui form">
                 <p>Начните публиковать посты от имени вашей организации/компании, создав отдельную блог-страницу</p>
                 <div className="field">
-                  <input ref={(input) => {this.blogTitle = input}} onChange={(e) => {this.setState({tempBlog: { ...this.state.tempBlog, blogTitle:  e.target.value}})}} type="text" name="blogTitle" placeholder="Название блога" />
+                  <input ref={(input) => {this.blogTitle = input}} onChange={(e) => {
+                    this.setState({tempBlog: { ...this.state.tempBlog, title:  e.target.value}})
+                  }} type="text" name="title" placeholder="Название блога" />
                 </div>
               </div>
             </div>
@@ -463,10 +495,10 @@ class UserBlog extends React.Component {
     } else {
       if (this.state.isLoaded) {
         return (
-          <div className="blog"  data-position="bottom right" data-tooltip={blog.blogTitle} data-inverted="">
+          <div className="blog"  data-position="bottom right" data-tooltip={blog.title} data-inverted="">
             <div className="image">
               <Link href={{ pathname: 'blog', query: { slug: blog.slug }}}><a>
-                <Avatar color={`#46978c`} round={true} size={40} src={blog.blogImage} name={blog.blogTitle} />
+                <Avatar color={`#46978c`} round={true} size={40} src={blog.image} name={blog.title} />
               </a></Link>
             </div>
             <style jsx>{`
@@ -485,52 +517,6 @@ class UserBlog extends React.Component {
         )
       }
     }
-  }
-}
-
-class EditButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isOwn: false
-    }
-    this.currentUser = this.props.user.profile;
-  }
-
-  componentWillMount() {
-    if(this.isOwn(this.props.currentUser._id, this.props.user._id)) {
-      this.setState({ isOwn: true })
-    } else {
-      this.setState({ isOwn: false })
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(this.isOwn(this.props.currentUser._id, nextProps.user._id)) {
-      this.setState({ isOwn: true })
-    } else {
-      this.setState({ isOwn: false })
-    }
-  }
-
-  isOwn(current, id) {
-    if(current == id) {
-      return true
-    }
-  }
-
-  render() {
-    return (
-      <span>
-        {this.state.isOwn && 
-          <Link href={{ pathname: 'settings', query: { slug: this.props.user.slug }}}>
-            <a className="ui button icon circular small">
-              Ред.
-            </a>
-          </Link>
-        }
-      </span>
-    );
   }
 }
 

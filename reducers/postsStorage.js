@@ -1,6 +1,6 @@
 import popArray from '../utils/popArray.js'
 
-export default (state = {}, action) => {
+export default (state = {posts: []}, action) => {
    switch (action.type) {
    case 'CREATE_POSTS_INSTANCE': 
       return {
@@ -8,7 +8,7 @@ export default (state = {}, action) => {
         [action.payload.key]: {
           isHydrating: false,
           options: action.payload.options,
-          posts: []
+          posts: [...action.payload.initialPosts]
         }
       }
    case 'FETCH_POSTS_START': 
@@ -61,8 +61,9 @@ export default (state = {}, action) => {
       var index = state[action.payload.key].posts.findIndex((i) => { 
         return i._id == action.payload.id
       })
-      var array = state[action.payload.key].posts.slice()
-      var posts = array.splice(index + 1, array.length);
+      var array = state[action.payload.key].posts;
+      var posts = [...array.slice(0, index), ...array.slice(index + 1, array.length)]
+
       return {
         ...state,
         [action.payload.key]: {

@@ -2,7 +2,8 @@
 import React from 'react';
 
 // Actions
-import { getBlogs, getUserSubscriptions } from '../../actions/blog.js'
+import { getBlogs } from '../../actions/blog.js'
+import { getSubscriptions } from '../../actions/user.js'
 
 // Components
 import Avatar from 'react-avatar'
@@ -19,25 +20,21 @@ export default class BlogList extends React.Component {
     }
   } 
 
+  // React LifeCycle
 	componentWillMount() {
-		if(this.props.blogs === undefined) {
-			if(this.props.subscriber) {
-				getUserSubscriptions(this.props.subscriber).then((res) => {
-					this.setState({
-						blogs : res.data
-					})
+		const { blogs, subscriber } = this.props
+		if(blogs == undefined) {
+			if(subscriber) {
+				getSubscriptions(subscriber, 'blogs').then((response) => {
+					this.setBlogs(response.data)
 				})
 			} else {
-				getBlogs().then((res) => {
-					this.setState({
-						blogs: res.data
-					})
+				getBlogs().then((response) => {
+					this.setBlogs(response.data)
 				})
 			}
 		} else {
-			this.setState({
-				blogs: this.props.blogs
-			})
+			this.setBlogs(blogs)
 		}
 	}
 
@@ -49,60 +46,58 @@ export default class BlogList extends React.Component {
 		}
 	}
 
-   componentDidMount() {
-	  	this.setState({
-	  		isLoaded: true
-	  	})
-   }
+	// Specific Methods
+  setBlogs(blogs) {
+  	this.setState({
+			blogs,
+			isLoaded: true
+		})
+  }
+
+  renderBlogs(blogs) {
+  	return blogs.map((blog, i) => {
+      return <Blog 
+      	size={this.props.size} 
+      	blog={blog} 
+      	key={i} />
+    })
+  }
 
   render() {
-  if(this.state.isLoaded) {
-  	  if(this.state.blogs.length == 0) {
-	      return (
-	        <div className="no-content">
-	          <p><i className="fa fa-ellipsis-h"></i></p>
-	        </div>
-	      )
-	   } else {
-	   	return (
-	       <div className="blog-list">
-	         {this.state.blogs.map((item, i) => {
-	           return <Blog size={this.props.size} blogData={item} key={i} />
-	         })}
-	         <style jsx>{`
-					.blog-list {
-						width:100%;
-					}
-	         `}</style>
-	       </div>
-	     )
-	   }
-   } else {
-	   return (<Loader />)
-    }
+  	const { isLoaded, blogs } = this.state
+  	if(isLoaded && blogs) {
+  	  if(!blogs.length) {
+	      return <NoContent></NoContent>
+		  } else {
+		   	return <Blogs>{this.renderBlogs(this.state.blogs)}</Blogs>
+		  }
+	  } else {
+		  return <Loader></Loader>
+  	}
   }
 }
-
 
 class Blog extends React.Component {
 	constructor(props) {
 		super(props);
 	}
+
 	render() {
-		var blog = this.props.blogData
+		const { blog, size } = this.props
 		if (blog) {
-			if(this.props.size != 'block') {
+			const { _id, slug, image, description, title, subscribers } = blog
+			if(size != 'block') {
 				return (
 					<div className="item">
-						<Link href={{ pathname: 'blog', query: { slug: blog.slug }}}><a>
-			                <Avatar color={`#46978c`} round={true} size={32} src={blog.blogImage} name={blog.blogTitle} />
-			            </a></Link>
-			            <div className="content">
+						<Link href={{ pathname: 'blog', query: { slug }}}><a>
+                <Avatar color={`#46978c`} round={true} size={32} src={image} name={title} />
+            </a></Link>
+            <div className="content">
 							<h4 className="ui header">
-								<Link href={{ pathname: 'blog', query: { slug: blog.slug }}}>
-									<a>{blog.blogTitle}</a>
+								<Link href={{ pathname: 'blog', query: { slug }}}>
+									<a>{title}</a>
 								</Link>
-								<div className="sub header">{(blog.blogDescription) ? blog.blogDescription : `Подписчиков: ${blog.blogSubscribersCount}`}</div>
+								<div className="sub header">{(description) ? description : `Подписчиков: ${subscribers}`}</div>
 							</h4>
 						</div>
 						<style jsx>{`
@@ -113,6 +108,10 @@ class Blog extends React.Component {
 								flex-direction:row;
 								overflow:hidden;
 								max-width:100%;
+								margin-bottom:10px;
+							}
+							.item:last-child {
+								margin-bottom:0
 							}
 							.item .header .sub {
 								white-space:nowrap;
@@ -152,29 +151,28 @@ class Blog extends React.Component {
 				return (
 					<div className="item">
 					  <div className="image">
-					    <Avatar color={`#46978c`} round={true} size={50} src={blog.blogImage} name={blog.blogTitle} />
+					    <Avatar color={`#46978c`} round={true} size={50} src={image} name={title} />
 					  </div>
 					  <div className="content">
-				        <div className="left">
-				  		    <Link href={{ pathname: 'blog', query: { slug: blog.slug }}}>
-				            <a className="header">{blog.blogTitle}</a> 
-				          </Link>
-				          <span className="subscribers">1 подписчик</span>
-				  		    <div className="description">
-				  		      {blog.blogDescription}
-				  		    </div>
-				        </div>
-				        <div className="right">
-				          <div className="action">
+			        <div className="left">
+			  		    <Link href={{ pathname: 'blog', query: { slug }}}>
+			            <a className="header">{title}</a> 
+			          </Link>
+			          <span className="subscribers">1 подписчик</span>
+			  		    <div className="description">
+			  		      {description}
+			  		    </div>
+			        </div>
+			        <div className="right">
+			          <div className="action">
 				          <SubscribeButton 
 					          subscribeText="Подписаться" 
 					          unsubscribeText="Отписаться" 
 					          additionalClasses="small" 
 					          entryType="blog"
-					          entryID={blog._id}
-					          />
+					          entryID={_id} />
 				        </div>
-				        </div>
+			        </div>
 					  </div>
 
 			      <style jsx>{`
@@ -211,7 +209,25 @@ class Blog extends React.Component {
 				)
 			}
 		} else {
-			return (<div></div>)
+			return null
 		}
 	}
+}
+
+function Blogs(props) {
+	return (
+		<div>
+			{props.children}
+		</div>
+	)
+}
+
+function NoContent() {
+	return (
+		<div className="no-content">
+      <p>
+      	<i className="fa fa-ellipsis-h"></i>
+      </p>
+    </div>
+   )
 }

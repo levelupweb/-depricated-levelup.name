@@ -2,7 +2,7 @@
 import React from 'react'
 import { initStore } from '../store'
 import withRedux from 'next-redux-wrapper'
-import Container from '../components/container'
+import Container from '../components/Container'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 import config from '../app.config.js'

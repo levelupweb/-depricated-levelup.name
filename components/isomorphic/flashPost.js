@@ -11,7 +11,7 @@ import randomString from '../../utils/randomString.js'
 
 // Actions
 import { setFace, setUserFaces  } from '../../actions/user.js'
-import { uploadImage } from '../../actions/app.js'
+import { uploadUnsignedImage } from '../../actions/app.js'
 import { setPostField, 
          prepareNewPost, 
          postAdd,
@@ -42,14 +42,11 @@ class FlashPost extends React.Component {
   }
 
   // React Lifecycle
-
   componentWillMount() {
-    this.dispatch(prepareNewPost(this.props.currentUser, 'note'))
-    if ( this.props.postState.post.postImage 
-      || this.props.postState.post.postVideo 
-      || this.props.postState.post.postContent 
-      || this.props.postState.post.postLink
-    ) {
+    const { currentUser, postState } = this.props
+    const { image, video, content, link } = postState.post
+    this.dispatch(prepareNewPost('note'))
+    if (image || video || content || link) {
       this.setState({
         isRevealed: true
       })
@@ -65,27 +62,6 @@ class FlashPost extends React.Component {
   }
 
   // Specific Methods
-
-  /* publishPost(token, post, key) {
-    this.dispatch(
-      setPostField('postStatus', 'published')
-    ).then(() => {
-      this.dispatch(
-        postAdd(token, post)
-      ).then((res) => {
-        if(res.data.success) {
-          this.props.onSubmit(key, res.data.post)
-        } else {
-          console.warn('Ошибка при добавлении поста: ', res.data)
-        }
-      })
-    }).then(() => {
-      this.dispatch(
-        flushPost()
-      )
-    })
-  } DEPR */ 
-
   savePost(token, post) {
     this.props.dispatch(
       savePost(token, post)
@@ -104,34 +80,31 @@ class FlashPost extends React.Component {
         this.setState({ 
           isBlocked: false
         })
-        this.handleChange('postContent', value)
+        this.handleChange('content', value)
       } else {
-        this.handleChange('postLink', findURL(value)[0])
-        this.handleChange('postContent', value)
+        this.handleChange('link', findURL(value)[0])
+        this.handleChange('content', value)
       }
     }
   }
 
-  handleImage(token, file) {
-    uploadImage(token, file)
-    .then((image) => {
-      this.dispatch(
-        setPostField('postImage', image.path)
-      )
-    })
+  handleImage(token, image) {
+    const { dispatch } = this.props
+    dispatch(uploadUnsignedImage(token, image, path => {
+      this.dispatch(setPostField('image', path))
+    }))
   }
 
   setVideo(e, value) {
     if(e.which == 13) {
       var id = getYouTubeId(value)
       if (id) {
-        this.handleChange('postVideo', id)
+        this.handleChange('video', id)
       }
     }
   }
 
   // Isomorphic Methods
-
   handleChange(field, value) {
     this.dispatch(
       setPostField(field, value)
@@ -161,10 +134,10 @@ class FlashPost extends React.Component {
 
       // Изображение
       var image = (
-        <div>{(post.postImage) ? 
+        <div>{(post.image) ? 
           <div className="uploaded-image">
-            <img src={post.postImage} width="100%" />
-            <i onClick={() => {this.handleChange('postImage', null)}} className="fa fa-close"></i>
+            <img src={post.image} width="100%" />
+            <i onClick={() => {this.handleChange('image', null)}} className="fa fa-close"></i>
           </div>
           :
           <div></div>
@@ -195,11 +168,11 @@ class FlashPost extends React.Component {
 
       // Ссылка
       var link = (<div>
-        {post.postLink != null &&
+        {post.link != null &&
           <div className="link">
             <i className="fa fa-link"></i>
-            <span><a href={post.postLink}>{post.postLink}</a></span>
-            <i className="fa fa-close" onClick={() => {this.handleChange('postLink', null)}}></i>
+            <span><a href={post.link}>{post.link}</a></span>
+            <i className="fa fa-close" onClick={() => {this.handleChange('link', null)}}></i>
           </div>
         }
         <style jsx>{`
@@ -230,10 +203,10 @@ class FlashPost extends React.Component {
 
       var video = (
         <div>
-          {(post.postVideo) &&
+          {(post.video) &&
             <div className="video">
-              <iframe width="500" height="315" src={`https://www.youtube.com/embed/${post.postVideo}`} frameBorder="0" allowFullScreen={true}></iframe>
-              <i className="fa fa-close" onClick={() => {this.handleChange('postVideo', null)}}></i>
+              <iframe width="500" height="315" src={`https://www.youtube.com/embed/${post.video}`} frameBorder="0" allowFullScreen={true}></iframe>
+              <i className="fa fa-close" onClick={() => {this.handleChange('video', null)}}></i>
               <style jsx>{`
                 .video {
                   position:relative;
@@ -257,17 +230,16 @@ class FlashPost extends React.Component {
         </div>
       )
 
-      var symbols = 140 - post.postContent.length;
+      var symbols = 140 - post.content.length;
 
       return (
-        <div className={(this.state.isRevealed) ? `revealed flashpost` : `flashpost`} onClick={() => {this.setState({isRevealed: true})}}>
-    			<form className="ui form">
+        <div className={this.state.isRevealed ? 'revealed flashpost' : 'flashpost'} onClick={() => {this.setState({isRevealed: true})}}>
+    			<form className={(this.props.userFaces.faces.length != 0) ? 'ui form' : 'ui form no-switch'}>
     				<div className="field">
     					<div className="image user">
                 <SwitchFace 
                   size="tiny"
-                  imageSize={40}
-                />
+                  imageSize={40} />
     			    </div>
               <div className="note">
                 <div>{image}</div>
@@ -279,18 +251,18 @@ class FlashPost extends React.Component {
                     onChange={(e) => {this.handleTyping(e.target.value)}} 
                     rows="2" 
                     placeholder={this.state.placeholder}
-                    defaultValue={post.postContent}
+                    defaultValue={post.content}
                   />
     			        <div className="bar">
                     {button}
-                    {(!post.postImage && !post.postVideo) &&
+                    {(!post.image && !post.video) &&
                       <span 
                         onClick={() => {this.image.click()}} 
                         className="ui button icon circular small basic">
                           <i className="fa fa-image"></i>
                       </span>
                     }
-                    {(!post.postVideo && !post.postImage) &&
+                    {(!post.video && !post.image) &&
                       <span>
                         <span className="ui button video icon circular small basic">
                             <i className="fa fa-video-camera"></i>
@@ -355,6 +327,9 @@ class FlashPost extends React.Component {
               padding-left:52px;
               transition: 0.2s all ease;
               resize: none;
+            }
+            .flashpost .no-switch textarea {
+              padding-left:0px;
             }
             .flashpost .field {
               position: relative;
@@ -429,7 +404,8 @@ class FlashPost extends React.Component {
 function mapStateToProps(state) {
   return { 
     currentUser: state.currentUser,
-    postState: state.postState
+    postState: state.postState,
+    userFaces: state.userFaces
   }
 }
 

@@ -26,31 +26,31 @@ class Default extends React.Component {
   }
 
   // React LifeCycle
-
   componentWillMount() {
-    if(this.props.currentUser) {
-      if(this.props.post.postLikes.indexOf(this.props.currentUser._id) != -1) {
+    var { currentUser, post } = this.props
+    if(currentUser) {
+      if(post.likes.indexOf(currentUser._id) != -1) {
         this.setState({
           isLiked: true,
-          likeCounter: this.props.post.postLikes.length
+          likeCounter: post.likes.length
         })
       }
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.currentUser) {
-      if(nextProps.post.postLikes.indexOf(nextProps.currentUser._id) != -1) {
+    var { currentUser, post } = nextProps
+    if(currentUser) {
+      if(post.likes.indexOf(currentUser._id) != -1) {
         this.setState({
           isLiked: true,
-          likeCounter: nextProps.post.postLikes.length
+          likeCounter: post.likes.length
         })
       }
     }
   }
 
   // Specific Methods
-
   handleLike(token, postID, userID) {
     setLike(token, postID).then((res) => {
       if(res.data.success) {
@@ -63,24 +63,28 @@ class Default extends React.Component {
     })
   }
 
+  renderAuthor(author) {
+    const { blog, user } = author
+    return (user) ? 
+    <User user={user} /> : 
+    <Blog blog={blog} />          
+  }
+
   render() {
-    var post = this.props.post
-    if (post) {
-      var comments = post.postCommentsCount;
-      var likes = this.state.likeCounter;
+    var { currentUser, post } = this.props;
+    var { title, image, author, _id, description, slug, updated, likes, comments } = post;
+    if (this.props.post) {
       return (
         <article className={`article preview grid-item w-100`}>
           <div className="user">
             <div className="left">
-              {(post.postAuthor.authorType == 'user') ?
-                <User id={post.postAuthor.authorID} /> : <Blog id={post.postAuthor.authorID} />
-              }
+              {this.renderAuthor(author)}
             </div>
             <div className="right">
               <div className="ui dropdown">
                 <i className="fa fa-ellipsis-h" aria-hidden="true"></i>
                 <div className="menu">
-                  <Link href={{ pathname: 'editor', query: { id: post._id }}}>
+                  <Link href={{ pathname: 'editor', query: { id: _id }}}>
                     <div className="item">Редактировать</div>
                   </Link>
                   <div className="item" onClick={() => {console.log('*modal')}}>Пожаловаться</div>
@@ -88,32 +92,32 @@ class Default extends React.Component {
               </div>
             </div>
           </div>
-          {post.postImage &&
+          {image &&
             <div className="image">
-              <img src={post.postImage} width="100%" />
+              <img src={image} width="100%" />
             </div>
           }
           <div className="content">
-            <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
-              <a className="header"><h2>{post.postTitle}</h2></a>
+            <Link href={{ pathname: 'post', query: { slug }}}>
+              <a className="header"><h2>{title}</h2></a>
             </Link>
-            <p className="primary">{(post.postDescription) ? post.postDescription : ''}</p>
+            <p className="primary">{(description) && description}</p>
           </div>
           <div className="meta">
             <div className="left">
-              <span onClick={() => {this.handleLike(this.token, post._id, this.props.currentUser._id)}}
+              <span onClick={() => {this.handleLike(this.token, _id, currentUser._id)}}
                   className="item">
                   <i className={(this.state.isLiked) ? 
                     `fa fa-heart icon` : 
                     `fa fa-heart-o icon`}>
                   </i> {this.state.likeCounter} Мне нравится
               </span>
-              <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+              <Link href={{ pathname: 'post', query: { slug }}}>
                 <a className="item">
-                  <i className="fa fa-comment-o icon"></i> {post.postComments.length} Комментариев
+                  <i className="fa fa-comment-o icon"></i> {comments.length} Комментариев
                 </a>
               </Link>
-              <Link href={{ pathname: 'post', query: { slug: post.slug }}}>
+              <Link href={{ pathname: 'post', query: { slug }}}>
                 <a className="item">
                   <i className="fa fa-comment-o icon"></i> Читать далее
                 </a>
@@ -121,7 +125,7 @@ class Default extends React.Component {
             </div>
             <div className="right">
               <span className="time">
-                <TimeAgo datetime={post.updated} locale='ru' />
+                <TimeAgo datetime={updated} locale='ru' />
               </span>
             </div>
           </div>

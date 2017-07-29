@@ -8,27 +8,18 @@ export default (state = defaultState, action) => {
     case 'SET_FACES':
       var faces = [];
       action.payload.map((item) => {
-        if(item.blogTitle) { 
-          faces.push({
-            _id: item._id,
-            description: item.blogDescription,
-            image: item.blogImage,
-            title: item.blogTitle,
-            type: 'blog'
-          })
-        } else {
-          faces.push({
-            _id: item._id,
-            description: item.userDescription,
-            image: item.userImage,
-            title: item.userName,
-            type: 'user'
-          })
-        }
+        var { description, image, _id, title, fullName } = item;
+        faces.push({
+          _id: _id,
+          description: description,
+          image: image,
+          author: title ? 'blog' : 'user',
+          title: title || fullName
+        })
       })
       return {
         ...state,
-        faces: faces
+        faces: [...faces]
       }
     case 'SET_FACE':
       return {

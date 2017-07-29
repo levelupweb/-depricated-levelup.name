@@ -7,44 +7,26 @@ import cookies from 'js-cookie'
 import { UI } from '../../../../utils/initScripts.js'
 
 // Actions
-import { updateUser, addSocial, removeUserSocial } from '../../../../actions/user'
+import { updateUser } from '../../../../actions/user'
+import { handleSuccess, handleError, handleWarn } from '../../../../actions/app'
+import { createSocial, removeSocial } from '../../../../actions/social'
 
 // Components
 import Avatar from 'react-avatar'
 import Link from 'next/link'
 import UserBar from './userbar'
 
-
-
 class UserSingle extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: {
-        slug: null, 
-        userDescription: null,
-        userName: null,
-        userEmail: null,
-        userGender: null,
-        userRole: null,
-        userImage: null,
-        userPassword: null,
-        userCompany: null,
-        userDescription: null,
-        userSocials: null,
-        userBio: null
-      }
-    }
-
+    this.dispatch = this.props.dispatch;
     this.token = cookies.get('x-access-token');
-    this.currentUser = this.props.currentUser.profile;
   }
 
   componentWillMount() {
     if(this.props.user !== null) {
       this.setState({
         user: {
-          ...this.state.user,
           ...this.props.user
         }
       })
@@ -58,43 +40,26 @@ class UserSingle extends React.Component {
        popup : $('.socials .popup'),
        on    : 'click'
     })
-  }
-
-  handleAddSocial() {
-    var newSocial = { title: this.newSocialTitle.innerHTML, link: this.newSocialLink.value }
-    addSocial(this.token, this.currentUser._id, newSocial).then((res) => {
-      if(res.data.success) {
-        // Добавление социальной сети в интерфейсе
-      } else {
-        // Алерт об ошибке
-      }
-    }) 
-  }
-
-  // В будущем можно переделать на удаление через ID соц сети
-  handleRemoveSocial(slug) {
-    var lowerSlug = slug.toLowerCase().split(/[ ,]+/).join(' ');
-    var socialNode = document.querySelector('.socials .items .item.' + lowerSlug);
-    var userSocials = this.state.user.userSocials;
-    var socialIndex = -1;
-    for(var i = 0, len = userSocials.length; i < len; i++) 
-      if (userSocials[i].title == slug) { socialIndex = i; break; }
-    
-    removeUserSocial(this.token, this.currentUser._id, userSocials[socialIndex]).then((res) => {
-      if(res.data.success) {
-        socialNode.remove()
-        // Handle Success
-      } else {
-        console.log(res.data.message)
-        // Handle Error
-      }
-    })
+    $('.dropdown').dropdown()
   }
 
   handleSave() {
-    updateUser(this.state.user._id, this.state.user).then((res) => {
-      // handle success
+    updateUser(this.token, this.state.user._id, this.state.user).then((res) => {
+      this.dispatch(handleSuccess('Страница успешно обновлена', true))
     })
+  }
+
+  handleCreateSocial(token) {
+    const social = {
+      link: this.socialLink.value,
+      owner: this.state.user._id,
+      title: this.socialTitle.innerHTML
+    }
+    this.dispatch(createSocial(token, social))
+  }
+
+  handleRemoveSocial(token, id) {
+    this.dispatch(removeSocial(token, id))
   }
 
   bindChangeEvent() {
@@ -119,7 +84,8 @@ class UserSingle extends React.Component {
     if(this.props.user !== null) {
       var entry = this.state.user;
       return (
-        <div>
+        <div className="blocks">
+          <div className="block-item">
           <Link href={{ pathname: 'user', query: { slug: entry.slug }}}>
             <a className="ui button circular basic">
               <i className="fa fa-angle-left icon"></i>
@@ -139,11 +105,11 @@ class UserSingle extends React.Component {
                   <p>Редактируйте основную информацию о вашем аккаунте</p>
                   <div className="field">
                     <label>Полное имя</label>
-                    <input defaultValue={entry.userName} type="text" name="userName" placeholder="Полное имя пользователя" />
+                    <input defaultValue={entry.fullName} type="text" name="fullName" placeholder="Полное имя пользователя" />
                   </div>
                   <div className="field">
                     <label>E-mail</label>
-                    <input defaultValue={entry.userEmail} type="text" name="userEmail" placeholder="E-mail пользователя" />
+                    <input defaultValue={entry.email} type="text" name="email" placeholder="E-mail пользователя" />
                   </div>
                   <h3 className="ui header">Смена пароля</h3>
                   <p>Не уверены в безопасности своего аккаунта? Мы рекомендуем регулярно производить смену пароля</p>
@@ -154,36 +120,36 @@ class UserSingle extends React.Component {
                   <p>Заполните свой профиль полностью, чтобы получить больше подписчиков</p>
                   <div className="field">
                     <label>Организация</label>
-                    <input type="text" defaultValue={entry.userCompany} name="userCompany" placeholder="Компания, место работы" />
+                    <input type="text" defaultValue={entry.company} name="company" placeholder="Компания, место работы" />
                   </div>
                   <div className="field">
                     <label>Должность</label>
-                    <input type="text" defaultValue={entry.userDescription} name="userDescription" placeholder="Профессия, должность" />
+                    <input type="text" defaultValue={entry.description} name="description" placeholder="Профессия, должность" />
                   </div>
                   <div className="field">
                     <label>Биография</label>
-                    <textarea name="userBio" placeholder="Биография, пару слов о себе" rows="2" defaultValue={entry.userBio}></textarea>
+                    <textarea name="bio" placeholder="Биография, пару слов о себе" rows="2" defaultValue={entry.bio}></textarea>
                   </div>
                   <div className="ui divider"></div>
                   <div className="socials field">
                       <label>Социальные сети</label>
                       <p>Добавьте ссылки на ваши социальные сети, чтобы читатели могли вас найти</p>
                       <div className="items">
-                        { entry.userSocials.map((item, i) => {
+                        { entry.socials.map((item, i) => {
                           var slug = item.title.toLowerCase().split(/[ ,]+/).join(' ');
                           return (
-                            <a onClick={() => {this.handleRemoveSocial(item.title)}} key={i} className={slug + ' ui circular button item animated fade'}  tabIndex="0">
+                            <a onClick={() => {this.handleRemoveSocial(this.token, item._id)}} key={i} className={slug + ' ui circular button item animated fade'}  tabIndex="0">
                               <div className="ui visible content"><i className={'fa-' + slug + ' fa icon'}></i></div>
                               <div className="ui hidden content"><i className="fa fa-close icon"></i></div>
                             </a>
-                          )})}
+                        )})}
                       <div className="ui circular floating button basic addbutton" data-inverted="" data-tooltip="Добавить социальную сеть" data-position="top left"><i className="fa fa-plus"></i></div>
                       <div className="ui fluid popup top left transition hidden">
                         <div className="ui divided">
                             <div className="field">
                             <label>Добавление сети</label>
                               <div className="ui rounded floating icon button basic dropdown">
-                                <span className="text" ref={(title) => {this.newSocialTitle = title}}>Сеть</span>
+                                <span className="text" ref={(title) => {this.socialTitle = title}}>Сеть</span>
                                 <div className="menu">
                                   <div className="search">
                                     <input type="text" placeholder="Поиск..." />
@@ -203,10 +169,10 @@ class UserSingle extends React.Component {
                               </div>
                             </div>
                             <div className="field">
-                              <input type="text" ref={(link) => {this.newSocialLink = link}} placeholder="Ссылка на профиль" />
+                              <input type="text" ref={(link) => {this.socialLink = link}} placeholder="Ссылка на профиль" />
                             </div>
                             <div className="field">
-                              <span onClick={() => {this.handleAddSocial()}} className="ui button rounded fluid basic">Добавить</span>
+                              <span onClick={() => {this.handleCreateSocial(this.token)}} className="ui button rounded fluid basic">Добавить</span>
                             </div>
                           </div>
                         </div>
@@ -220,37 +186,32 @@ class UserSingle extends React.Component {
             .saveButton {
               float:right;
             }
-
             .socials-form {
               padding:15px;
             }
-
             .socials .button.item:hover .hidden {
               display:block;
               opacity:1;
             }
-
             .socials .divided {
               display:flex;
               flex-direction:column;
             }
-
             .socials .divided input,
             .socials .divided .button {
               width:100%;
             }
-
             .socials .dropdown .menu {
               min-width:200px;
               margin-top:20px;
             }
-
             .socials .dropdown .menu input {
               margin:15px;
               display:block;
               width:185px;
             }
           `}</style>
+          </div>
         </div>
       );
     } else {
@@ -261,4 +222,10 @@ class UserSingle extends React.Component {
   }
 }
 
-export default connect(state => state)(UserSingle)
+function mapStateToProps(state) {
+  return { 
+    currentUser: state.currentUser 
+  }
+}
+
+export default connect(mapStateToProps)(UserSingle)

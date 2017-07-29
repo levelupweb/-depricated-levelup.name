@@ -32,28 +32,32 @@ class Sidebar extends React.Component {
   // Specific Methods
 
   savePost(token) {
-    this.props.dispatch(
-      savePost(token, this.props.postState.post, 'Пост сохранён')
+    const { postState, dispatch } = this.props;
+    dispatch(
+      savePost(token, postState.post, 'Пост сохранён')
     )
   }
 
   publishPost(token) {
-    this.props.dispatch(
-      setPostField('postStatus', 'published')
+    const { postState, dispatch } = this.props; 
+    dispatch(
+      setPostField('status', 'published')
     ).then(() => {
-      this.props.dispatch(
+      dispatch(
         savePost(token, this.props.postState.post, 'Пост опубликован')
       )
     })
   }
 
   render() {
-    var user = this.props.user;
-    var post = this.props.post;
+    const { user, post, postState, dispatch } = this.props;
+    const { author, slug, image, tags } = postState.post
     return (
       <div className="sidebar blocks">
    		  <div className="block-item switch">
-          <SwitchFace imageSize={55} defaultFace={this.props.postState.post.postAuthor.authorID} />
+          <SwitchFace 
+            imageSize={55} 
+            defaultFace={author.user ? author.user : author.blog} />
         </div>
         <div className="block-item">
           <h4 className="ui header">
@@ -67,71 +71,68 @@ class Sidebar extends React.Component {
             <a className="item" onClick={() => {this.savePost(this.token)}}>
               <i className="fa fa-save" aria-hidden="true"></i> Сохранить
             </a>
-            <Link href={{ pathname: 'post', query: { slug: this.props.postState.post.slug }}}><a className="item">
+            <Link href={{ pathname: 'post', query: { slug }}}><a className="item">
               <i className="fa fa-eye" aria-hidden="true"></i> Предпросмотр
             </a></Link>
           </div>
         </div>
         <div className="block-item">
           <Image 
-            url={post.postImage}
-            post={this.props.postState.post}
-            dispatch={this.props.dispatch}
-          />
+            url={image}
+            post={postState.post}
+            dispatch={dispatch} />
         </div>
         <div className="block-item">
           <Tags 
-            tags={this.props.postState.post.postTags}
-            dispatch={this.props.dispatch}
-          />
+            tags={tags}
+            dispatch={dispatch} />
         </div>
-
-     	<style jsx>{`
-  			.sidebar {
-          overflow-y:scroll;
-          width:310px;
-          height:100%;
-          position: fixed!important;
-          left:0px;
-          top:68px;
-          border-right:1px solid #eee;
-          background:#fff;
-          padding-bottom:60px;
-        }
-        .sidebar::-webkit-scrollbar {
-          display:none;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-          display:none;
-        }
-        .switch {
-          padding-top:0px;
-        }
-        .sidebar .block-vertical {
-          border-bottom:1px solid rgba(255,255,255,0.1)
-        }
-        .sidebar .profile {
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-        }
-        .sidebar .profile .user {
-          display:flex;
-          align-items:center;
-        }
-        .sidebar .profile .user .content {
-          margin-left:10px;
-        }
-        .sidebar .profile .user span {
-          display:block;
-        }
-     	`}</style>
-   	</div>
+       	<style jsx>{`
+    			.sidebar {
+            overflow-y:scroll;
+            width:310px;
+            height:100%;
+            position: fixed!important;
+            left:0px;
+            top:68px;
+            border-right:1px solid #eee;
+            background:#fff;
+            padding-bottom:60px;
+          }
+          .sidebar::-webkit-scrollbar {
+            display:none;
+          }
+          .sidebar::-webkit-scrollbar-thumb {
+            display:none;
+          }
+          .switch {
+            padding-top:0px;
+          }
+          .sidebar .block-vertical {
+            border-bottom:1px solid rgba(255,255,255,0.1)
+          }
+          .sidebar .profile {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+          }
+          .sidebar .profile .user {
+            display:flex;
+            align-items:center;
+          }
+          .sidebar .profile .user .content {
+            margin-left:10px;
+          }
+          .sidebar .profile .user span {
+            display:block;
+          }
+     	  `}</style>
+   	  </div>
     );
   }
 }
 
-class Tags extends React.Component {
+export class Tags extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -175,15 +176,17 @@ class Tags extends React.Component {
   }
 
   render() {
-    if(this.state.isRevealed) {
+    const { isRevealed } = this.state;
+    const { tags } = this.props;
+    if(isRevealed) {
       return (
         <div>
           <h3 className="ui header">
             Теги 
-            {this.props.tags.length == 0 ?
+            {tags.length == 0 ?
              <small>Список пуст</small> 
              :
-             <small>Осталось {5 - this.props.tags.length}</small>
+             <small>Осталось {5 - tags.length}</small>
            }
           </h3>
           <div className="ui form">
@@ -194,12 +197,12 @@ class Tags extends React.Component {
                 onKeyPress={(e) => {this.handleTyping(e)}}
                 placeholder="Введите тэг" 
                 id="inputTag"
-                disabled={(this.props.tags.length >= 5) ? true : false}
+                disabled={(tags.length >= 5) ? true : false}
               />
             </div>
           </div>
           <div className="tags">
-            {this.props.tags.map((item, i) => {
+            {tags.map((item, i) => {
               return <span className="tag" key={i}>
                 {item}
                 <i onClick={() => {this.pullTag(item)}} className="fa fa-close"></i>
@@ -265,13 +268,13 @@ class Image extends React.Component {
   constructor(props) {
     super(props);
     this.token = cookies.get('x-access-token');
-  }
+  } 
 
   handleImage(file) {
-    updateImage(this.token, 'post', this.props.post._id, file)
+    this.props.dispatch(updateImage(this.token, 'post', this.props.post._id, file))
     .then((image) => {
       this.props.dispatch(
-        setPostField('postImage', image.path)
+        setPostField('image', image.path)
       )
     })
     .then(() => {
@@ -283,7 +286,7 @@ class Image extends React.Component {
 
   removeImage() {
     this.props.dispatch(
-      setPostField('postImage', null)
+      setPostField('image', null)
     )
   }
 
