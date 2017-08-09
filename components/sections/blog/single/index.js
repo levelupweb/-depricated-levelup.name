@@ -22,31 +22,6 @@ class Blog extends React.Component {
   constructor(props) {
   	super(props);
   	this.token = cookies.get('x-access-token');
-  	this.state = {}
-  }
-
-  // Generic Methods
-  mapDataToState (data) {
-    if(!!data) {
-      for(var name in data) {
-        this.setState({
-          [name]: data[name] || false
-        })
-      }
-    }
-  }
-
-	// React Lifecycle
-  componentWillMount() {
-   	if(!this.state.blog) {
-	   	this.mapDataToState(this.props.app.pageData)
-	  }
-  }
-
-  componentWillReceiveProps(nextProps) {
-   	if(this.state.blog) {
-   		this.mapDataToState(nextProps.app.pageData)
-   	}
   }
 
   componentDidMount() {
@@ -71,7 +46,8 @@ class Blog extends React.Component {
   }
 
   render() {
-  	const { blog } = this.state
+  	console.log(this.props)
+  	const { blog } = this.props
   	if (blog) { 
       const { _id, image, title, description, subscribers, created, owner, posts } = blog;
 	    return (
@@ -220,6 +196,7 @@ var Image = (props) => {
 function mapStateToProps(state) {
   return {
 		app: state.app,
+		blog: state.app.pageData.blog,
 		currentUser: state.currentUser
 	}
 }

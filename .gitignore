@@ -47,7 +47,8 @@ Temporary Items
 .apdisk
 
 .next
-.next/dist
+.next/**
+.next/dist/
 .next/bundles
 node_modules
 Дизайн
