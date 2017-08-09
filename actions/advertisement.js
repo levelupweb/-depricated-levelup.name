@@ -1,34 +1,29 @@
-import config from '../app.config.js'
-import cookies from 'js-cookie'
-
 // actions
-import { handleWarn, handleError, handleSuccess } from './app.js'
+import { handleError, handleSuccess } from "./app";
 
 // models
-import * as MODEL from '../models/advertisement.js'
+import * as MODEL from "../models/advertisement";
 
 // Action Creators
-export function createAdvertisement(token, advertisement) {   
-  return (dispatch) => {
-  	return MODEL.createAdvertisement(token, advertisement).then((response) => {
-  		if(response.data.success) {
-  			dispatch(handleSuccess('Рекламное объявление ' + advertisement.title + ' успешно создано', true))
-  		} else {
-  			dispatch(handleError(response.data.message, true))
-  		}
-  		return response
-  	})
-  }
-}
+export const createAdvertisement = (token, advertisement) => dispatch =>
+  MODEL.createAdvertisement(token, advertisement).then(response => {
+    if (response.data.success) {
+      dispatch(
+        handleSuccess(
+          `Рекламное объявление ${advertisement.title} успешно создано`,
+          true
+        )
+      );
+    } else {
+      dispatch(handleError(response.data.message, true));
+    }
+    return response;
+  });
 
-export function updateAdvertisement(token, id, advertisement) {
-  return (dispatch) => {
-    return MODEL.updateAdvertisement(token, id, advertisement)
-  }
-}
 
-export function removeAdvertisement(token, advertisementId) {   
-	return (dispatch) => {
-   	return MODEL.removeAdvertisement(token, advertisementId)
-  }
-}
+export const updateAdvertisement = (token, id, advertisement) =>
+  MODEL.updateAdvertisement(token, id, advertisement);
+
+export const removeAdvertisement = (token, advertisementId) =>
+  MODEL.removeAdvertisement(token, advertisementId);
+

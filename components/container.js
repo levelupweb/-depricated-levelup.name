@@ -1,16 +1,16 @@
 // Important
-import React from 'react';
-import { connect } from 'react-redux'
-import cookies from 'js-cookie'
+import React from "react";
+import { connect } from "react-redux";
+import cookies from "js-cookie";
 
 // Components
-import Header from './isomorphic/header/index.js'
-import Sidebar from './isomorphic/sidebar/index.js'
-import Message from './Message.js'
-import AccessDenied from './AccessDenied.js'
+import Header from "./isomorphic/header/index.js";
+import Sidebar from "./isomorphic/sidebar/index.js";
+import Message from "./Message.js";
+import AccessDenied from "./AccessDenied.js";
 
 // Actions
-import { handleWarn } from '../actions/app.js'
+import { handleWarn } from "../actions/app.js";
 
 class Container extends React.Component {
   constructor(props) {
@@ -18,23 +18,34 @@ class Container extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props
-    const hasVisited = cookies.get('hasVisited');
+    const { dispatch } = this.props;
+    const hasVisited = cookies.get("hasVisited");
     if (!hasVisited) {
-      dispatch(handleWarn(
-        'Данный сайт использует ваши cookie-данные для лучшей работы', true
-      ));
+      dispatch(
+        handleWarn(
+          "Данный сайт использует ваши cookie-данные для лучшей работы",
+          true
+        )
+      );
     }
-    cookies.set('hasVisited', true)
+    cookies.set("hasVisited", true);
   }
 
   render() {
-    const { message, module, app } = this.props; 
-    const { header, sidebar, beforeChildren, child, afterChildren, slug, classNames } = module;
+    const { message, module, app } = this.props;
+    const {
+      header,
+      sidebar,
+      beforeChildren,
+      child,
+      afterChildren,
+      slug,
+      classNames
+    } = module;
 
-    if(app.accessable) {
+    if (app.accessable) {
       return (
-        <div className={header ? 'module-wrapper' : 'module-wrapper no-header'}>
+        <div className={header ? "module-wrapper" : "module-wrapper no-header"}>
           {sidebar && <Sidebar />}
           <div className={`main module-${slug} ${classNames}`}>
             <div className="inner">
@@ -50,18 +61,16 @@ class Container extends React.Component {
         </div>
       );
     } else {
-      return <AccessDenied />
+      return <AccessDenied />;
     }
   }
 }
 
 function mapStateToProps(state) {
-  return { 
+  return {
     app: state.app,
     message: state.message
-  }
+  };
 }
 
-
-export default connect(mapStateToProps)(Container)
-
+export default connect(mapStateToProps)(Container);

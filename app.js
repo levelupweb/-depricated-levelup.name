@@ -5,14 +5,11 @@ const next = require('next')
 const cookieParser = require('cookie-parser')
 
 const dev = process.env.NODE_ENV !== 'production'
-const nextApp = next({ dev: true, dir: process.cwd() })
+const nextApp = next({ dev: dev, dir: process.cwd() })
 const nextHandler = nextApp.getRequestHandler()
 
 nextApp.prepare().then(() => {
   app.use(cookieParser())
-  app.get('/messages', (req, res) => {
-    res.json(messages)
-  })
 
   app.get('*', (req, res) => {
     const parsedUrl = parse(req.url, true)

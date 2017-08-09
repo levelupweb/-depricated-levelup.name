@@ -46,6 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.next
 .next/dist
 .next/bundles
 node_modules
