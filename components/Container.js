@@ -16,7 +16,7 @@ class Container extends React.Component {
   constructor(props) {
     super(props);
   }
-
+ 
   componentDidMount() {
     const { dispatch } = this.props;
     const hasVisited = cookies.get("hasVisited");
@@ -32,12 +32,16 @@ class Container extends React.Component {
   }
 
   render() {
-    const { message, module, app } = this.props;
+    const {
+      children,
+      message, 
+      module, 
+      app 
+    } = this.props;
     const {
       header,
       sidebar,
       beforeChildren,
-      child,
       afterChildren,
       slug,
       classNames
@@ -52,7 +56,7 @@ class Container extends React.Component {
               {header && <Header />}
               <div className="after-header">
                 {beforeChildren}
-                {child}
+                {children}
                 {afterChildren}
               </div>
             </div>

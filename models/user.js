@@ -68,7 +68,7 @@ export function createUser(token, user) {
 	})
 }
 
-export function getSubscriptions(id, type) {
+export function getSubscriptions(id, type = '') {
 	return axiosNoAuth({
 		url: 'user/entries/' + id + '/subscriptions/' + type,
 		method: 'GET'

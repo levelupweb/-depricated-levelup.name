@@ -100,6 +100,7 @@ class Feed extends React.Component {
 
   displayPosts(posts, options, skip, isFull) {
     const { key } = this.state;
+    const { currentUser } = this.props;
     const instance = this.props.postsStorage[key]
     if(posts) {
       if(posts.length) {
@@ -110,9 +111,24 @@ class Feed extends React.Component {
           threshold={10}
           elementIsScrollable={false} />)
       } else {
-        return <div className="no-content">
-          <div className="divider ui dot"></div>
-        </div>
+        if(this.isOwner(currentUser._id, options)) {
+          return <div className="no-content">
+            Вы пока ничего не опубликовали. Опубликуйте свой первый пост.
+            <style jsx>{`
+              .no-content {
+              }
+            `}</style>
+          </div>
+        } else {
+          return <div className="no-content">
+            К сожалению, здесь пока нет ни одного поста
+            <style jsx>{`
+              .no-content {
+                text-align:center;
+              }
+            `}</style>
+          </div>
+        }
       }
     } else {
       return <Loader />

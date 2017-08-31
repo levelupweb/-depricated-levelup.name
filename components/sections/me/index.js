@@ -30,7 +30,8 @@ class Me extends React.Component {
     this.state = {
     	user: null,
     	posts: [],
-      campaigns: []
+      campaigns: [],
+      subscriptions: null
     }
   }
 
@@ -61,6 +62,11 @@ class Me extends React.Component {
         })
       })
     })
+    .then(() => {
+      getSubscriptions(this.state.user._id).then((response) => {
+        this.setState({ subscriptions: response.data })
+      })
+    })
   }
 
   componentDidMount() {
@@ -82,8 +88,9 @@ class Me extends React.Component {
   }
 
   render() {
-  	const { posts, user } = this.state
-    if(user && posts) {
+  	const { posts, user, subscriptions } = this.state
+    if(user && posts && subscriptions) {
+      const { users, blogs } = subscriptions
       const { image, fullName, slug, gender, description, bio, updated } = user;
       return (
         <div className="module-wrapper">
@@ -176,19 +183,25 @@ class Me extends React.Component {
                     <h4 className="ui header">
                       Блоги
                     </h4>
-                    <BlogList 
-                      editing={true}
-                      size="block"
-                      subscriber={this.state.user._id} />
+                    {(blogs.length > 0) ?
+                      <BlogList blogs={blogs} /> 
+                      : // Если подписки с блогами пусты
+                      <div className="no-content">
+                        <p><i className="fa fa-ellipsis-h"></i> Ваш список подписок на блоги пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересные вам страницы и читайте только интересное вам!</p>
+                      </div>
+                    }
                   </div>
                   <div className="column">
                     <h4 className="ui header">
                       Авторы
                     </h4>
-                    <UserList 
-                      editing={true}
-                      size="block"
-                      subscriber={this.state.user._id} />
+                    {(users.length > 0) ?
+                      <UserList users={users} /> 
+                      : // Если подписки с авторами пусты
+                      <div className="no-content">
+                        <p><i className="fa fa-ellipsis-h"></i> Ваш список подписок на авторов пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересных вам людей и читайте только интересное вам!</p>
+                      </div>
+                    }
                   </div>
                 </div>
   						</div>

@@ -131,10 +131,9 @@ class Comments extends React.Component {
 					</div>
 					<style jsx>{`
 						.ui.comments {
-							margin:10px 0px;
-							margin-top:15px;
-			          	padding-top:15px;
-			          	border-top:1px solid #eee;
+	          	padding-top:15px;
+	          	padding-bottom:10px;
+	          	border-top:1px solid #eee;
 						}
 						
 				   `}</style>

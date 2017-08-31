@@ -14,66 +14,34 @@ import SubscribeButton from './subscribeButton.js'
 export default class BlogList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      blogs: [],
-      isLoaded: false
-    }
   } 
 
-  // React LifeCycle
-	componentWillMount() {
-		const { blogs, subscriber } = this.props
-		if(blogs == undefined) {
-			if(subscriber) {
-				getSubscriptions(subscriber, 'blogs').then((response) => {
-					this.setBlogs(response.data)
-				})
-			} else {
-				getBlogs().then((response) => {
-					this.setBlogs(response.data)
-				})
-			}
-		} else {
-			this.setBlogs(blogs)
-		}
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if(nextProps.blogs) {
-			this.setState({
-				blogs: nextProps.blogs
-			})
-		}
-	}
-
-	// Specific Methods
-  setBlogs(blogs) {
-  	this.setState({
-			blogs,
-			isLoaded: true
-		})
-  }
-
-  renderBlogs(blogs) {
+  renderBlogs(blogs, size = "list") {
   	return blogs.map((blog, i) => {
-      return <Blog 
-      	size={this.props.size} 
-      	blog={blog} 
-      	key={i} />
+      return <Blog size={size} blog={blog} key={i} />
     })
   }
 
   render() {
-  	const { isLoaded, blogs } = this.state
-  	if(isLoaded && blogs) {
-  	  if(!blogs.length) {
-	      return <NoContent></NoContent>
-		  } else {
-		   	return <Blogs>{this.renderBlogs(this.state.blogs)}</Blogs>
-		  }
-	  } else {
-		  return <Loader></Loader>
-  	}
+  	const { blogs, size } = this.props;
+  	if(blogs.length == 0) {
+	   	return (
+        <div className="no-content">
+          <p><i className="fa fa-ellipsis-h"></i> Блоги не найдены</p>
+        </div>
+      )
+	   } else {
+	   	return (
+	      <div className="user-list">
+	        {this.renderBlogs(blogs, size)}
+	        <style jsx>{`
+						.user-list {
+							width:100%;
+						}
+	        `}</style>
+	      </div>
+	    )
+	  } 
   }
 }
 
@@ -226,7 +194,7 @@ function NoContent() {
 	return (
 		<div className="no-content">
       <p>
-      	<i className="fa fa-ellipsis-h"></i>
+      	<i className="fa fa-ellipsis-h"></i> Ваш список подписок на блоги пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересные вам блоги и читайте только интересное вам!
       </p>
     </div>
    )

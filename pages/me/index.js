@@ -19,21 +19,28 @@ Router.onRouteChangeError = () => NProgress.done()
 class Page extends React.Component {
   constructor(props) {
     super(props);
-    this.options = {
-      ...this.props.app.pageSettings,
-      child: <Me />,
-      beforeChildren : null,
-      afterChildren : null
-    }
   }
 
   render () {
-    return <Container module={this.options}>
-      {this.options.child}
+    return <Container module={Page.options}>
+      <Me />
     </Container>
   }
 }
 
-const Component = HOC(Page, 'me', {});
+Page.options = {
+  slug: "me",
+  title: "Личная страница",
+  passLevel: 0,
+  userMustBeLoggedIn: true,
+  classNames: "full",
+  sidebar: false,
+  header: true,
+  description: "Кабинет пользователя",
+  beforeChildren : null,
+  afterChildren : null
+}
+
+const Component = HOC(Page, {});
 export default withRedux(initStore, (state) => state)(Component)
 

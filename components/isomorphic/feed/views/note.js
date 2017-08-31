@@ -4,7 +4,7 @@ import cookies from 'js-cookie'
 import { connect } from 'react-redux'
 import dynamic from 'next/dynamic'
 
-// Actions
+// Actions 
 import { uploadUnsignedImage } from '../../../../actions/app.js'
 import { setLike, removePostById, updatePost } from '../../../../actions/post.js'
 
@@ -226,7 +226,7 @@ class Note extends React.Component {
 			      <style jsx>{`
 			      	article {
 			      		margin-bottom:20px;
-			      		padding-bottom:20px;
+			      		padding-bottom:0px;
 			      		border-bottom:1px solid #eee;
 			      	}
 			        .note .user,
@@ -237,6 +237,7 @@ class Note extends React.Component {
 			        }
 			        .note .meta {
 		          	margin-top:15px;
+		          	padding-bottom:15px;
 		          	padding-top:15px;
 		          	border-top:1px solid #eee;
 			        }

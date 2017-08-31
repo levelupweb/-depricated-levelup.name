@@ -11,83 +11,37 @@ import Loader from './loader.js'
 import SubscribeButton from './subscribeButton.js'
 
 
-export default class UserList extends React.Component {
+class UserList extends React.Component {
   constructor(props) {
 		super(props);
-		this.state = {
-			users: [],
-			isLoaded: false
-		}
   } 
 
-	componentWillMount() {
-		const { users, subscriber } = this.props
-		if(users === undefined) {
-			if(subscriber) {
-				getSubscriptions(subscriber, 'users').then((response) => {
-					this.setUsers(response.data)
-				})
-			} else {
-				getUsers().then((response) => {
-					this.setUsers(response.data)
-				})
-			}
-		} else {
-			this.setUsers(users)
-		}
-	}
-
-	componentWillReceiveProps(nextProps) {
-		const { users } = nextProps;
-	  if(users) {
-      this.setUsers(users)
-	  }
-	}
-
-  componentDidMount() {
-		this.setState({
-			isLoaded: true
-		})
-  }
-
-  setUsers(users) {
-  	this.setState({
-  		users,
-  		isLoaded: true
-  	})
-  }
-
-  renderUsers(users, size) {
+  renderUsers(users, size = 'list') {
     return users.map((user, i) => {
      	return <User size={size} user={user} key={i} />
    	})
   }
 
   render() {
-  	const { isLoaded, users } = this.state
-  	const { size } = this.props
-	  if(isLoaded) {
-	  	if(users.length == 0) {
-		   	return (
-		        <div className="no-content">
-		          <p><i className="fa fa-ellipsis-h"></i></p>
-		        </div>
-		      )
-		   } else {
-		   	return (
-		       <div className="user-list">
-		         {this.renderUsers(users, size)}
-		         <style jsx>{`
-							.user-list {
-								width:100%;
-							}
-		         `}</style>
-		       </div>
-		     )
-		   }
-	  } else {
-		  return <Loader />
-	  }
+  	const { users, size } = this.props;
+  	if(users.length == 0) {
+	   	return (
+        <div className="no-content">
+          <p><i className="fa fa-ellipsis-h"></i> Пользователи не найдены</p>
+        </div>
+      )
+	   } else {
+	   	return (
+	      <div className="user-list">
+	        {this.renderUsers(users, size)}
+	        <style jsx>{`
+						.user-list {
+							width:100%;
+						}
+	        `}</style>
+	      </div>
+	    )
+	  } 
   }
 }
 
@@ -207,3 +161,6 @@ class User extends React.Component {
 		}
 	}
 }
+
+
+export default UserList;

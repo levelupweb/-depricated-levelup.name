@@ -131,9 +131,9 @@ class Default extends React.Component {
           </div>
           <style jsx>{`
             article {
-                margin-bottom:20px;
-                padding-bottom:20px;
-                border-bottom:1px solid #eee;
+              margin-bottom:20px;
+              padding-bottom:10px;
+              border-bottom:1px solid #eee;
             }
             .article .user {
               margin-top:0px;
@@ -146,6 +146,7 @@ class Default extends React.Component {
             }
             .article .meta {
               margin-top:20px;
+              margin-bottom:10px;
               width:100%;
               display:flex;
               align-items:center;

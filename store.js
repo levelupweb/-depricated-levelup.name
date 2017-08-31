@@ -3,6 +3,6 @@ import thunkMiddleware from 'redux-thunk'
 import reducers from './reducers'
 import promise from 'redux-promise'
 
-export const initStore = (initialState) => {
+export const initStore = (initialState = {}) => {
   return createStore(reducers, initialState, compose(applyMiddleware(thunkMiddleware)))
 }

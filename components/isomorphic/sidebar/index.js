@@ -7,10 +7,9 @@ import config from '../../../app.config.js'
 
 // Utils 
 import { UI } from '../../../utils/initScripts.js'
-import AuthService from '../../../utils/AuthService.js'
 
 // Actions
-import { getLogout } from '../../../actions/user.js'
+import { getLogout, getSubscriptions } from '../../../actions/user.js';
 
 // Components
 import Link from 'next/link'
@@ -21,21 +20,31 @@ import Loader from '../loader.js'
 import User from '../user.js'
 
 class Sidebar extends React.Component {
-   constructor(props) {
-    	super(props);
-    	this.dispatch = this.props.dispatch;
-   }
+  constructor(props) {
+  	super(props);
+  	this.dispatch = this.props.dispatch;
+  	this.state = { subscriptions: null }
+  }
 
-   render() {
+  componentWillMount() {
+		getSubscriptions(this.props.currentUser._id).then((response) => {
+			this.setState({ subscriptions: response.data })
+		})
+  }
+
+  render() {
    	var currentUser = this.props.currentUser;
-    	return (
-      <div className="sidebar">
-      	{!currentUser.isLogged ? 
-      		<div>
-      			<div className="blocks">
-      				<div className="block-item full">
+   	const subscriptions = this.state.subscriptions;
+   	if(subscriptions) {
+	   	const { users, blogs, tags } = subscriptions;
+	  	return (
+	    <div className="sidebar">
+	    	{!currentUser.isLogged ? 
+	    		<div>
+	    			<div className="blocks">
+	    				<div className="block-item full">
 	      				<div className="promo inverted">
-	      					<img className="ui image rounded" src={config.frontend + 'background-white.png'} width="100%" />
+	      					<img className="ui image rounded" src={config.static + '/img/background-white.png'} width="100%" />
 	      					<div className="content">
 	      						<h2>Будь частью чего-то бо́льшего</h2>
 	      						<p>Зарегиструйся и получи возможность делиться с миром своими публикациями, постами и прочим контентом</p>
@@ -44,7 +53,7 @@ class Sidebar extends React.Component {
 	      				</div>
 	      			</div>
 	      			<div className="block-item">
-      					<h4 className="ui header">
+	    					<h4 className="ui header">
 								Меню
 								<small>навигация</small>
 							</h4>
@@ -60,8 +69,8 @@ class Sidebar extends React.Component {
 							  	</a></Link>
 							</div>
 	      			</div>
-      				<div className="block-item">
-      					<h4 className="ui header">
+	    				<div className="block-item">
+	    					<h4 className="ui header">
 								Вопросы?
 								<small>у нас есть ответ!</small>
 							</h4>
@@ -77,7 +86,7 @@ class Sidebar extends React.Component {
 							  	</a>
 							</div>
 	      			</div>
-      				<div className="block-item">
+	    				<div className="block-item">
 		      			<h4 className="ui header">
 								Темы <small>популярные</small>
 							</h4>
@@ -85,11 +94,11 @@ class Sidebar extends React.Component {
 						</div>
 		      	</div>
 		      </div>
-      		: // Если залогинен пользователь 
-      		<div>
+	    		: // Если залогинен пользователь 
+	    		<div>
 	      		<div className="blocks">
 	      			<div className="block-item">
-      					<h4 className="ui header">
+	    					<h4 className="ui header">
 								Меню
 								<small>навигация</small>
 							</h4>
@@ -120,7 +129,7 @@ class Sidebar extends React.Component {
 	      			</div>
 	      			<div className="block-item full">
 	      				<div className="promo">
-	      					<img className="ui image rounded" src={config.frontend + 'background-orange.png'} width="100%" />
+	      					<img className="ui image rounded" src={config.static + '/img/background-orange.png'} width="100%" />
 	      					<div className="content">
 	      						<h2>Исследуй!</h2>
 	      						<p>Начни искать интересное для себя. Подпишись на тематические блоги и интересных авторов</p>
@@ -134,7 +143,13 @@ class Sidebar extends React.Component {
 									Авторы
 									<small>, на которые вы подписаны</small>
 								</h4>
-								<UserList subscriber={currentUser._id} />
+								{(users.length > 0) ?
+									<UserList users={users} /> 
+									: // Если подписки с авторами пусты
+									<div className="no-content">
+          					<p><i className="fa fa-ellipsis-h"></i> Ваш список подписок на авторов пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересных вам людей и читайте только интересное вам!</p>
+        					</div>
+								}
 							</div>
 							
 							<div className="block-section">
@@ -142,7 +157,13 @@ class Sidebar extends React.Component {
 									Блоги
 									<small>, на которые вы подписаны</small>
 								</h4>
-								<BlogList subscriber={currentUser._id} />
+								{(blogs.length > 0) ?
+									<BlogList blogs={blogs} /> 
+									: // Если подписки с блогами пусты
+									<div className="no-content">
+          					<p><i className="fa fa-ellipsis-h"></i> Ваш список подписок на блоги пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересные вам страницы и читайте только интересное вам!</p>
+        					</div>
+								}
 							</div>
 							
 							<div className="block-section">
@@ -176,7 +197,7 @@ class Sidebar extends React.Component {
 						
 		      	</div>
 		    </div>
-      	}
+	    	}
 		  	<style jsx>{`
 				.sidebar {
 					overflow-y:scroll;
@@ -228,8 +249,11 @@ class Sidebar extends React.Component {
 					position:relative;
 				}
 		    `}</style>  
-		</div>
-    );
+			</div>
+	    );
+		} else {
+			return null
+		}
   }
 }
 

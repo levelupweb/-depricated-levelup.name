@@ -8,27 +8,23 @@ import { settingUpPageProperties, settingUpPageData, setAccessStatus } from '../
 // Utils
 import getToken from '../utils/getToken.js'
 
-function withAuth(Component, pageSlug, pageBuilder) {
+function withAuth(Component, pageBuilder) {
   return class HOC extends Component {
     static async getInitialProps ({ req, store, query, isServer }) {
       const { dispatch } = store;
       let token = getToken(req);
-
       await dispatch(authenticateUser(token)).then(async (user) => {
-        await dispatch(settingUpPageProperties(pageSlug)).then(async (properties) => {
-          if (canUserPass(user, properties.userMustBeLoggedIn)) {
-            await dispatch(settingUpPageData(pageBuilder, query))
-          } else {
-            await dispatch(setAccessStatus(false))
-          }
-        })
+        if (canUserPass(user, Component.options.userMustBeLoggedIn)) {
+          await dispatch(settingUpPageData(pageBuilder, query))
+        } else {
+          await dispatch(setAccessStatus(false))
+        }
       })
+      return {}
     }
-
     constructor(props) {
       super(props)
     }
-
     render() {
       return (
         <Component {...this.props} />
@@ -36,7 +32,6 @@ function withAuth(Component, pageSlug, pageBuilder) {
     }
   }
 }
-
 
 function canUserPass(user, userMustBeLoggedIn) {
   if(user) {

@@ -59,15 +59,17 @@ export class Blog extends React.Component {
   }
 
   render() {
+
     const { isLoaded, blog } = this.state;
     const { size, classNames, imageSize } = this.props;
+
     if (isLoaded && blog) {
         const { image, title, subscribers, description, slug } = blog
         return (
           <div className={`${size} blog`}>
             <div className="image">
               <Link href={{ pathname: 'blog', query: { slug }}}><a>
-                <Avatar color={`#46978c`} round={true} size={32} src={image} name={title} />
+                <Avatar color={`#46978c`} round={true} size={32} src={config.storage + image} name={title} />
               </a></Link>
             </div>
             <div className="content">

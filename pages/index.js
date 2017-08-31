@@ -20,24 +20,31 @@ Router.onRouteChangeStart = (url) => NProgress.start()
 Router.onRouteChangeComplete = () => NProgress.done()
 Router.onRouteChangeError = () => NProgress.done()
 
-const child = (<div className="blocks"><div className="block-item">
-  <Feed flashPost={true} options={{perPage: 3, status: ['published']}} />
-</div></div>)
-
 class Page extends React.Component {
   constructor(props) {
     super(props);
-    this.options = {
-      ...this.props.app.pageSettings,
-      child
-    }
   }
 
   render() {
-    return <Container module={this.options}>
-      {this.options.child}
+    return <Container module={Page.options}>
+      <div className="blocks">
+        <div className="block-item">
+          <Feed flashPost={true} options={{perPage: 3, status: ['published']}} />
+        </div>
+      </div>
     </Container>
   }
+}
+
+Page.options = {
+  slug: "index",
+  title: "Лента",
+  passLevel: 0,
+  userMustBeLoggedIn: false,
+  classNames: "",
+  sidebar: true,
+  header: true,
+  description: "Заглавная страница сайта"
 }
 
 const pageBuilder = {
@@ -52,5 +59,6 @@ const pageBuilder = {
   }
 }
 
-const Component = HOC(Page, 'index', pageBuilder);
+
+const Component = HOC(Page, pageBuilder);
 export default withRedux(initStore, (state) => state)(Component)

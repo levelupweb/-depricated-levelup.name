@@ -19,19 +19,26 @@ Router.onRouteChangeError = () => NProgress.done()
 class Page extends React.Component {
   constructor(props) {
     super(props);
-    this.options = {
-      ...this.props.app.pageSettings,
-      child: <Blogs blogs={this.props.app.pageData.blog} />,
-      beforeChildren : null,
-      afterChildren : null
-    }
   }
 
   render () {
-    return <Container module={this.options}>
-      {this.options.child}
+    return <Container module={Page.options}>
+      <Blogs blogs={this.props.app.pageData.blog} />
     </Container>
   }
+}
+
+Page.options = {
+  slug: "blogs",
+  title: "Блоги",
+  passLevel: 0,
+  userMustBeLoggedIn: false,
+  classNames: "",
+  sidebar: true,
+  header: true,
+  description: "Список блогов",
+  beforeChildren : null,
+  afterChildren : null
 }
 
 const query = {
@@ -41,7 +48,7 @@ const query = {
   }
 }
 
-const Component = HOC(Page, 'blogs', query);
+const Component = HOC(Page, query);
 export default withRedux(initStore, (state) => state)(Component)
 
 
