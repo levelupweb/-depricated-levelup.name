@@ -15,7 +15,7 @@ import { getLogout, getSubscriptions } from '../../../actions/user.js';
 import Link from 'next/link'
 import UserList from '../userList'
 import TagsList from '../tagsList'
-import BlogList from '../blogList'
+import BlogList from '../blogList/BlogList.js'
 import Loader from '../loader.js'
 import User from '../user.js'
 

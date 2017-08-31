@@ -13,7 +13,7 @@ import User from '../user.js'
 import Avatar from 'react-avatar'
 import UserList from '../userList.js'
 import PostList from '../postList.js'
-import BlogList from '../blogList.js'
+import BlogList from '../blogList/BlogList.js'
 
 class Header extends React.Component {
    constructor(props) {
