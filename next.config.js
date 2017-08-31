@@ -15,8 +15,8 @@ module.exports = {
           name: 'dist/[path][name].[ext]',
       },
     }, {
-      test: /\.css$/,
-      loader: `babel-loader!next-style-loader!css-loader?sourceMap&minimize=${!dev}&url=false`,
+      test: /\.scss|css$/,
+      loader: `babel-loader!next-style-loader!css-loader?sourceMap&minimize=${!dev}&url=false!sass-loader`
     }
   );
     return config
