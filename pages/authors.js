@@ -41,12 +41,7 @@ Page.options = {
   afterChildren : null
 }
 
-var query = {
-  user: {
-    type: 'user',
-    single: false
-  }
-}
+const pageBuilder = {}
 
 const Component = HOC(Page, pageBuilder);
 export default withRedux(initStore, (state) => state)(Component)

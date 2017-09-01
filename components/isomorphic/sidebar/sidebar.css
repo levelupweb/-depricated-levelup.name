@@ -1,0 +1,44 @@
+.sidebar {
+	overflow-y:scroll;
+	width:310px;
+	height:100%;
+	position: fixed!important;
+	left:0px;
+	top:68px;
+	border-right:1px solid #eee;
+	background:#fff;
+	padding-bottom:60px;
+	.blocks {
+		padding-bottom:70px;
+	}
+	.block-section {
+		position:relative;
+	}
+	.block {
+		padding: 15px;
+	}
+	.promo {
+		border-radius: 4px;
+		position: relative;
+		.content {
+			position: absolute;
+			left:0px;
+			top:0px;
+			width:100%;
+			height:100%;
+			display:flex;
+			justify-content:center;
+			align-items:center;
+			flex-direction:column;
+			text-align:center;
+			padding:15px;
+			color:#fff;
+		}
+	}
+}
+.sidebar::-webkit-scrollbar {
+	display:none;
+}
+.sidebar::-webkit-scrollbar-thumb {
+	display:none;
+}
