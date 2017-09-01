@@ -1,18 +1,21 @@
 import Document, { Head, Main, NextScript } from 'next/document';
-import flush from 'styled-jsx/server';
+import flushDefault from 'styled-jsx/server';
 import isNode from '../utils/isnode';
 import config from '../app.config.js';
+import { flush } from 'next-style-loader/applyStyles';
 
 class MyDocument extends Document {
   static getInitialProps ({ renderPage }) {
     const { html, head, errorHtml, chunks } = renderPage()
-    const styles = flush()
-    return { html, head, errorHtml, chunks, styles }
+    const styles = flushDefault()
+    const scopedCSS = flush()
+    return { html, head, errorHtml, chunks, styles, scopedCSS }
   }
   render () {
     return (
      <html>
        <Head>
+          {this.props.scopedCSS.tag}
           <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&amp;subset=cyrillic" rel="stylesheet" />
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
           <link rel="stylesheet" href={config.static + "/css/ui/semantic.css"} />

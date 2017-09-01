@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import cookies from "js-cookie";
 
 // Components
-import Header from "./isomorphic/header/index.js";
+import Header from "./isomorphic/header/Header.js";
 import Sidebar from "./isomorphic/sidebar/index.js";
 import Message from "./Message.js";
 import AccessDenied from "./AccessDenied.js";

@@ -74,19 +74,12 @@ blockquote {
  	padding: 15px 0px;
   border-bottom: 1px solid #eee;
 }
-.block-item:first-child {
-	padding-top:0px;
-}
 .block-item:last-child {
   border-bottom: 0px;
-  padding-bottom: 0px;
 }
 .block-item.full {
 	margin-left:0px;
 	margin-right:0px;
-}
-.block-content {
-
 }
 .block-section {
 	border-bottom:1px solid #eee;

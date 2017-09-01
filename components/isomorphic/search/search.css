@@ -1,0 +1,29 @@
+.search {
+	position: relative;
+	.search-input {
+		input {
+			width:500px;
+			border:0;
+			padding:10px 20px;
+			outline:none;
+			border-radius:27em;
+			&:focus {
+				background:#fafafa;
+			}
+		}
+	}
+	.search-results {
+		position: absolute;
+		background:#fff;
+		left:0px;
+		top:100%;
+		margin-top:10px;
+		border-radius:4px;
+ 		width:100%;
+ 		border:1px solid #eee;
+ 		-webkit-box-shadow: 2px 2px 80px 5px rgba(0,0,0,0.1);
+		-moz-box-shadow: 2px 2px 80px 5px rgba(0,0,0,0.1);
+		box-shadow: 2px 2px 80px 5px rgba(0,0,0,0.1);
+		z-index:999;
+	}
+}

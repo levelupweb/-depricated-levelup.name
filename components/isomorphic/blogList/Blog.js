@@ -1,10 +1,11 @@
 import React from 'react';
 import SubscribeButton from '../subscribeButton.js';
-import Avatar from 'react-avatar'
+import Avatar from 'react-avatar';
+import TimeAgo from 'timeago-react'
 import Link from 'next/link'
 
 const Blog = ({ blog, size }) => {
-	const { _id, slug, image, description, title, subscribers } = blog
+	const { _id, slug, image, description, title, subscribers, created } = blog
 	switch(size) {
 		case 'block': 
 		return (<div className="blog-item block">
@@ -18,7 +19,7 @@ const Blog = ({ blog, size }) => {
           </Link>
           <span className="subscribers">1 подписчик</span>
   		    <div className="description">
-  		      {description}
+  		      {description || <span>Создан: <TimeAgo datetime={created} locale='ru' /></span>}
   		    </div>
         </div>
         <div className="right">

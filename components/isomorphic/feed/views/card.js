@@ -14,7 +14,6 @@ import { UI } from '../../../../utils/initScripts.js'
 // Components
 import User from '../../user.js'
 import Blog from '../../blog.js'
-import TimeAgo from 'timeago-react';
 import Link from 'next/link'
 import Loader from '../../loader.js'
 
