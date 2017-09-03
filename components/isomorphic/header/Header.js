@@ -10,23 +10,30 @@ import applyStyles from 'next-style-loader/applyStyles';
 import { makeSearch } from '../../../models/app.js'
 
 // Components
-import Auth from '../authentication/index.js'
+import Auth from '../authorization/Authorization.js'
 import Link from 'next/link'
 import User from '../user.js'
 import Avatar from 'react-avatar'
 import UserList from '../userList.js'
 import PostList from '../postList.js'
 import BlogList from '../blogList/BlogList.js'
+import Modal from '../modal/Modal.js'
+import Authorization from '../authorization/Authorization.js'
 
 const performSearch = query => 
 	makeSearch(query).then(response => 
 		Promise.resolve(response.data.total ? response.data : false)
 	)
 
+const renderModalHandler = (
+	<div className="ui button basic circular">Войти</div>
+)
+
 class Header extends React.Component {
   constructor(props) {
 		super(props);
 		this.state = { 
+			isModalActive: false,
 			search: {
 				searchQuery: '',
 				isLoading: false,
@@ -68,6 +75,7 @@ class Header extends React.Component {
   }
 
   renderUser(currentUser) {
+  	const { isModalActive } = this.state;
   	if(currentUser.isLogged) {
   		return (
   			<Link href='/me'><a>
@@ -78,9 +86,11 @@ class Header extends React.Component {
   		)
   	} else {
   		return (
-  			<Auth><div className="ui button basic circular">
-					Войти
-				</div></Auth>
+  			<Modal isActive={isModalActive} handler={renderModalHandler} title="Авторизация">
+  				<Authorization onAuthSuccess={() => {
+  					this.setState({ isModalActive: false })
+  				}} />
+				</Modal>
 			)
   	}
   }
@@ -105,7 +115,7 @@ class Header extends React.Component {
 		 				</div>
 		 				<Link href="/">
 		 					<a className="item ui button primary circular">
-		    			Лента
+		    				Лента
 							</a>
 			  		</Link>
 				  	{currentUser.isLogged && 

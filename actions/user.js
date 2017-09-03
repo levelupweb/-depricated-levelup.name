@@ -9,6 +9,72 @@ import { handleWarn, handleError, handleSuccess } from './app.js'
 // models
 import * as MODEL from '../models/user.js'
 
+export function signIn(user) {
+	return (dispatch) => {
+		const authData = {
+			login: user.authLogin,
+			password: user.authPassword
+		}
+	  return MODEL.signIn(authData).then((response) => {
+			if(response.data.success) {
+				dispatch(authenticateUserSuccess(response.data.user))
+			} 
+			return response
+		}).then((response) => {
+			const { token, success, message, errors, user } = response.data
+			if(token && success) {
+				const cookiesOptions = { 
+					expires: 7,
+					path: '' 
+				}
+				cookies.set('x-access-token', token, cookiesOptions);
+				return {
+					user,
+					success: true,
+					message: {
+						title: 'Готово',
+						message
+					}
+				}
+			} else {
+				return {
+					success: false,
+					message: {
+						title: 'Ошибка',
+						description: message
+					}
+				}
+			}
+		})
+	}
+}
+
+export function signUp(user) {
+	return (dispatch) => {
+	   return MODEL.signUp(user).then((response) => {
+	   	const { success, message, errors } = response.data
+			if(success) {
+				return {
+					success: true,
+					message: {
+						title: 'Готово!',
+						description: message
+					}
+				}
+			} else {
+				return {
+					success: false,
+					message: {
+						title: 'Ошибка',
+						description: message
+					},
+					errors: errors
+				}
+			}
+		})
+	}
+}
+
 export function authenticateUser(token) {
 	return dispatch => {
 		if(token) { 
@@ -23,58 +89,6 @@ export function authenticateUser(token) {
 	}
 }
 
-export function signIn(user) {
-	return (dispatch) => {
-	   return MODEL.signIn(user).then((response) => {
-			if(response.data.success) {
-				dispatch(authenticateUserSuccess(response.data.user))
-			} 
-			return response
-		}).then((response) => {
-			if(response.data.token && response.data.success) {
-				cookies.set(
-					'x-access-token', 
-					response.data.token, 
-					{ expires: 7, path: '' }
-				);
-				dispatch(handleSuccess(
-					'Привет, ' + response.data.user.fullName, true
-				));
-				return {
-					success: true,
-					message: response.data.message,
-					user: response.data.user
-				}
-			} else {
-				return {
-					success: false,
-					message: response.data.message
-				}
-			}
-		})
-	}
-}
-
-export function signUp(user) {
-	return (dispatch) => {
-	   return MODEL.signUp(user).then((response) => {
-			if(response.data.success) {
-				return {
-					success: true,
-					message: response.data.message
-				}
-			} else {
-				return {
-					success: false,
-					message: response.data.message,
-					errors: response.data.errors
-				}
-			}
-		})
-	}
-}
-
-
 export function authenticateUserSuccess(user) {
 	if (user) {
 		return {
@@ -86,7 +100,6 @@ export function authenticateUserSuccess(user) {
 			type: 'LOGIN_FAILURE'
 		}
 	}
-	
 }
 
 export function getLogout() {

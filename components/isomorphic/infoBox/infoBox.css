@@ -1,0 +1,24 @@
+.infoBox-wrapper {
+	position: relative;
+	.ui.message {
+		.close.icon {
+			position: absolute;
+			transition: 0.2s all ease;
+			right:15px;
+			top:15px;
+			color:#000;
+			opacity: .4;
+			&:hover {
+				opacity: 1;
+			}
+		}
+		p.description {
+			margin-bottom:0;
+		}
+		.errors {
+			.list {
+				margin-top:15px;
+			}
+		}
+	}
+}

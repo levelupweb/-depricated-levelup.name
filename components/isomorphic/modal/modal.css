@@ -1,0 +1,10 @@
+.modal-wrapper {
+	.ui.modal {
+		.content {
+			padding:0!important;
+		}
+		.header {
+			padding:0;
+		}
+	}
+}

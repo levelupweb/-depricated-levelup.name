@@ -10,7 +10,7 @@ import HOC from '../components/HOC.js'
 import cookies from 'js-cookie'
 
 // For Page
-import Feed from '../components/isomorphic/feed/feed.js'
+import Feed from '../components/isomorphic/feed/Feed.js'
 
 // Models
 import { fetchPosts } from '../models/post.js'

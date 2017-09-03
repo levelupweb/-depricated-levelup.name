@@ -2,6 +2,7 @@
 import config from '../../../app.config.js'
 import { connect } from 'react-redux'
 import Router from 'next/router'
+import PropTypes from 'prop-types'
 import cookies from 'js-cookie'
 import Loader from '../loader'
 import Link from 'next/link'
@@ -10,14 +11,27 @@ import hash from 'object-hash'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 // Actions
-import { getPosts, fetchPosts, createPostsInstance, pushPost, removePost } from '../../../actions/post.js'
+import { 
+  getPosts, 
+  fetchPosts, 
+  createPostsInstance, 
+  pushPost, 
+  removePost 
+} from '../../../actions/post.js'
 
 // Components
 import InfiniteScroll from 'redux-infinite-scroll';
-import Item from './item.js'
-import Blank from './views/blank.js'
-import Note from './views/note.js'
+import Item from './Item.js'
+import Blank from './views/Blank.js'
 import FlashPost from '../flashPost.js'
+
+const renderPosts = (token, key, posts, onRemove) =>
+  posts.map(post =>
+    <Item post={post} key={post._id} onRemove={postId => {
+      onRemove(token, key, postId)
+    }} />
+  )
+
 
 class Feed extends React.Component {
   constructor(props) {
@@ -87,21 +101,10 @@ class Feed extends React.Component {
     }
   }
 
-  renderPosts(posts) {
-    if(posts) {
-      return posts.map((post, i) => {
-        return <Item 
-          post={post} 
-          key={post._id} 
-          onRemove={(postID) => {this.removeItem(this.token, this.state.key, postID)}} />
-      })
-    }
-  }
-
   displayPosts(posts, options, skip, isFull) {
     const { key } = this.state;
-    const { currentUser } = this.props;
-    const instance = this.props.postsStorage[key]
+    const { currentUserId, postsStorage } = this.props;
+    const instance = postsStorage[key];
     if(posts) {
       if(posts.length) {
         return (<InfiniteScroll
@@ -111,7 +114,7 @@ class Feed extends React.Component {
           threshold={10}
           elementIsScrollable={false} />)
       } else {
-        if(this.isOwner(currentUser._id, options)) {
+        if(this.isOwner(currentUserId, options)) {
           return <div className="no-content">
             Вы пока ничего не опубликовали. Опубликуйте свой первый пост.
             <style jsx>{`
@@ -136,29 +139,62 @@ class Feed extends React.Component {
   }
 
   render() {
-    const { postsStorage, currentUser, options, postState, flashPost, defaultPosts, initialPosts } = this.props;
-    const instance = postsStorage[this.state.key];
+    const { 
+      postsStorage,
+      currentUserId, 
+      currentUser, 
+      options, 
+      postState, 
+      flashPost, 
+      defaultPosts, 
+      initialPosts 
+    } = this.props;
+    const { key } = this.state;
+    const instance = postsStorage[key];
     if(instance) {
       const { isFull, posts } = instance;
       return (
         <div className="grid">
-          {(flashPost && this.isOwner(currentUser._id, options)) && 
+          {(flashPost && this.isOwner(currentUserId, options)) && 
             <FlashPost 
-              onSubmit={(key) => {this.pushItem(this.token, key, postState.post)}}
-              hashKey={this.state.key} />
+              onSubmit={key => {
+                this.pushItem(this.token, key, postState.post)
+              }}
+              hashKey={key} />
           }
-          {this.displayPosts(this.renderPosts(posts), options, posts.length, isFull)}
+          {this.displayPosts(
+            renderPosts(this.token, key, posts, this.removeItem), 
+            options, 
+            posts.length, 
+            isFull
+          )}
         </div>
       )
     } else {
-      return <div>{this.renderPosts(this.props.initialPosts)}</div>
+      return <div>
+        {renderPosts(this.token, key, initialPosts, this.removeItem)}
+      </div>
     }
   }
+}
+
+Feed.defaultProps = {
+  flashPost: false,
+  options: {
+    perPage: 5,
+    status: ['published']
+  }
+}
+
+Feed.propTypes = {
+  flashPost: PropTypes.bool,
+  options: PropTypes.object
 }
 
 function mapStateToProps(state) {
   return { 
     currentUser: state.currentUser,
+    currentUserId: state.currentUser._id,
     postsStorage: state.postsStorage,
     postState: state.postState,
     initialPosts: state.app.pageData.initialPosts

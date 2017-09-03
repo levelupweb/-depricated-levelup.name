@@ -9,7 +9,7 @@ import { UI } from '../../../../utils/initScripts.js'
 import FlashPost from '../../../isomorphic/flashPost.js'
 import Comments from '../../../isomorphic/comments/index.js'
 import UserBar from './userbar.js'
-import Feed from '../../../isomorphic/feed/feed.js'
+import Feed from '../../../isomorphic/feed/Feed.js'
 
 class User extends React.Component {
   constructor(props) {

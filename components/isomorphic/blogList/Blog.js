@@ -2,6 +2,7 @@ import React from 'react';
 import SubscribeButton from '../subscribeButton.js';
 import Avatar from 'react-avatar';
 import TimeAgo from 'timeago-react'
+import PropTypes from 'prop-types';
 import Link from 'next/link'
 
 const Blog = ({ blog, size }) => {
@@ -50,6 +51,15 @@ const Blog = ({ blog, size }) => {
 			</div>
 		</div>)
 	}
+}
+
+Blog.propTypes = {
+	size: PropTypes.string,
+	blog: PropTypes.object.isRequired
+}
+
+Blog.defaultProps = {
+	size: 'list'
 }
 
 export default Blog;

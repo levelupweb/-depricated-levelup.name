@@ -38,6 +38,20 @@ class Sidebar extends React.Component {
 			this.setState({ isLoaded: true })
   	}
   }
+  componentWillReceiveProps(nextProps) {
+  	this.setState({
+  		isLoaded: false
+  	}, () => {
+			const { currentUserId, currentUser } = nextProps;
+  		if(currentUser.isLogged) {
+				performSubscriptionsRequest(currentUserId).then(subscriptions => {
+  				this.setState({ subscriptions, isLoaded: true })
+  			})
+  		} else {
+				this.setState({ isLoaded: true })
+  		}
+  	})
+  }
 
   render() {
   	const { currentUser, currentUserId } = this.props;
