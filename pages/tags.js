@@ -9,7 +9,7 @@ import config from '../app.config.js'
 import HOC from '../components/HOC.js'
 
 // Components
-import Tags from '../components/sections/tags/index.js'
+import Tags from '../components/sections/tags/Tags.js'
 
 // Router with Progress Bar
 Router.onRouteChangeStart = (url) => NProgress.start()
@@ -23,7 +23,7 @@ class Page extends React.Component {
 
   render () {
     return <Container module={Page.options}>
-      <Tags tags={this.props.app.pageData.tags} />
+      <Tags defaultView={this.props.url.query.view || null} />
     </Container>
   }
 }

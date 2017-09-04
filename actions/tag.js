@@ -17,6 +17,10 @@ export function getTags(options) {
 	return MODEL.getTags(options)
 }
 
+export function getUserTags(userId, options) {
+	return MODEL.getUserTags(options)
+}
+
 export function updateTag(token, id, tag) {
 	return MODEL.updateTag(token, id, tag)
 }
@@ -33,9 +37,4 @@ export function findTag(query) {
 // DEPRICATED
 export async function getTagSubscribers(tagID) {
 	return await axios.get(config.API + 'tag/entries/' + tagID + '/getsubscribers')	
-}
-
-// DEPRICATED
-export function getUserTags(userID) {
-	return axios.get(config.API + 'tag/entries/' + userID + '/byuser')	
 }

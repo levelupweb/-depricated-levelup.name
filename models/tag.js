@@ -26,6 +26,14 @@ export function getTags(options) {
    })
 }
 
+export function getUserTags(userId, options) {
+	return axiosNoAuth({
+		url: 'tag/entries/' + userId + '/subscriptions',
+		method: 'GET',
+		params: options
+   })
+}
+
 export function updateTag(token, id, tag) {
 	return axiosAuth(token, {
 		url: 'tag/entries/' + id + '/update',

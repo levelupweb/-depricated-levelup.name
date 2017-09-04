@@ -1,0 +1,84 @@
+.tag-list {
+  .tag {
+    &.block {
+      border-bottom:1px solid rgba(0,0,0,0.03);
+      background:#fff;
+      position:relative;
+      max-height:200px;
+      overflow:hidden;
+      height:150px;
+      width: 100%;
+      .image {
+        img {
+          opacity:0.1;
+          width:100%;
+        }
+      }
+      .content {
+        position: absolute;
+        bottom:15px;
+        width:90%;
+        left:15px;
+      }
+      .header {
+        position: relative;
+        font-weight:bold;
+        overflow: hidden;
+        font-size:27px;
+        width:100%;
+        display:block;
+        color:#000;
+        padding:10px 0;
+        &:after {
+          content: '';
+          width:40px;
+          height:100%;
+          position: absolute;
+          right:0px;
+          top:0px;
+          bottom:0px;
+          background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+          background: -o-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+          background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+        }   
+        .meta p {
+          color:#c0c0c0;
+        }
+      }
+      .info {
+        position:absolute;
+        font-size:13px;
+        left:15px;
+        top:15px;
+      }
+      .action {
+        position: absolute;
+        right:15px;
+        top:15px;
+      }
+    }
+  }
+  .tag.menu {
+    width: 100%;
+    position:relative;
+    background:#fafafa;
+    margin-top:5px;
+    display:inline-block;
+    width:auto!important;
+    padding:3px 6px;
+    font-size:13px;
+    border-radius:5px;
+    a {
+      color:#000;
+    }
+  }
+  .tag.list {
+    background:#fafafa;
+    padding:5px;
+    margin-right:5px;
+    margin-bottom:5px;
+    width:auto;
+    display:inline-block;
+  }
+}

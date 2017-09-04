@@ -9,11 +9,11 @@ import sidebarStyles from './sidebar.css';
 import { getLogout, getSubscriptions } from '../../../actions/user.js';
 
 // Components
-import Link from 'next/link'
-import UserList from '../userList/UserList.js'
-import TagsList from '../tagsList'
-import BlogList from '../blogList/BlogList.js'
-import Loader from '../loader.js'
+import Link from 'next/link';
+import UserList from '../userList/UserList.js';
+import TagList from '../tagList/TagList.js';
+import BlogList from '../blogList/BlogList.js';
+import Loader from '../loader.js';
 
 const performSubscriptionsRequest = userId =>
 	getSubscriptions(userId).then(response => 
@@ -181,7 +181,13 @@ class Sidebar extends React.Component {
 										Темы
 										<small>, на которые вы подписаны</small>
 									</h4>
-									<TagsList size="menu" subscriber={currentUser._id} />
+									{(tags.length > 0) ?
+										<TagList tags={tags} /> 
+										: // Если подписки с темами пусты
+										<div className="no-content">
+	          					<p><i className="fa fa-ellipsis-h"></i> Ваш список подписок на темы пока пуст. <Link href={{ pathname: 'explore'}}><a>Подпишитесь</a></Link> на интересное вам и читайте только актуальное для вас!</p>
+	        					</div>
+									}
 								</div>
 							</div>
 						</div>
