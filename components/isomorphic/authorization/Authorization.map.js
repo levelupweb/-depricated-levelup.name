@@ -60,3 +60,17 @@ export const handleView = (state, view) => ({
 	...state,
 	view
 })
+
+export const handleRegisterSuccess = (state, message) => ({
+	...state,
+	view: AUTHORIZATION,
+	temporaryUser: {},
+	authData: {},
+	infoBox: {
+		...state.infoBox,
+		isActive: true,
+		errors: [],
+		type: INFOBOX_SUCCESS,
+		message,
+	}
+})

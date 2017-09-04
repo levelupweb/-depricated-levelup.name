@@ -34,6 +34,11 @@
 			padding:15px;
 			color:#fff;
 		}
+		&.blacked {
+			* {
+				color:#000!important;
+			}
+		}
 	}
 }
 .sidebar::-webkit-scrollbar {

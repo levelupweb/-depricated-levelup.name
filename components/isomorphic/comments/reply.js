@@ -88,7 +88,7 @@ class ReplyForm extends React.Component {
 			    	<style jsx>{`
 			    		.reply {
 							border-top:1px solid #eee;
-							padding-top:20px;
+							padding:20px 0;
 			    		}
 						.form textarea {
 							border:0px;
@@ -96,9 +96,6 @@ class ReplyForm extends React.Component {
 							background:#fff;
 							padding:0px;
 							min-height:30px;
-						}
-						.reply {
-							margin-top:15px;
 						}
 						.form .field {
 							display:flex;

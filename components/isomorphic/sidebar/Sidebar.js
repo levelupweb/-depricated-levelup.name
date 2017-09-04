@@ -38,6 +38,7 @@ class Sidebar extends React.Component {
 			this.setState({ isLoaded: true })
   	}
   }
+
   componentWillReceiveProps(nextProps) {
   	this.setState({
   		isLoaded: false
@@ -62,7 +63,7 @@ class Sidebar extends React.Component {
 					<div className="sidebar">
 	    			<div className="blocks">
 	    				<div className="block-item full">
-	      				<div className="promo inverted">
+	      				<div className="promo blacked">
 	      					<img className="ui image rounded" src={config.static + '/img/background-white.png'} width="100%" />
 	      					<div className="content">
 	      						<h2>Будь частью чего-то бо́льшего</h2>

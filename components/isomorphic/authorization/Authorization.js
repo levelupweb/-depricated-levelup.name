@@ -7,29 +7,29 @@ import cookies from 'js-cookie'
 import Modal from '../modal/Modal.js'
 
 import { 
-	defaultState,
 	handleTemporaryUserField,
 	handleModalActiveStatus,
+	handleRegisterSuccess,
 	handleInfoBoxSuccess,
 	handleInfoBoxError,
 	handleAuthData,
-	restoreState,
+	defaultState,
 	handleView
 } from './Authorization.map.js';
 
 import { 
-	AUTHORIZATION, 
-	REGISTER, 
-	REGISTER_SECOND, 
+	REGISTER_DATA_PASSWORD_REPEAT,
 	REGISTER_DATA_DESCRIPTION,
+	REGISTER_DATA_FULLNAME,
+	REGISTER_DATA_PASSWORD,
 	REGISTER_DATA_GENDER,
 	REGISTER_DATA_LOGIN,
-	REGISTER_DATA_FULLNAME,
 	REGISTER_DATA_EMAIL,
-	REGISTER_DATA_PASSWORD,
-	REGISTER_DATA_PASSWORD_REPEAT,
 	AUTH_DATA_PASSWORD,
-	AUTH_DATA_LOGIN
+	REGISTER_SECOND, 
+	AUTH_DATA_LOGIN,
+	AUTHORIZATION, 
+	REGISTER, 
 } from './Authorization.consts.js';
 
 import { 
@@ -58,10 +58,7 @@ class Auth extends React.Component {
 		const { dispatch, onAuthSuccess } = this.props
 		dispatch(signIn(data)).then(response => {
 			if(response.success) {
-				$('.ui.modal').modal('hide')
-				this.setState(state => 
-					defaultState
-				)
+				this.setState(state => defaultState, hideModal())
 			} else {
 				this.setState(state => 
 					handleInfoBoxError(state, response.message)
@@ -79,12 +76,8 @@ class Auth extends React.Component {
 				)
 			} else {
 				this.setState(state => 
-					handleInfoBoxSuccess(state, response.message)
+					handleRegisterSuccess(state, response.message)
 				)
-				this.setState(state => 
-					handleView(state, AUTHORIZATION)
-				)
-				this.setState({temporaryUser: {}})
 			} 
 		})
 	}
@@ -281,6 +274,10 @@ class Auth extends React.Component {
 	    </div>
     );
 	}
+}
+
+function hideModal() {
+	return $('.ui.modal').modal('hide')
 }
 
 export default connect()(Auth)

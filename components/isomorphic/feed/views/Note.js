@@ -227,7 +227,7 @@ class Note extends React.Component {
 			      	article {
 			      		margin-bottom:20px;
 			      		padding-bottom:0px;
-			      		border-bottom:1px solid #eee;
+			      		border-bottom:1px solid rgba(0, 0, 0, 0.03)
 			      	}
 			        .note .user,
 			        .note .meta {
@@ -239,7 +239,7 @@ class Note extends React.Component {
 		          	margin-top:15px;
 		          	padding-bottom:15px;
 		          	padding-top:15px;
-		          	border-top:1px solid #eee;
+		          	border-top:1px solid rgba(0, 0, 0, 0.03)
 			        }
 			        .note .media {
 			         	margin-top:10px;

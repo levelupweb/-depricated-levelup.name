@@ -133,7 +133,7 @@ class Default extends React.Component {
             article {
               margin-bottom:20px;
               padding-bottom:10px;
-              border-bottom:1px solid #eee;
+              border-bottom:1px solid rgba(0, 0, 0, 0.03);
             }
             .article .user {
               margin-top:0px;
