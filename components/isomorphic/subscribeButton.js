@@ -9,65 +9,81 @@ import { subscribeToEntry } from '../../models/app'
 class SubscribeButton extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    	isSubscribed: false
-    }
+    this.state = { isSubscribed: false, isHydrating: false }
     this.token = cookies.get('x-access-token');
-    this.currentUser = this.props.currentUser;
   }
 
   componentWillMount() {
-    if(this.isSubscribed(this.props.entryID, this.props.entryType)) {
-      this.set(true)
+    const { entryId, entryType } = this.props;
+    if(this.isSubscribed(entryId, entryType)) {
+      this.setState({ isSubscribed: true }) 
     } else {
-      this.set(false)
+      this.setState({ isSubscribed: false })
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.isSubscribed(nextProps.entryID, nextProps.entryType)) {
-      this.set(true)
+    if(this.isSubscribed(nextProps.entryId, nextProps.entryType)) {
+      this.setState({ isSubscribed: true }) 
     } else {
-      this.set(false)
+      this.setState({ isSubscribed: false }) 
     }
   }
 
   isSubscribed(entryID, entryType) {
-    if(this.currentUser.isLogged) {
-      if(this.currentUser.subscriptions[entryType + 's'].indexOf(entryID) != -1) {
-        return true
-      } else {
-        return false
-      }
+    const { currentUser } = this.props
+    if(currentUser.isLogged) {
+     return currentUser.subscriptions[entryType + 's'].indexOf(entryID) != -1
     }
   }
 
-  set(value) {
-    this.setState({isSubscribed: value})
-  }
+  handleSubscription(token, entryType, entryId) {
+    this.setState({
+      isHydrating: true
+    });
 
-  handleSubscription(token, entryType, entryID) {
-    subscribeToEntry(token, entryType, entryID).then((res) => {
-      this.set(!this.state.isSubscribed)
+    subscribeToEntry(token, entryType, entryId).then(response => {
+      if(response.data.success) {
+        this.setState({ 
+          isSubscribed: !this.state.isSubscribed,
+          isHydrating: false
+        }) 
+      } else {
+        console.log('Ошибка при подписке..')
+        this.setState({
+          isHydrating: false
+        })
+      }
     })
   }
 
   render() {
-  	if(!this.state.isSubscribed) {
+    const { isSubscribed, isHydrating } = this.state;
+    const { subscribeText, entryType, entryId, additionalClasses, unsubscribeText } = this.props
+  	if(!isSubscribed) {
   		return (
-  			<a onClick={() => {this.handleSubscription(this.token, this.props.entryType, this.props.entryID)}} className={`button circular ui primary ${this.props.additionalClasses}`}>
-		        {(this.props.subscribeText) ? this.props.subscribeText : 'Подписаться на автора'}
+  			<a onClick={() => {
+          this.handleSubscription(this.token, entryType, entryId)
+        }} className={"button circular ui primary " + additionalClasses + (isHydrating && " loading")}>
+		      {subscribeText ? subscribeText : 'Подписаться на автора'}
 		    </a>	
       	)
   	} else {
 	    return (
-			<a onClick={() => {this.handleSubscription(this.token, this.props.entryType, this.props.entryID)}} className={`button default circular ui ${this.props.additionalClasses}`}>
-				    {(this.props.unsubscribeText) ? this.props.unsubscribeText : 'Отписаться от автора'}
+			<a onClick={() => {
+        this.handleSubscription(this.token, entryType, entryId)
+      }} className={"button default circular ui " + additionalClasses + (isHydrating && " loading")}>
+				{unsubscribeText ? unsubscribeText : 'Отписаться от автора'}
 			</a>	
 	    )
-	}
+    }
   }
 }
 
-export default connect((store) => store)(SubscribeButton)
+const mapStateToProps = (state) => ({
+  currentUser: state.currentUser,
+  currentUserId: state.currentUser._id
+})
+
+export default connect(mapStateToProps)(SubscribeButton)
 

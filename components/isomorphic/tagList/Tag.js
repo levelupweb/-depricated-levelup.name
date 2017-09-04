@@ -38,7 +38,7 @@ const Tag = ({ tag, size }) => {
           subscribeText="Подписаться" 
           unsubscribeText="Отписаться"
           entryType="tag"
-          entryID={_id}
+          entryId={_id}
           additionalClasses="small"
         />
       </div>
@@ -65,7 +65,7 @@ const Tag = ({ tag, size }) => {
           subscribeText="Подписаться" 
           unsubscribeText="Отписаться"
           entryType="tag"
-          entryID={_id}
+          entryId={_id}
           additionalClasses="small"
         />
       </div>
